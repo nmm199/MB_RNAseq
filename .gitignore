@@ -13,3 +13,4 @@
 *.pData
 *.df
 /results/
+/backup/
