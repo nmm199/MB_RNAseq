@@ -1,0 +1,15 @@
+*.Rproj.user
+*.Rproj
+*.Ruserdata
+*.Rhistory
+*.RData
+*.rds
+*.Rdata
+*.fasta
+*.txt
+*.csv
+*.tab
+*.pdf
+*.pData
+*.df
+/results/
