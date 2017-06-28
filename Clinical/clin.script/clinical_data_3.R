@@ -21,7 +21,7 @@ gsub("T","",names(mb.vsd)) -> names(goi.vsd)
 
 #### read in database
 message("reading in database")
-pData <- read.csv("/home/nmm199/R/MB_Data/Input data/database160617.csv", row.names = 1)
+pData <- read.csv("/home/nmm199/R/MB_RNAseq/Input data/database160617.csv", row.names = 1)
 
 
 #### convert pData object into sig.test variables
@@ -54,7 +54,7 @@ resection <- ifelse(resection==1, "Gross total resection", "subtotal resection")
 
 ### RTX
 # RTX <-pData$RTX_value
-RTX <- pData$RTX_R
+RTX <- pData$RTX_value
 
 ### CSI
 CSI <-pData$RTXCSI_R
@@ -65,14 +65,14 @@ meth <-pData$X450K_R
 
 ### need to read in 7 subgroup analysis and cytogenetic data
 
-meth7 <- read.csv("/home/nmm199/R/MB_Data/Input data/all7subgroupCalls.csv", header=TRUE, sep=",", quote="\"", dec=".", row.names=1)
+meth7 <- read.csv("/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv", header=TRUE, sep=",", quote="\"", dec=".", row.names=1)
 meth7.cat <- meth7[c(1)]
 
-cytogen <- read.table (file = "/home/nmm199/R/MB_Data/Input data/arm_calls_clean220617.txt", header=T, sep="\t")
-
+cytogen <- read.table (file = "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt", header=T, sep="\t")
 
 ### pathology
 histopath <-pData$path_R
+LCA <- ifelse (pData$path_R =="LCA", "LCA", "non LCA")
 
 ### MYC
 MYC.cat <-pData$MYC_R
@@ -81,6 +81,18 @@ MYC.cat <-ifelse(MYC.cat==0, "MYC non ampl", "MYC ampl")
 ### MYCN
 MYCN.cat <-pData$MYCN_R
 MYCN.cat <- ifelse(MYCN.cat==0, "MYCN non ampl", "MYCN ampl")
+
+### MYC/MYCN ampl
+
+MYCN.cat.ampl <- MYCN.cat =="MYCN ampl"
+MYC.cat.ampl <- MYC.cat =="MYC ampl"
+MYCMYCN.cat <- ifelse(MYC.cat.ampl =="TRUE"|MYCN.cat.ampl =="TRUE", "MYC MYCN ampl", "MYC MYCN non ampl")
+
+MYC.df <- data.frame(MYC.cat, 
+                     MYCN.cat, 
+                     MYCMYCN.cat
+                     )
+
 
 ###TP53
 TP53.cat<- pData$TP53_R
@@ -153,8 +165,10 @@ test.pData <- data.frame(NMB,
                     CSI,
                     meth,
                     histopath,
+                    LCA,
                     MYC.cat,
                     MYCN.cat,
+                    MYCMYCN.cat,
                     TP53.cat,
                     TERT.cat,
                     relapse,
@@ -167,7 +181,7 @@ test.pData <- data.frame(NMB,
                     )
 rownames(test.pData) <- rownames(pData)
 
-save(test.pData, file = "/home/nmm199/R/MB_Data/Clinical/test.pData")                    
+save(test.pData, file = "/home/nmm199/R/MB_RNAseq/Clinical/test.pData")                    
 View(test.pData)
 
 ### need to add the 7 group methylation status using dataframes
@@ -177,6 +191,105 @@ test.meth7$Sample_Name <- rownames(test.meth7)
 test.pData$meth7 <- test.meth7[match(rownames(test.pData), rownames(test.meth7)), ]$all.calls
 
 View(test.pData)
+
+### adding cytogenetic data into the main dataframe -try with q 13 loss first, then can extend to all data
+
+cytogen.q13.cat <- ifelse(cytogen$q13 == "Loss", "Loss", "no loss") 
+
+
+########################################
+
+#######################
+###cytogenetics arm data function, for each
+
+### frequencies of cytogenetic arm changes
+cytogen.freq <- function (x){
+  table.temp <- table (x)
+  return (table.temp)
+}
+
+
+cytogen.p1 <- cytogen.freq(x = cytogen$p1)
+cytogen.p2 <- cytogen.freq(x = cytogen$p2)
+cytogen.p3 <- cytogen.freq(x = cytogen$p3)
+cytogen.p4 <- cytogen.freq(x= cytogen$p4)
+cytogen.p5 <- cytogen.freq(x= cytogen$p5)
+cytogen.p6 <- cytogen.freq(x= cytogen$p6)
+cytogen.p7 <- cytogen.freq(x= cytogen$p7)
+cytogen.p8 <- cytogen.freq(x= cytogen$p8)
+cytogen.p9 <- cytogen.freq(x= cytogen$p9)
+cytogen.p10 <- cytogen.freq(x= cytogen$p10)
+cytogen.p11 <- cytogen.freq(x= cytogen$p11)
+cytogen.p12 <- cytogen.freq(x= cytogen$p12)
+cytogen.p16 <- cytogen.freq(x= cytogen$p16)
+cytogen.p17 <- cytogen.freq(x= cytogen$p17)
+cytogen.p18 <- cytogen.freq(x= cytogen$p18)
+cytogen.p19 <- cytogen.freq(x= cytogen$p19)
+cytogen.p20 <- cytogen.freq(x= cytogen$p20)
+cytogen.p21 <- cytogen.freq(x= cytogen$p21)
+
+
+cytogen.q1 <- cytogen.freq(x = cytogen$q1)
+cytogen.q2 <- cytogen.freq(x = cytogen$q2)
+cytogen.q3 <- cytogen.freq(x = cytogen$q3)
+cytogen.q4 <- cytogen.freq(x= cytogen$q4)
+cytogen.q5 <- cytogen.freq(x= cytogen$q5)
+cytogen.q6 <- cytogen.freq(x= cytogen$q6)
+cytogen.q7 <- cytogen.freq(x= cytogen$q7)
+cytogen.q8 <- cytogen.freq(x= cytogen$q8)
+cytogen.q9 <- cytogen.freq(x= cytogen$q9)
+cytogen.q10 <- cytogen.freq(x= cytogen$q10)
+cytogen.q11 <- cytogen.freq(x= cytogen$q11)
+cytogen.q12 <- cytogen.freq(x= cytogen$q12)
+cytogen.q13 <- cytogen.freq(x= cytogen$q13)
+cytogen.q14 <- cytogen.freq(x= cytogen$q14)
+cytogen.q15 <- cytogen.freq(x= cytogen$q15)
+cytogen.q16 <- cytogen.freq(x= cytogen$q16)
+cytogen.q17 <- cytogen.freq(x= cytogen$q17)
+cytogen.q18 <- cytogen.freq(x= cytogen$q18)
+cytogen.q19 <- cytogen.freq(x= cytogen$q19)
+cytogen.q20 <- cytogen.freq(x= cytogen$q20)
+cytogen.q21 <- cytogen.freq(x= cytogen$q21)
+cytogen.q22 <- cytogen.freq(x= cytogen$q22)
+
+
+# cytogen.df <- as.data.frame(cytogen.p1, 
+#                            cytogen.p2, 
+#                           cytogen.p3,
+#                          cytogen.p4, 
+#                         cytogen.p5,
+#                        cytogen.p6,
+#                       cytogen.p7,
+#                      cytogen.p8, 
+#                     cytogen.p9, 
+#                    cytogen.p10,
+#                   cytogen.p11,
+#                  cytogen.p12,
+#                 cytogen.p16,
+#                cytogen.p17, 
+#               cytogen.p18,
+#              cytogen.p19, 
+#             cytogen.p20,
+#            cytogen.p21,
+#           cytogen.q1, 
+#          cytogen.q2, 
+#         cytogen.q3, 
+#        cytogen.q4, 
+#       cytogen.q5, 
+#      cytogen.q6, 
+#     cytogen.q7)
+
+# rownames(cytogen.df) <- colnames(cytogen)                        
+
+nrow(cytogen)
+
+
+
+
+
+
+#################################
+
 
 ########################################
 ### matching NMB numbers to determine which included in RNA seq for reporting purposes
@@ -188,7 +301,7 @@ RNAseq <- colnames (mb.vsd)
 RNAseq
 
 ### save as readable text file, which can then be uploaded to computer harddrive and matched to existing clinical database in excel
-write.table(RNAseq, "/home/nmm199/R/MB_Data/Clinical/RNAseq.txt", sep="\t")
+write.table(RNAseq, "/home/nmm199/R/MB_RNAseq/Clinical/RNAseq.txt", sep="\t")
 
 
 #############################################
@@ -673,6 +786,87 @@ SHH.old.incl <- Age.incl.df [SHH.old, ]
 summary (SHH.old.incl)
 
 
+
+
+########################
+
+### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add at this stage
+
+# cytogen.df <- data.frame(cytogen, cytogen.q13.cat)
+# rownames(cytogen.df) <- cytogen.df$SampleID 
+# View(cytogen.df)
+# nrow(cytogen.df)
+### duplicate NMB650 data emailed Ed 
+
+# test.pData$
+
+#test.cytogen.q13$
+#test.cytogen.q13 <- data.frame(SampleID, cytogen.q13.cat)
+#test.pData$cytogen.q13 <- 
+#test.pData$q13loss <- test.
+
+
+#test.cytogen <- data.frame (cytogen.cat)
+cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
+### need to convert q13 loss into loss, and rest into "no loss"
+
+cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "Loss", "No loss")
+View(cytogen.q13.df)
+cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
+                             row.names=cytogen.q13.cat [,1],
+                             cytogen.q13)
+
+
+
+### copy code that worked for methylation data
+#test.meth7 <- data.frame(meth7.cat)
+
+#test.meth7$Sample_Name <- rownames(test.meth7)
+#test.pData$meth7 <- test.meth7[match(rownames(test.pData), rownames(test.meth7)), ]$all.calls
+
+#View(test.pData)
+
+# rownames(cytogen.q13.cat) <- cytogen$SampleID
+# is.data.frame(cytogen.q13.cat)
+
+### need to resolve NMB650/ NMB650p
+### replace(cytogen.q13.cat, [1,345], "NMB650p")
+### add in cytogenetic data later as NMB650 is not in the survival cohort
+
+
+# View(cytogen.q13.cat)
+
+
+
+
+
+######## other code to consider using
+### creating survival dataframe for age 3-16
+### incorporating cytogenetic data
+### then can run the chi.sq analysis
+### transform c/s 13 loss yes/no as a variable 
+
+
+#cytogen.univar <- foreach(i = 1:length(cytogen))%do%{
+# temp.starts <- start(cytogen[[i]]) 
+# temp.chisq <- chi.sq(as.factor(cytogen[[i])], matched.test.incl.pData$relapse)
+# temp.vector <- rep(NA, max(temp.starts)) 
+# temp.vector[temp.starts] <-cytogen[[i]]$score
+#  return(temp.vector)
+#}
+
+
+
+# index.cytogen.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
+# matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
+# is.vector(matched.test.incl.pData)
+# matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
+# matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
+
+
+
+
+
 #######################
 
 
@@ -729,12 +923,17 @@ text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
 message ("restrict survival analysis for age 3-16 years")
 message ("creating matched data frame")
 
-index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
-matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
-is.vector(matched.test.incl.pData)
-matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
-matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
+#index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
+#matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
+#is.vector(matched.test.incl.pData)
+#matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
+#matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
 
+
+message ("adding in cytogenetic 13q data")
+
+index.incl.cytogen <- match(rownames (Age.incl.df),row.names(cytogen.q13.cat [,1]))
+matched.test.incl.pData <- Age.incl.df[index.incl.cytogen[!is.na(index.incl.cytogen)],]
 
 
 relapse.bin.incl <- ifelse(matched.test.incl.pData$relapse == "relapse", 1,0)
@@ -1019,8 +1218,12 @@ matched.goi.vsd.cat.G3G4.incl <- ifelse(matched.goi.vsd.G3G4.incl>median(goi.vsd
 # G3G4 <- grep("G[34]", "G3G4")  
 
 
+
+
+##########################################
+
 ### backward elimination to remove least significant variable at each stage, model with G3G4
-### assign levels to relevant factors, below does not work
+### assign levels to relevant factors, below function does not work
 
 MYC.G3G4.cat <- relevel (matched.G3G4.incl.pData$MYC.cat, ref="MYC non ampl")
 mstatus.G3G4 <- relevel (matched.G3G4.incl.pData$mstatus, ref = "M0/M1")
@@ -1217,7 +1420,7 @@ summary(cox.result)
 
 ### multivariate logistic regression and comparison to existing models
 
-unsink()
+sink()
 dev.off()
 
 
