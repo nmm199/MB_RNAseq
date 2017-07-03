@@ -1,7 +1,7 @@
 # library(readr)
 library(NMF)
 
-sink("pDatalog.txt")  
+sink("pDatalog.txt")
 # sink() at end
 # message ()
 
@@ -254,41 +254,36 @@ cytogen.q22 <- cytogen.freq(x= cytogen$q22)
 
 
 # cytogen.df <- as.data.frame(cytogen.p1, 
-#                            cytogen.p2, 
-#                           cytogen.p3,
-#                          cytogen.p4, 
+#                         cytogen.p2, 
+#                         cytogen.p3,
+#                         cytogen.p4, 
 #                         cytogen.p5,
-#                        cytogen.p6,
-#                       cytogen.p7,
-#                      cytogen.p8, 
-#                     cytogen.p9, 
-#                    cytogen.p10,
-#                   cytogen.p11,
-#                  cytogen.p12,
-#                 cytogen.p16,
-#                cytogen.p17, 
-#               cytogen.p18,
-#              cytogen.p19, 
-#             cytogen.p20,
-#            cytogen.p21,
-#           cytogen.q1, 
-#          cytogen.q2, 
-#         cytogen.q3, 
-#        cytogen.q4, 
-#       cytogen.q5, 
-#      cytogen.q6, 
-#     cytogen.q7)
+#                         cytogen.p6,
+#                         cytogen.p7,
+#                         cytogen.p8, 
+#                         cytogen.p9, 
+#                         cytogen.p10,
+#                         cytogen.p11,
+#                         cytogen.p12,
+#                         cytogen.p16,
+#                         cytogen.p17, 
+#                         cytogen.p18,
+#                         cytogen.p19, 
+#                         cytogen.p20,
+#                         cytogen.p21,
+#                         cytogen.q1, 
+#                         cytogen.q2, 
+#                         cytogen.q3, 
+#                         cytogen.q4, 
+#                         cytogen.q5, 
+#                         cytogen.q6, 
+#                         cytogen.q7)
 
 # rownames(cytogen.df) <- colnames(cytogen)                        
 
-nrow(cytogen)
+# nrow(cytogen)
 
 
-
-
-
-
-#################################
 
 
 ########################################
@@ -790,51 +785,30 @@ summary (SHH.old.incl)
 
 ########################
 
-### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add at this stage
-
-# cytogen.df <- data.frame(cytogen, cytogen.q13.cat)
-# rownames(cytogen.df) <- cytogen.df$SampleID 
-# View(cytogen.df)
-# nrow(cytogen.df)
+### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add cytogenetic data at this stage
 ### duplicate NMB650 data emailed Ed 
 
-# test.pData$
-
-#test.cytogen.q13$
-#test.cytogen.q13 <- data.frame(SampleID, cytogen.q13.cat)
-#test.pData$cytogen.q13 <- 
-#test.pData$q13loss <- test.
-
-
-#test.cytogen <- data.frame (cytogen.cat)
 cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
+
 ### need to convert q13 loss into loss, and rest into "no loss"
 
 cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "Loss", "No loss")
-View(cytogen.q13.df)
+
+### make q13 loss dataframe
+
 cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
                              row.names=cytogen.q13.cat [,1],
                              cytogen.q13)
 
+View(cytogen.q13.df)
+
+matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
+
+View(matched.test.pData)
 
 
-### copy code that worked for methylation data
-#test.meth7 <- data.frame(meth7.cat)
-
-#test.meth7$Sample_Name <- rownames(test.meth7)
-#test.pData$meth7 <- test.meth7[match(rownames(test.pData), rownames(test.meth7)), ]$all.calls
-
-#View(test.pData)
-
-# rownames(cytogen.q13.cat) <- cytogen$SampleID
-# is.data.frame(cytogen.q13.cat)
-
-### need to resolve NMB650/ NMB650p
-### replace(cytogen.q13.cat, [1,345], "NMB650p")
-### add in cytogenetic data later as NMB650 is not in the survival cohort
 
 
-# View(cytogen.q13.cat)
 
 
 
@@ -900,48 +874,23 @@ message ("evaluate effect of biomarker on PFS")
 ### change relapse to binary
 relapse.bin <- ifelse(matched.test.pData$relapse == "relapse", 1, 0)
 
-km.PFS <- survfit(Surv(matched.test.pData$PFS, relapse.bin)~matched.goi.vsd.cat)
-km.PFS
-
-plot(km.PFS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-PFS.names <- c("biomarker - high", "biomarker - low")
-legend (15,1, PFS.names,  lty= 1:2)
-# temp.logrank.pval <- 0.494
-# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
-
-PFS.logrank <- survdiff(Surv(matched.test.pData$PFS, relapse.bin) ~ matched.goi.vsd.cat)
-PFS.logrank
-
-message ("will need to manually adjust the graph based on the log-rank p value")
-
-plot(km.PFS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-PFS.names <- c("biomarker - high", "biomarker - low")
-legend (15,1, PFS.names,  lty= 1:2)
-temp.logrank.pval <- 0.494
-text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
 
 message ("restrict survival analysis for age 3-16 years")
 message ("creating matched data frame")
 
-#index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
-#matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
-#is.vector(matched.test.incl.pData)
-#matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
-#matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
-
-
-message ("adding in cytogenetic 13q data")
-
-index.incl.cytogen <- match(rownames (Age.incl.df),row.names(cytogen.q13.cat [,1]))
-matched.test.incl.pData <- Age.incl.df[index.incl.cytogen[!is.na(index.incl.cytogen)],]
+index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
+matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
+is.vector(matched.test.incl.pData)
+matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
+matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
 
 
 relapse.bin.incl <- ifelse(matched.test.incl.pData$relapse == "relapse", 1,0)
 
 
-matched.test.incl.pData$PFS -> time
-relapse.bin.incl -> event
-matched.goi.vsd.cat.incl -> marker
+# matched.test.incl.pData$PFS -> time
+# relapse.bin.incl -> event
+# matched.goi.vsd.cat.incl -> marker
 
 km.log.test <- function(time, event, marker, out.file = "none"){
 if(out.file!="none"){
@@ -963,14 +912,8 @@ km.log.test(matched.test.incl.pData$PFS,relapse.bin.incl, matched.goi.vsd.cat.in
 
 
 
-### now go back in and add p value from PFS.incl.logrank into graph
-message ("need to add p value from PFS.incl.logrank into graph")
 
-plot(km.PFS.incl, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-PFS.names <- c("biomarker - high", "biomarker - low")
-legend (15,1, PFS.names,  lty= 1:2)
-# temp.logrank.pval <- 0.016
-# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
 
 
 ### cox regression analysis
@@ -1003,62 +946,43 @@ summary(cox.relapse.incl)
 ### check alive status is binary
 matched.test.pData$OS.cat
 
-OS.cat.bin <- ifelse(matched.test.pData$OS.cat == "Dead", 1, 0)
-OS.cat.bin
-
-km.OS <- survfit(Surv(matched.test.pData$Followup, OS.cat.bin)~matched.goi.vsd.cat)
-km.OS
-
-plot(km.OS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "OS", main = "Biomarker expression and overall survival (OS)",  lty = 1:2)
-OS.names <- c("biomarker - high", "biomarker - low")
-legend (15,1, OS.names,  lty= 1:2)
-# temp.logrank.pval <- 0.494
-# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
-
-OS.logrank <- survdiff(Surv(matched.test.pData$Followup, OS.cat.bin) ~ matched.goi.vsd.cat)
-OS.logrank
-summary(OS.logrank)
-
-message ("will need to manually adjust the graph based on the log-rank p value")
-
-plot(km.OS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-OS.names <- c("biomarker - high", "biomarker - low")
-legend (15,1, PFS.names,  lty= 1:2)
-temp.logrank.pval <- 0.331
-text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
-
-
-message ("restrict survival analysis for age 3-16 years")
+# OS.cat.bin <- ifelse(matched.test.pData$OS.cat == "Dead", 1, 0)
+# OS.cat.bin
 
 OS.cat.bin.incl <- ifelse(matched.test.incl.pData$OS.cat == "Dead", 1,0)
 km.OS.incl <- survfit(Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl)~matched.goi.vsd.cat.incl)
 km.OS.incl
 
-plot(km.OS.incl, col = c("red", "blue"), xlab = "overall survival (years)", ylab = "OS", main = "Biomarker expression and overall survival (PFS)",  lty = 1:2)
-OS.names.incl <- c("biomarker - high", "biomarker - low")
-legend (15,1, OS.names.incl,  lty= 1:2)
-# temp.logrank.pval <- 0.67
-# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
 
-OS.incl.logrank <- survdiff(Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
-OS.incl.logrank
+km.log.test.OS <- function(time, event, marker, out.file = "none"){
+  if(out.file!="none"){
+    pdf(out.file)
+  }
+  km.OS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  plot(km.OS.incl, col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS", xlim = c(0,10), main = "Biomarker expression and overall survival (OS)",  lty = 1:2)
+  OS.names <- c("biomarker - high", "biomarker - low")
+  legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
+  OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val
+  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  if(out.file!="none"){
+    dev.off()
+  }
+}
 
-### now go back in and add p value from PFS.incl.logrank into graph
-message ("need to add p value from OS.incl.logrank into graph")
+km.log.test.OS(matched.test.incl.pData$Followup, OS.cat.bin.incl, matched.goi.vsd.cat.incl )
 
-plot(km.OS.incl, col = c("red", "blue"), xlab = "overall survival (years)", ylab = "OS", main = "Biomarker expression and overall survival (PFS)",  lty = 1:2)
-OS.names.incl <- c("biomarker - high", "biomarker - low")
-legend (15,1, OS.names.incl,  lty= 1:2)
-# temp.logrank.pval <- 0.625
-text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+
+
 
 
 ### cox regression analysis
-message("cox regression for OS on entire cohort")
+#message("cox regression for OS on entire cohort")
 
-cox.OS <- coxph (Surv(matched.test.pData$Followup, OS.cat.bin) ~ matched.goi.vsd.cat)
-summary(cox.OS)$logtest
-summary(cox.OS)
+#cox.OS <- coxph (Surv(matched.test.pData$Followup, OS.cat.bin) ~ matched.goi.vsd.cat)
+#summary(cox.OS)$logtest
+#summary(cox.OS)
 
 ### 
 
@@ -1067,6 +991,49 @@ message("cox regression on age 3-16 years")
 cox.OS.incl <- coxph (Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
 summary(cox.OS.incl)$logtest
 summary(cox.OS.incl)
+
+
+cox.result.OS <- function (time, event, marker, strata = NULL)  
+{
+ if(is.null(strata)){
+   cox.temp <- coxph (Surv(time, event)~marker, data= matched.test.incl.pData)
+ }else{
+   cox.temp <- coxph (Surv(time, event)~marker, data= matched.test.incl.pData)
+}
+     summary.cox <- c(rownames(summary(cox.temp)$coefficients),summary(cox.temp)$coefficients,
+     summary(cox.temp)$n,
+     summary(cox.temp)$nevent)
+     names(summary.cox) <- c("marker_name",colnames(summary(cox.temp)$coefficients), "n","nevents")
+  return (summary.cox)
+}
+
+
+cox.result.OS.1 <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
+cox.result.OS.1 
+        
+        t# cox.OS.incl <- survfit(cox.result.OS(matched.test.incl.pData, OS.cat.bin.incl, matched.goi.vsd.cat.incl))
+
+
+
+
+
+### example below to delete after worked out cox graph function
+km.log.test.OS <- function(time, event, marker, out.file = "none"){
+  if(out.file!="none"){
+    pdf(out.file)
+  }
+  km.OS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  plot(km.OS.incl, col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS", xlim = c(0,10), main = "Biomarker expression and overall survival (OS)",  lty = 1:2)
+  OS.names <- c("biomarker - high", "biomarker - low")
+  legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
+  OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val
+  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  if(out.file!="none"){
+    dev.off()
+  }
+}
+
 
 
 #####################################
@@ -1089,7 +1056,7 @@ chi.sq(as.factor(EFS.cat.bin), as.factor(matched.goi.vsd.cat))
 km.EFS <- survfit(Surv(matched.test.pData$EFS, EFS.cat.bin)~matched.goi.vsd.cat)
 
 # km.EFS <- survfit(Surv(matched.test.pData$EFS, EFS.cat.bin==1)~matched.goi.vsd.cat) is the same as when not specifying status==1
-km.EFS
+# km.EFS
 
 plot(km.EFS, col = c("red", "blue"), xlab = "time to event (years)", ylab = "EFS", main = "Biomarker expression and event-free survival (EFS)",  lty = 1:2)
 EFS.names <- c("biomarker - high", "biomarker - low")
@@ -1126,7 +1093,7 @@ legend (15,1, EFS.names.incl,  lty= 1:2)
 EFS.incl.logrank <- survdiff(Surv(matched.test.incl.pData$EFS, OS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
 EFS.incl.logrank
 
-### now go back in and add p value from PFS.incl.logrank into graph
+### now go back in and add p value from EFS.incl.logrank into graph
 message ("need to add p value from EFS.incl.logrank into graph")
 
 plot(km.EFS.incl, col = c("red", "blue"), xlab = "event-free survival (years)", ylab = "EFS", main = "Biomarker expression and event-free survival (EFS)",  lty = 1:2)
@@ -1153,11 +1120,14 @@ summary(cox.EFS.incl)
 
 
 
+
+
 ###################################
 
 ### multivariate analysis
-### to use R+, M+, LCA, sex, MYC, MYCN, TP53 across entire group, restricted to age 3-16 yo
+### to use R+, M+, LCA, sex, MYCMYCN.cat, TP53 across entire group, restricted to age 3-16 yo
 ### cross reference with dataset of curative intent (CSI and max resection)
+
 
 ### for relapse
 
@@ -1258,7 +1228,6 @@ exp(cbind(OR = coef(log.reg.multi.G3G4.1), confint(log.reg.multi.G3G4.1)))
 
 ### question: proceed in this manner, and do manually at the time? 
 
-### e.g next step is exclude MYCN.cat
 
 ### then compare to the addition of the biomarker, perform backward elimination
 
@@ -1276,15 +1245,6 @@ summary(log.reg.multi.G3G4.1A)
 confint (log.reg.multi.G3G4.1A)
 exp(coef(log.reg.multi.G3G4.1A))
 exp(cbind(OR = coef(log.reg.multi.G3G4.1A), confint(log.reg.multi.G3G4.1A)))
-
-
-
-### exclude histopath$other?
-### exclude MYC status (Non ampl): discuss strategy, in light of Ed's risk stratification
-### do I add back in elements such as MYC, MYCN at the end. ?or combine as a group (either MYC/MYCN)
-
-
-
 
 
 
@@ -1327,15 +1287,16 @@ log.reg.multi.goi.G3G4 <- glm(matched.G3G4.incl.pData$relapse ~ matched.G3G4.inc
 ### multivariate cox regression analysis
 
 
-# time <- matched.test.incl.pData$PFS
-### event <- ifelse(matched.test.incl.pData$relapse=="relapse", 1, 0)
-#event <- relapse.bin.incl
-#y <-matched.test.incl.pData$histopath
-#a <-matched.test.incl.pData$mstatus
-#b <-matched.test.incl.pData$resection
-#c <-matched.test.incl.pData$MYC.cat 
-#d <-matched.test.incl.pData$MYCN.cat
+time <- matched.test.incl.pData$PFS
+# event <- ifelse(matched.test.incl.pData$relapse=="relapse", 1, 0)
+event <- relapse.bin.incl
+y <-matched.test.incl.pData$histopath
+a <-matched.test.incl.pData$mstatus
+b <-matched.test.incl.pData$resection
+c <-matched.test.incl.pData$MYC.cat 
+d <-matched.test.incl.pData$MYCN.cat
 
+View(test.pData)
 
 cox.result <- function (time, event, y, a, b, c, d)  
 {
@@ -1344,16 +1305,19 @@ cox.result <- function (time, event, y, a, b, c, d)
   return (summary(summary.cox))
 }
 
-summary(summary.cox)
+
+
+# summary(summary.cox)
 
 ### function not currently running
   
-# cox.result.1 <- cox.result (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, 
-                           # y = matched.test.incl.pData$histopath,
-                            #a = matched.test.incl.pData$mstatus,
-                           # b = matched.test.incl.pData$resection,
-                           # c = matched.test.incl.pData$MYC.cat,
-                           # d = matched.test.incl.pData$MYCN.cat
+
+cox.result.1 <- cox.result (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, 
+                           y = matched.test.incl.pData$histopath,
+                           a = matched.test.incl.pData$mstatus,
+                           b = matched.test.incl.pData$resection,
+                           c = matched.test.incl.pData$MYC.cat,
+                           d = matched.test.incl.pData$MYCN.cat
                             #  )
 
 #summary(cox.result.1)
@@ -1575,3 +1539,96 @@ dev.off()
 # surv.cox.rel <- survfit (cox.relapse, newdata=cox.relapse.df)
 # summary(surv.cox.rel)                
 
+######################
+
+# message ("adding in cytogenetic 13q data") - superceded because 13q loss data was added earlier on to test.pData
+
+# index.incl.cytogen <- match(rownames (Age.incl.df),row.names(cytogen.q13.cat [,1]))
+# matched.test.incl.pData <- Age.incl.df[index.incl.cytogen[!is.na(index.incl.cytogen)],]
+
+
+
+#######################
+### redundant PFS code 
+
+
+
+# km.PFS <- survfit(Surv(matched.test.pData$PFS, relapse.bin)~matched.goi.vsd.cat)
+# km.PFS
+
+# plot(km.PFS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
+# PFS.names <- c("biomarker - high", "biomarker - low")
+# legend (12,1, PFS.names,  lty= 1:2)
+# temp.logrank.pval <- 0.494
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+ #PFS.logrank <- survdiff(Surv(matched.test.pData$PFS, relapse.bin) ~ matched.goi.vsd.cat)
+# PFS.logrank
+
+# message ("will need to manually adjust the graph based on the log-rank p value")
+
+# plot(km.PFS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
+# PFS.names <- c("biomarker - high", "biomarker - low")
+# legend (15,1, PFS.names,  lty= 1:2)
+# temp.logrank.pval <- 0.494
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+### now go back in and add p value from PFS.incl.logrank into graph
+# message ("need to add p value from PFS.incl.logrank into graph")
+
+#plot(km.PFS.incl, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
+#PFS.names <- c("biomarker - high", "biomarker - low")
+#legend (15,1, PFS.names,  lty= 1:2)
+# temp.logrank.pval <- 0.016
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+
+
+###############################
+### redundant OS code
+
+# km.OS <- survfit(Surv(matched.test.pData$Followup, OS.cat.bin)~matched.goi.vsd.cat)
+# km.OS
+
+# plot(km.OS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "OS", main = "Biomarker expression and overall survival (OS)",  lty = 1:2)
+# OS.names <- c("biomarker - high", "biomarker - low")
+# legend (15,1, OS.names,  lty= 1:2)
+# temp.logrank.pval <- 0.494
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+
+# km.log.test(matched.test.incl.pData$Followup,OS.cat.bin, matched.goi.vsd.cat.incl )
+
+# OS.logrank <- survdiff(Surv(matched.test.pData$Followup, OS.cat.bin) ~ matched.goi.vsd.cat)
+# OS.logrank
+# summary(OS.logrank)
+
+# message ("will need to manually adjust the graph based on the log-rank p value")
+
+# plot(km.OS, col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS", main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
+# OS.names <- c("biomarker - high", "biomarker - low")
+ #legend (15,1, PFS.names,  lty= 1:2)
+#temp.logrank.pval <- 0.331
+#text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+
+ #message ("restrict survival analysis for age 3-16 years")
+
+
+
+ #plot(km.OS.incl, col = c("red", "blue"), xlab = "overall survival (years)", ylab = "OS", main = "Biomarker expression and overall survival (PFS)",  lty = 1:2)
+#OS.names.incl <- c("biomarker - high", "biomarker - low")
+#legend (15,1, OS.names.incl,  lty= 1:2)
+# temp.logrank.pval <- 0.67
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
+
+ #OS.incl.logrank <- survdiff(Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
+ #OS.incl.logrank
+
+### now go back in and add p value from OS.incl.logrank into graph
+# message ("need to add p value from OS.incl.logrank into graph")
+
+# plot(km.OS.incl, col = c("red", "blue"), xlab = "overall survival (years)", ylab = "OS", main = "Biomarker expression and overall survival (PFS)",  lty = 1:2)
+# OS.names.incl <- c("biomarker - high", "biomarker - low")
+# legend (15,1, OS.names.incl,  lty= 1:2)
+# temp.logrank.pval <- 0.625
+# text(11, 0.8, paste("Log-rank p value  = ", temp.logrank.pval))
