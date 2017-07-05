@@ -15,9 +15,6 @@
 ### input files:
 file = "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
 
-
-
-
 ### Functions:
 
 ### frequencies of cytogenetic arm changes
