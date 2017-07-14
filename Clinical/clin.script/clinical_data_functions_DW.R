@@ -443,7 +443,6 @@ clinPathAssess <- function(test.pData,
   
   
   list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
-  print(list.age.cat.infant)
   
   list.sex <- chi.sq (x = matched.test.pData$sex, y= matched.goi.vsd.cat)
   
