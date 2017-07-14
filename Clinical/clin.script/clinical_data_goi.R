@@ -47,7 +47,7 @@ library(survival)
 
 ### Functions used
 
-source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_functions_run.R")
+source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_functions_DW.R")
 
 ### names of functions for info on function see source file
 ### "chi.sq"
