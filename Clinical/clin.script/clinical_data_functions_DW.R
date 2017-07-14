@@ -7,6 +7,7 @@
 ### The survival analysis is designed in a cohort of children who received therapy with curative intent (including cranio-spinal irradiation), age 3-16 years
 
 ### Author: Dr Marion Mateos
+### Date: July 14 2017
 
 
 
@@ -436,7 +437,13 @@ clinPathAssess <- function(test.pData,
   
   ### Chi squared analysis
   
+  #matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX")
+  #matched.test.pData$CSI <-ifelse(matched.test.pData$CSI=="Yes", "CSI", "No CSI")
+  #matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant")
+  
+  
   list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
+  print(list.age.cat.infant)
   
   list.sex <- chi.sq (x = matched.test.pData$sex, y= matched.goi.vsd.cat)
   
