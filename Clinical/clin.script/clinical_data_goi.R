@@ -47,7 +47,7 @@ library(survival)
 
 ### Functions used
 
-source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_functions_DW.R")
+source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_functions_DW_test.R")
 
 ### names of functions for info on function see source file
 ### "chi.sq"
@@ -99,7 +99,7 @@ cytogen <- read.table (cytogen.data, header=T, sep="\t")
 test.pData <- updatepData(pData, meth7, cytogen, pdf.file = "./temp.pdf", log.file = "./temp.log.txt")
 save(test.pData, file = "/home/nmm199/R/MB_RNAseq/Clinical/test.pData") 
 
-log.file = "pDatalog.txt"
+# log.file = "pDatalog.txt"
 
 ################################################################################
 
@@ -108,6 +108,7 @@ pdf.file <- "marker.results.pdf"
 goi.vsd.df <-  rbind(goi.vsd,goi.vsd)
 
 all.results <- apply(goi.vsd.df, 1, function(x){return(clinPathAssess(test.pData,x))})
+
 results <- clinPathAssess(test.pData,goi.vsd,pdf.file = "marker.results.pdf",log.file = "marker.results.txt")
 
 
