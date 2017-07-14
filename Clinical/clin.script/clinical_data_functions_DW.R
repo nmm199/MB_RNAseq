@@ -585,7 +585,7 @@ clinPathAssess <- function(test.pData,
   ### resection
   
   log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-  summary(log.reg.resection)
+ print(summary(log.reg.resection))
   resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
   
   
@@ -838,7 +838,6 @@ clinPathAssess <- function(test.pData,
   SHH.old <- Age.incl.df$meth7 =="SHH_Old"
   SHH.old.incl <- Age.incl.df [SHH.old, ]
   summary (SHH.old.incl)
-  
   
   
   
