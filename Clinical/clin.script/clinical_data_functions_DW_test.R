@@ -78,16 +78,26 @@ cor.result <- function(x,y){
 ## linear regression p value
 
 
+#lin.reg <- function(x,y){
+#  temp.reg <- lm (x ~y)
+ # summary.temp <- summary(temp.reg)
+ # summary.temp$coefficients -> out.stats
+ # plot(x,y)
+ # abline(lm (x ~y))
+ # list.temp <- list (summary.temp,out.stats,p.val=out.stats[2,4])
+ # return(list.temp)
+#}
+
+
 lin.reg <- function(x,y){
   temp.reg <- lm (x ~y)
   summary.temp <- summary(temp.reg)
   summary.temp$coefficients -> out.stats
   plot(x,y)
-  abline(lm (x ~y))
+  abline(lm (x ~y), main = "Biomarker correlation with continuous variable",xlab = "Continuous variable", ylab = "Biomarker expression")
   list.temp <- list (summary.temp,out.stats,p.val=out.stats[2,4])
   return(list.temp)
 }
-
 
 
 ### Function Number 4
@@ -224,6 +234,54 @@ km.log.test.EFS <- function(time, event, marker, out.file = "none"){
 
 
 
+###################
+
+### Function number 
+### function name "km.log.test.EFS.sub" to test biomarker within subgroup, in this case it will be run in G3/G4 combined
+### same inputs and outputs as parent function "km.log.test.EFS"
+
+
+km.log.test.EFS.sub <- function(time, event, marker, out.file = "none"){
+  if(out.file!="none"){
+    pdf(out.file)
+  }
+  km.EFS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  plot(km.EFS.incl, yaxt="n", col = c("red", "blue"),xlab = "event-free survival (years)", ylab = "EFS (%)", xlim = c(0,10), main = "Biomarker expression and event-free survival (EFS) in G3/G4",  lty = 1:2)
+  EFS.names <- c("biomarker - high", "biomarker - low")
+  legend (x="topright", EFS.names,  lty= 1:2, col = c("red","blue"))
+  axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
+  EFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  1 - pchisq(EFS.incl.logrank$chisq, length(EFS.incl.logrank$obs)-1) -> surv.p.val
+  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  if(out.file!="none"){
+    dev.off()
+  }
+}
+
+
+
+
+
+
+
+
+
+### Function number 12
+
+### A file named "updatepData" which is to create a new dataframe using most uptodate files, which is then used in Function number 9, to assess biomarker performance within the clinical group
+
+### input 
+## x.data, current database
+## meth7, worksheet with 7 molecular group data
+## cytogen, worksheet with cytogenetic arm calls
+
+### output
+## a dataframe called test.pData
+## a log file called "temp.log.txt" (summary data for n=802 patients, minimal information which may not be used in final analysis)
+## a pdf file called "temp.pdf"
+## temp.pdf contains qq plots for age as a continuous variable, summary statistics for the entire cohort (n=802), boxplot for age (continuous variable) across 4 molecular subgroups )
+
+
 
 updatepData <-  function(x.data, meth7, cytogen, pdf.file = NULL, log.file = NULL){
   #### convert pData object columns into categorical variables
@@ -268,7 +326,7 @@ updatepData <-  function(x.data, meth7, cytogen, pdf.file = NULL, log.file = NUL
   
   meth7.cat <- meth7[c(1)]
   
-  cytogen.q13.cat <- ifelse(cytogen$q13 == "Loss", "Loss", "no loss") 
+  cytogen.q13.cat <- ifelse(cytogen$q13 == "Loss", "q13 loss", "no q13 loss") 
   
   ### pathology
   histopath <-pData$path_R
@@ -333,7 +391,7 @@ updatepData <-  function(x.data, meth7, cytogen, pdf.file = NULL, log.file = NUL
   
   
   ### Getting summary characteristics
-  summary(age.cont)
+  print(summary(age.cont))
   mean(age.cont, na.rm = T)
   median(age.cont, na.rm = T)
   
@@ -391,6 +449,15 @@ updatepData <-  function(x.data, meth7, cytogen, pdf.file = NULL, log.file = NUL
 
 
 ###############################################################################
+### Function number 13
+### aim is to input a candidate marker (goi, gene of interest, and then to run univariate analysis for association with outcome of interest and as a survival biomarker in age 3-16yrs treated with curative intent)
+### input files
+## data frame called test.pData, goi.vsd (biomarker file)
+
+### output files
+## marker.results.pdf file for graphics including heatmap association, boxplots, survival curves
+## marker.results.txt file for record of workings and output statistics including chi squared analysis, logistic regression, linear regression
+
 
 clinPathAssess <- function(test.pData,
                            goi.vsd,
@@ -421,6 +488,25 @@ clinPathAssess <- function(test.pData,
   matched.goi.vsd <- goi.vsd[!is.na(index)] 
   matched.goi.vsd.cat <- ifelse(matched.goi.vsd>median(goi.vsd, na.rm = T), "high","low") 
   
+  
+  ### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add cytogenetic data at this stage
+  ### duplicate NMB650 data emailed Ed 
+  
+  cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
+  
+  ### need to convert q13 loss into loss, and rest into "no loss"
+  
+  cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "q13 loss", "No q13 loss")
+  
+  ### make q13 loss dataframe
+  
+  cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
+                               row.names=cytogen.q13.cat [,1],
+                               cytogen.q13)
+  
+  
+  matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
+  
   #############################################
   
   ### summary data 
@@ -431,7 +517,7 @@ clinPathAssess <- function(test.pData,
   
   ### summary data for all variables within the age 3-16 yo group, to construct survival cohort
   age.df <- data.frame(NMB, age.filter, age.cont)
-  summary(age.df)
+  print(summary(age.df))
   
   ##############################################
   
@@ -499,6 +585,10 @@ clinPathAssess <- function(test.pData,
   list.TERT <- chi.sq (x = matched.test.pData$TERT.cat, y = matched.goi.vsd.cat)
   print(list.TERT)
   
+  cat ("assessing cytogenetic q13 loss against biomarker", sep = "\n")
+  list.q13loss <- chi.sq (x = matched.test.pData$q13loss, y = matched.goi.vsd.cat)
+  print(list.q13loss)
+  
   
   ### is the biomarker overrepresented in poor prognostic groups or those who received different therapy
   cat("assessing RTX delivery status against biomarker, is the biomarker overrepresented in poor prognostic groups or those who received different therapy", sep ="\n")
@@ -518,35 +608,15 @@ clinPathAssess <- function(test.pData,
   histopath.result
   
   
-  
-  ### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add cytogenetic data at this stage
-  ### duplicate NMB650 data emailed Ed 
-  
-  cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
-  
-  ### need to convert q13 loss into loss, and rest into "no loss"
-  
-  cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "q13 Loss", "No q13 loss")
-  
-  ### make q13 loss dataframe
-  
-  cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
-                               row.names=cytogen.q13.cat [,1],
-                               cytogen.q13)
-  
-  
-  matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
-  
-  ###################################
+ ###################################
   
   ### Correlation coefficients
   
   cat ("correlation coefficients for association between variables", sep ="\n")
   
-  
   list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd)
   list(list.cor.age)
-  list.cor.age[[1]]
+  print(list.cor.age[[1]])
   
   
   ##################################
@@ -558,7 +628,6 @@ clinPathAssess <- function(test.pData,
   
   ### question: how do get 95% confidence interval, tried predict(lin.reg.age, interval = "confidence"), object needs to be as a dataframe
   # predict(lm(matched.test.pData$age.cont ~ matched.goi.vsd, data = matched.test.pData, interval = "confidence"))
-  
   
   
   
@@ -618,7 +687,7 @@ clinPathAssess <- function(test.pData,
   print(summary(log.reg.resection))
   resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
   
-  
+ 
   
   ### histopath
   log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
@@ -639,7 +708,7 @@ clinPathAssess <- function(test.pData,
   
   
   ### MYC.cat
-    log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+  log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
   print(summary(log.reg.MYC))
   MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC amplification")
   
@@ -667,13 +736,19 @@ clinPathAssess <- function(test.pData,
   TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "Correlation between biomarker and TP53 mutational status")
   
   
+  ### q13 loss
+  log.reg.q13loss <- glm (matched.test.pData$q13loss ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
+  print(summary(log.reg.TP53))
+  q13.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$q13loss, col = c("Red", "Blue"), xlab = "Cytogenetic arm q13 status", ylab = "Biomarker expression", main = "Correlation between biomarker and q13 loss")
+  
+  
+  
   ### additional subgroup specific tests
   
   ### TERT (may need to specific subgroup)
   
   log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData)
   print(summary(log.reg.TP53))
-  
   TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT status", ylab = "Biomarker expression", main = "Correlation between biomarker and TERT status")
   
   
@@ -932,7 +1007,7 @@ clinPathAssess <- function(test.pData,
   km.log.test.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
   km.log.test.all
   
-  km.log.test.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+  km.log.test.G3G4 <- km.log.test.sub(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
   km.log.test.G3G4
   
   ### cox regression analysis
@@ -979,7 +1054,8 @@ clinPathAssess <- function(test.pData,
   cat ("km analysis for EFS for children aged 3-16 years, treated with curative intent", sep = "\n")
   
   km.log.test.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-  km.log.test.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
+  km.log.test.EFS.G3G4 <- km.log.test.EFS.sub(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
+  
   
   ### cox regression analysis
   
