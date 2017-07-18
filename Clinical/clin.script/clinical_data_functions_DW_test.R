@@ -10,6 +10,7 @@
 ### Date: July 14 2017
 
 
+##########################################################################################
 
 ### Function Number 1
 ### Function entitled "chi.sq"
@@ -42,6 +43,7 @@ chi.sq <- function(x,y){
 
 
 
+##########################################################################################
 
 
 
@@ -66,6 +68,7 @@ cor.result <- function(x,y){
 }
 
 
+##########################################################################################
 
 
 ### Function Number 3
@@ -100,11 +103,14 @@ lin.reg <- function(x,y){
 }
 
 
+##########################################################################################
+
+
 ### Function Number 4
 ### Function entitled "km.log.test" to create kaplan meier survival curves for age 3=16 year old children treated with curative intent, MB
 ### input:
-## time
-## event
+## time (PFS)
+## event (Progression/relapse)
 ## marker
 
 ### output:
@@ -132,12 +138,49 @@ km.log.test <- function(time, event, marker, out.file = "none"){
 }
 
 
+##########################################################################################
+
+
+### Function Number 5
+### Function entitled "km.log.test.sub" to create kaplan meier survival curves for age 3=16 year old children treated with curative intent, for chosen MB subgroup(s)
+### input:
+## time (PFS)
+## event (Progression/relapse)
+## marker
+
+### output:
+## km survival curve
+## p values plotted on graph
+## y axis with values as %
+## legend and p value for survival analysis 
+## title to be adjusted according to subgroup, currently for G3/G4 combined
+
+
+km.log.test.sub <- function(time, event, marker, out.file = "none"){
+  if(out.file!="none"){
+    pdf(out.file)
+  }
+  km.PFS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "Biomarker expression and progression-free survival (PFS) in G3/G4",  lty = 1:2)
+  PFS.names <- c("biomarker - high", "biomarker - low")
+  legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
+  axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
+  PFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
+  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  if(out.file!="none"){
+    dev.off()
+  }
+}
 
 
 
 
-### Function number 5
-### Function entitled "km.log.test.OS"to create kaplan-meier survival curves for OS for children treated age 3-16years with curative intent
+##########################################################################################
+
+
+### Function number 6
+### Function entitled "km.log.test.OS" to create kaplan-meier survival curves for OS for children treated age 3-16years with curative intent
 ### input:
 ## time
 ## event
@@ -168,10 +211,10 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
 }
 
 
+##########################################################################################
 
 
-
-### Function number 6
+### Function number 7
 ### Function entitled "cox.result.OS"  to produce cox regression hazard ratio for overall survival in cohort of children
 ### input
 ## time
@@ -197,9 +240,9 @@ cox.result.OS <- function (time, event, marker, strata = NULL)
   return (summary.cox)
 }
 
+##################################################################################
 
-
-### Function Number 7
+### Function Number 8
 
 ### Function entitled "km.log.test.EFS" to create kaplan meier survival curves for EFS for age 3-16 year old children treated with curative intent, MB
 ### Event is defined as death due to any cause, relapse/progression, second malignancy 
@@ -234,11 +277,62 @@ km.log.test.EFS <- function(time, event, marker, out.file = "none"){
 
 
 
-###################
+#################################################################################
 
-### Function number 
+### Function number 9
+
+### Function named "km.log.test.OS.sub" to examine potential biomarker in subgroup of childhood MB e.g G3G4 combined
+### Function creates kaplan-meier survival curves for OS for children treated age 3-16years with curative intent, within a specified molecular subgroup(s)
+### input:
+## time
+## event
+## marker
+
+### output:
+## km survival curve
+## p values plotted on graph
+## y axis with values as %
+## legend and p value for survival analysis 
+## title to be adjusted for the specific subgroup, currently written for G3G4 combined
+
+
+km.log.test.OS.sub <- function(time, event, marker, out.file = "none"){
+  if(out.file!="none"){
+    pdf(out.file)
+  }
+  km.OS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  plot(km.OS.incl,yaxt="n", col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS (%)", xlim = c(0,10), main = "Biomarker expression and overall survival (OS) in G3/G4",  lty = 1:2)
+  OS.names <- c("biomarker - high", "biomarker - low")
+  legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
+  axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
+  OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val
+  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  if(out.file!="none"){
+    dev.off()
+  }
+}
+
+
+######################################################################################
+
+### Function number 10
+
 ### function name "km.log.test.EFS.sub" to test biomarker within subgroup, in this case it will be run in G3/G4 combined
-### same inputs and outputs as parent function "km.log.test.EFS"
+### same inputs and outputs as parent function "km.log.test.EFS", see below
+
+### Event is defined as death due to any cause, relapse/progression, second malignancy 
+### input:
+## time
+## event
+## marker
+
+### output:
+## km survival curve
+## p values plotted on graph
+## y axis with values as %
+## legend and p value for survival analysis
+## title to be adjusted for the specific subgroup, currently written for G3G4 combined
 
 
 km.log.test.EFS.sub <- function(time, event, marker, out.file = "none"){
@@ -260,13 +354,10 @@ km.log.test.EFS.sub <- function(time, event, marker, out.file = "none"){
 
 
 
+##########################################################################################
 
 
-
-
-
-
-### Function number 12
+### Function number 11
 
 ### A file named "updatepData" which is to create a new dataframe using most uptodate files, which is then used in Function number 9, to assess biomarker performance within the clinical group
 
@@ -449,7 +540,8 @@ updatepData <-  function(x.data, meth7, cytogen, pdf.file = NULL, log.file = NUL
 
 
 ###############################################################################
-### Function number 13
+
+### Function number 12
 ### aim is to input a candidate marker (goi, gene of interest, and then to run univariate analysis for association with outcome of interest and as a survival biomarker in age 3-16yrs treated with curative intent)
 ### input files
 ## data frame called test.pData, goi.vsd (biomarker file)
@@ -659,39 +751,57 @@ clinPathAssess <- function(test.pData,
   
   
   ### age categorical
+  cat ("processing logistic regression for age.cat.infant & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
   print(summary(log.reg.age.cat))
+  print(cbind(OR=exp(coef(log.reg.age.cat)), exp(confint(log.reg.age.cat))))
   age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
   
   
   ### sex 
+  cat ("processing logistic regression for sex & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
   print(summary(log.reg.sex))
+  print(cbind(OR=exp(coef(log.reg.sex)), exp(confint(log.reg.sex))))
   sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
   
   ### metastatic status
+  cat ("processing logistic regression for metastatic status & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
   print(summary(log.reg.mstatus))
+  print(cbind(OR=exp(coef(log.reg.mstatus)), exp(confint(log.reg.mstatus))))
   mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
   
   
   ### relapse 
+  cat ("processing logistic regression for relapse & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
   print(summary(log.reg.relapse))
+  print(cbind(OR=exp(coef(log.reg.relapse)), exp(confint(log.reg.relapse))))
   relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
-  #str(log.reg.relapse)
+  
   
   
   ### resection
+  cat ("processing logistic regression for resection & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
   print(summary(log.reg.resection))
+  print(cbind(OR=exp(coef(log.reg.resection)), exp(confint(log.reg.resection))))
   resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
   
  
   
   ### histopath
+  cat ("processing logistic regression for histopath & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
   print(summary(log.reg.histopath))
+  print(cbind(OR=exp(coef(log.reg.histopath)), exp(confint(log.reg.histopath))))
   
   histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
   histopath.pw
@@ -699,8 +809,11 @@ clinPathAssess <- function(test.pData,
   
   
   ### visualise relationship between biomarker and LCA pathology
+  cat ("processing logistic regression for LCA pathology & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
   print(summary(log.reg.LCA))
+  print(cbind(OR=exp(coef(log.reg.LCA)), exp(confint(log.reg.LCA))))
   
   LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
   LCA.pw
@@ -708,8 +821,11 @@ clinPathAssess <- function(test.pData,
   
   
   ### MYC.cat
+  cat ("processing logistic regression for MYC amplification & biomarker, OR, 95% CI result and boxplots", sep ="\n")
+  
   log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
   print(summary(log.reg.MYC))
+  print(cbind(OR=exp(coef(log.reg.MYC)), exp(confint(log.reg.MYC))))
   MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC amplification")
   
   ### MYCN.cat
@@ -776,7 +892,6 @@ clinPathAssess <- function(test.pData,
   ### visualise relationship between biomarker and methylation groups
   
   meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 4 molecular subgroups")
-  
   meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("yellow","green","red","blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 7 molecular subgroups")
   
   
@@ -791,7 +906,6 @@ clinPathAssess <- function(test.pData,
   
   ### pairwise t-test to determine where the difference lies between the groups
   meth.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth)
-  
   meth.pw
   
   
@@ -981,7 +1095,6 @@ clinPathAssess <- function(test.pData,
   matched.goi.vsd.G3G4.incl <- goi.vsd[!is.na(index.incl)] 
   matched.goi.vsd.cat.G3G4.incl <- ifelse(matched.goi.vsd.G3G4.incl>median(goi.vsd, na.rm = T), "high","low")
   
-  
   print(summary(matched.G3G4.incl.pData$meth7))
   
   
@@ -1005,10 +1118,8 @@ clinPathAssess <- function(test.pData,
   cat("running km survival curve for PFS and biomarker, graphical output to PDF", sep = "\n")
   
   km.log.test.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
-  km.log.test.all
   
   km.log.test.G3G4 <- km.log.test.sub(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  km.log.test.G3G4
   
   ### cox regression analysis
   
@@ -1019,10 +1130,9 @@ clinPathAssess <- function(test.pData,
   summary(cox.relapse.incl)
   
   cox.relapse.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$PFS, relapse.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
-  summary(cox.relapse.incl.G3G4)$logtest
-  summary(cox.relapse.incl.G3G4)
-  
-  
+  print(summary(cox.relapse.incl.G3G4)$logtest)
+  print(summary(cox.relapse.incl.G3G4))
+ 
   ##########################################
   
   ### OS 
@@ -1031,8 +1141,8 @@ clinPathAssess <- function(test.pData,
   
   km.log.test.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl )
   
-  km.log.test.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  km.log.test.OS.G3G4
+  km.log.test.OS.G3G4 <- km.log.test.OS.sub(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+  
   
   ### cox regression analysis
   
@@ -1040,10 +1150,10 @@ clinPathAssess <- function(test.pData,
   
   
   cox.result.OS.all <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-  cox.result.OS.all 
+  print(summary(cox.result.OS.all))
   
   cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  summary(cox.result.OS.G3G4)
+  print(summary(cox.result.OS.G3G4))
   
   
   
@@ -1063,18 +1173,19 @@ clinPathAssess <- function(test.pData,
   
   cox.EFS.incl <- coxph (Surv(matched.test.incl.pData$EFS, EFS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
   summary(cox.EFS.incl)$logtest
-  summary(cox.EFS.incl)
+  print(summary(cox.EFS.incl))
   
   
   cox.EFS.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$EFS, EFS.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
   summary(cox.EFS.incl.G3G4)$logtest
-  summary(cox.EFS.incl.G3G4)
+  print(summary(cox.EFS.incl.G3G4))
   
   
   ###################################
   
   sink()
   dev.off()
+  
   ###### need to return some objects with results
   list() -> res
   return(res)
