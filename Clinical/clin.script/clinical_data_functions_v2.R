@@ -1,14 +1,17 @@
 ### File information:
 
-### This is a list of functions that were written for the "clinical_data_4.R" script analysis
+### This is a list of functions that were written for the "clinical_data_4_update.R" script analysis
 ### Many of these functions are generic for survival analysis
 ### Aims of this document are to provide tools to perform univariate analysis in a group of children treated for medulloblastoma. 
 ### All kaplan-meier survival analyses provide graphical output with labelled axes and p value
 ### The survival analysis is designed in a cohort of children who received therapy with curative intent (including cranio-spinal irradiation), age 3-16 years
 
 ### Author: Dr Marion Mateos
+### Date: 19 July 2017
 
 
+
+###########################################################
 
 ### Function Number 1
 ### Function entitled "chi.sq"
@@ -44,6 +47,8 @@ chi.sq <- function(x,y){
 
 
 
+###########################################################
+
 ### Function Number 2
 ### Function entitled "cor.result"
 ### Aim of function: evaluation correlation between 2 variables, x and y
@@ -67,6 +72,8 @@ cor.result <- function(x,y){
 
 
 
+###########################################################
+
 ### Function Number 3
 ### Function entitled "lin.reg"
 ### input
@@ -80,16 +87,61 @@ cor.result <- function(x,y){
 lin.reg <- function(x,y){
   temp.reg <- lm (x ~y)
   summary.temp <- summary(temp.reg)
-  summary.temp$coefficients -> out.stats
+  out.stats <- summary.temp$coefficients
+  temp.stats <- cbind(OR=exp(coef(temp.reg)), exp(confint(temp.reg)))
   plot(x,y)
   abline(lm (x ~y))
-  list.temp <- list (summary.temp,out.stats,p.val=out.stats[2,4])
-  return(list.temp)
+  list.temp <- list (summary.temp,out.stats,p.val=out.stats[2,4], temp.stats)
+  return(list.temp )
 }
 
 
 
-### Function Number 4
+
+###########################################################
+
+### Function number 4
+### function called "logisticRegression" which runs glm (logistic regression) for association between biomarker (independent) and outcome variable
+
+### input
+## x <- dependent variable (must be binary, 0,1)
+## y <- biomarker (independent variable)
+## data <- matched dataset
+
+### output is a dataframe containing: 
+## OR
+## 95% confidence intervals
+## p value for logistic regression
+
+
+
+logisticRegression <- function(x,y, data) {
+  
+  temp.glm <- glm (x ~ y, family = binomial (link = 'logit'), data= data)
+  return(cbind(OR=exp(coef(temp.glm)), exp(confint(temp.glm)), summary(temp.glm)$coefficients))
+}
+
+
+
+### Note: previously unable to make logistic regression function work, error message "y values must be 0 <= y <= 1", this working function above used glm(x ~y)
+
+# x <- matched.test.pData$age.cat.infant
+# y <- matched.goi.vsd
+# data.source <-  matched.test.pData
+
+# log.reg <- function(x,y,data.source){
+# log.reg.temp <- glm(y ~ x, family = binomial (link = 'logit'), data = data.source)
+# summary.temp <-summary(log.reg.temp)
+# boxplot.temp <- boxplot (y ~ x, col = c("red", "blue"), xlab = "x", ylab = "Biomarker expression", main = "Correlation between biomarker and variable x")
+# }
+
+
+
+
+
+###########################################################
+
+### Function Number 5
 ### Function entitled "km.log.test" to create kaplan meier survival curves for age 3=16 year old children treated with curative intent, MB
 ### input:
 ## time
