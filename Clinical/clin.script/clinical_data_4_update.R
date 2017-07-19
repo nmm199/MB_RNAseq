@@ -1,6 +1,6 @@
 
 ### File introduction
-### File name: clinical_data_4.R
+### File name: clinical_data_4_update.R
 
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
@@ -10,7 +10,8 @@
 
 
 ### Author: Dr Marion Mateos
-### Date: July 3 2017
+### Date: July 19 2017
+### this file was created by modifying clinical_data_4.R
 
 
 ### R version 3.4.0 (2017-04-21)
@@ -274,15 +275,12 @@ test.pData <- data.frame(NMB,
                     )
 rownames(test.pData) <- rownames(pData)
 
-View(test.pData)
-
 ### need to add the 7 group methylation status using dataframes
 test.meth7 <- data.frame(meth7.cat)
 
 test.meth7$Sample_Name <- rownames(test.meth7)
 test.pData$meth7 <- test.meth7[match(rownames(test.pData), rownames(test.meth7)), ]$all.calls
 
-View(test.pData)
 save(test.pData, file = "/home/nmm199/R/MB_RNAseq/Clinical/test.pData") 
 
 
@@ -303,6 +301,26 @@ matched.goi.vsd.cat <- ifelse(matched.goi.vsd>median(goi.vsd, na.rm = T), "high"
 
 
 
+### add cytogenetic data to existing data frame, NMB650 duplicate (650, 650p for paraffin, however not included in the survival cohort)
+
+cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
+
+### need to convert q13 loss into loss, and rest into "no loss"
+
+cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "q13 Loss", "No q13 loss")
+
+### make q13 loss dataframe
+
+cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
+                             row.names=cytogen.q13.cat [,1],
+                             cytogen.q13)
+
+# View(cytogen.q13.df)
+
+matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
+
+# View(matched.test.pData)
+
 #############################################
 
 ### summary data 
@@ -322,69 +340,67 @@ summary(age.df)
 
 ### Chi squared analysis
 
+cat ("reclassify age.cat.infant into infant and non infant", sep = "\n")
+### reclassifying age.cat.infant categories from true/false to infant/non infant for graphics purposes
+# list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
+matched.pData.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant")
 
-list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
+cat ("generate chi sq comparisons for all variables against the biomarker", sep = "\n") 
+cat ("and also assess if there is enrichment of the biomarker in poor prognostic groups or those who did not receive upfront curative therapy", sep = "\n")
+cat ("chi squared results are then generated as an output list called chi.sq.results", sep = "\n")
 
+list.age.cat.infant <- chi.sq(x = matched.pData.cat.infant, y = matched.goi.vsd.cat)
 list.sex <- chi.sq (x = matched.test.pData$sex, y= matched.goi.vsd.cat)
-
 list.mstatus <- chi.sq(x = matched.test.pData$mstatus, y=matched.goi.vsd.cat) 
-
 list.relapse <- chi.sq(x = matched.test.pData$relapse, y = matched.goi.vsd.cat) 
-
 list.resection <- chi.sq (x = matched.test.pData$resection, y = matched.goi.vsd.cat)
-
 list.meth.4 <- chi.sq (x= matched.test.pData$meth, y = matched.goi.vsd.cat)
-
 list.meth.7 <- chi.sq (x = matched.test.pData$meth7, y = matched.goi.vsd.cat)
-
 list.path <- chi.sq (x = matched.test.pData$histopath, y = matched.goi.vsd.cat)
-
+list.LCA <- chi.sq (x = matched.test.pData$LCA, y = matched.goi.vsd.cat)
 list.MYC <- chi.sq (x = matched.test.pData$MYC.cat, y = matched.goi.vsd.cat)
-
 list.MYCN <- chi.sq (x = matched.test.pData$MYCN.cat, y = matched.goi.vsd.cat)
-
 list.MYCMYCN <- chi.sq(x= matched.test.pData$MYCMYCN.cat, y= matched.goi.vsd.cat)
-
 list.TP53 <- chi.sq (x = matched.test.pData$TP53.cat, y = matched.goi.vsd.cat)
-
 list.TERT <- chi.sq (x = matched.test.pData$TERT.cat, y = matched.goi.vsd.cat)
-
+list.q13loss <- chi.sq (x=matched.test.pData$q13loss, y = matched.goi.vsd.cat)
 
 ### is the biomarker overrepresented in poor prognostic groups or those who received different therapy
-
 list.RTX <- chi.sq (x = matched.test.pData$RTX, y = matched.goi.vsd.cat)
-
 list.CSI <- chi.sq (x = matched.test.pData$CSI, y = matched.goi.vsd.cat)
 
+### print output from chi.squared analysis and list, can either do individually as in the age.cat.infant example below or as a larger list
+# print(list.age.cat.infant)
+#list.age.cat.infant[[3]]
+
+### create object that includes all chi squared results, that will then be outputted at end of script
+
+chi.sq.results <- list(list.age.cat.infant,
+                       list.sex,
+                       list.mstatus,
+                       list.relapse, 
+                       list.resection, 
+                       list.meth.4,
+                       list.meth.7, 
+                       list.path,
+                       list.LCA, 
+                       list.MYC, 
+                       list.MYCN, 
+                       list.MYCMYCN, 
+                       list.TP53,
+                       list.TERT, 
+                       list.q13loss,
+                       list.RTX,
+                       list.CSI
+                       )
+
+print(chi.sq.results)
 
 ### run Fisher's exact test on those where count < 5 e.g pathology "other"
 
 histopath.table <- table(as.factor(matched.test.pData$histopath), as.factor(matched.goi.vsd.cat))
-
 histopath.result <- fisher.test(histopath.table)
 histopath.result
-
-list.LCA <- chi.sq (x = matched.test.pData$LCA, y = matched.goi.vsd.cat)
-
-### add cytogenetic data to existing data frame, NMB650 duplicate (650, 650p for paraffin, however not included in the survival cohort)
-
-cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
-
-### need to convert q13 loss into loss, and rest into "no loss"
-
-cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "q13 Loss", "No q13 loss")
-
-### make q13 loss dataframe
-
-cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
-                             row.names=cytogen.q13.cat [,1],
-                             cytogen.q13)
-
-View(cytogen.q13.df)
-
-matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
-
-View(matched.test.pData)
 
 
 ###################################
@@ -392,7 +408,6 @@ View(matched.test.pData)
 ### Correlation coefficients
 
 cat ("correlation coefficients for association between variables", sep ="\n")
-
 
 list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd)
 list(list.cor.age)
@@ -406,10 +421,9 @@ list.cor.age[[1]]
 lin.reg.age <- lin.reg(x= matched.test.pData$age.cont, y= matched.goi.vsd)
 lin.reg.age
 
+
 ### question: how do get 95% confidence interval, tried predict(lin.reg.age, interval = "confidence"), object needs to be as a dataframe
 # predict(lm(matched.test.pData$age.cont ~ matched.goi.vsd, data = matched.test.pData, interval = "confidence"))
-
-
 
 
 #################################
@@ -420,70 +434,56 @@ lin.reg.age
 age.cont.wilcox <- wilcox.test(matched.test.pData$age.cont ~ matched.goi.vsd.cat, exact = F, correct = F)
 age.cont.wilcox
 
-
-
 ##################################
 ### logistic regression
 
-cat ("processing logistic regression individually", sep ="\n")
-
-### cannot make logistic regression function work, error message "y values must be 0 <= y <= 1"
-
-# x <- matched.test.pData$age.cat.infant
-# y <- matched.goi.vsd
-# data.source <-  matched.test.pData
-
-# log.reg <- function(x,y,data.source){
- # log.reg.temp <- glm(y ~ x, family = binomial (link = 'logit'), data = data.source)
- # summary.temp <-summary(log.reg.temp)
- # boxplot.temp <- boxplot (y ~ x, col = c("red", "blue"), xlab = "x", ylab = "Biomarker expression", main = "Correlation between biomarker and variable x")
- # }
-
-
-
-
+cat ("processing logistic regression for each variable", sep ="\n")
 
 ### age categorical
 
-log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-summary(log.reg.age.cat)
+#log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#summary(log.reg.age.cat)
+
+log.reg.age.cat <- logisticRegression(matched.test.pData$age.cat.infant, matched.goi.vsd, matched.test.pData)
+print(log.reg.age.cat)
 age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
 
-
 ### sex 
-
-log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
-summary(log.reg.sex)
+log.reg.sex <- logisticRegression(matched.test.pData$sex,matched.goi.vsd,matched.test.pData)
+print(log.reg.sex)
+#log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
+#summary(log.reg.sex)
 sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
 
 ### metastatic status
-
-log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
-summary(log.reg.mstatus)
-
+log.reg.mstatus <- logisticRegression(matched.test.pData$mstatus, matched.goi.vsd, matched.test.pData)
+print(log.reg.mstatus)
+#log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
+#summary(log.reg.mstatus)
 mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
 
 
 ### relapse 
-
-log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-summary(log.reg.relapse)
+log.reg.relapse <- logisticRegression(matched.test.pData$relapse, matched.goi.vsd, matched.test.pData)
+print(log.reg.relapse)
+#log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#summary(log.reg.relapse)
 relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
 #str(log.reg.relapse)
 
-
 ### resection
-
-log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-summary(log.reg.resection)
+log.reg.resection <- logisticRegression(matched.test.pData$resection, matched.goi.vsd, matched.test.pData)
+print(log.reg.resection)
+#log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#summary(log.reg.resection)
 resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
 
 
-
 ### histopath
-
-log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-summary(log.reg.histopath)
+log.reg.histopath <- logisticRegression(matched.test.pData$histopath, matched.goi.vsd, matched.test.pData)
+print(log.reg.histopath)
+#log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+#summary(log.reg.histopath)
 
 histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
 histopath.pw
@@ -491,9 +491,10 @@ histopath.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$histopath, col
 
 
 ### visualise relationship between biomarker and LCA pathology
-
-log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-summary(log.reg.LCA)
+log.reg.LCA<- logisticRegression(matched.test.pData$LCA, matched.goi.vsd, matched.test.pData)
+print(log.reg.LCA)
+#log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+#summary(log.reg.LCA)
 
 LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
 LCA.pw
@@ -502,22 +503,27 @@ LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blu
 
 ### MYC.cat
 
-log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-summary(log.reg.MYC)
+log.reg.MYC<- logisticRegression(matched.test.pData$MYC.cat, matched.goi.vsd, matched.test.pData)
+print(log.reg.MYC)
+#log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+#summary(log.reg.MYC)
 MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC expression")
 
 ### MYCN.cat
-
-log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-summary(log.reg.MYCN)
+log.reg.MYCN<- logisticRegression(matched.test.pData$MYCN.cat, matched.goi.vsd, matched.test.pData)
+print(log.reg.MYCN)
+#log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
+#summary(log.reg.MYCN)
 MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
 
 
 
 ### combined MYC / MYCN amplification group
 
-log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-summary(log.reg.MYCMYCN)
+log.reg.MYCMYCN<- logisticRegression(matched.test.pData$MYCMYCN.cat, matched.goi.vsd, matched.test.pData)
+print(log.reg.MYCMYCN)
+#log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
+#summary(log.reg.MYCMYCN)
 
 MYCMYCN.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$MYCMYCN.cat)
 MYCMYCN.pw
@@ -525,20 +531,27 @@ MYCMYCNN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, co
 
 
 ### TP53
-
-log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
-summary(log.reg.TP53)
+log.reg.TP53  <- logisticRegression(matched.test.pData$TP53.cat, matched.goi.vsd, matched.test.pData)
+print(log.reg.TP53)
+#log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
+#summary(log.reg.TP53)
 TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "Correlation between biomarker and TP53 mutational status")
 
 
 ### additional subgroup specific tests
 
 ### TERT (may need to specific subgroup)
-
-log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData)
-summary(log.reg.TP53)
+log.reg.TERT  <- logisticRegression(matched.test.pData$TERT.cat, matched.goi.vsd, matched.test.pData)
+print(log.reg.TERT)
+#log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData)
+#summary(log.reg.TP53)
 
 TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT status", ylab = "Biomarker expression", main = "Correlation between biomarker and TERT status")
+
+###q13 loss
+log.reg.q13loss  <- logisticRegression(matched.test.pData$q13loss, matched.goi.vsd, matched.test.pData)
+print(log.reg.q13loss)
+q13.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$q13loss, col = c("Red", "Blue"), xlab = "Cytogenetic arm q13 status", ylab = "Biomarker expression", main = "Correlation between biomarker and q13 loss")
 
 
 ##################################################
@@ -548,13 +561,17 @@ TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("
 ### includes some more detailed assumption testing and post-hoc analysis
 cat ("logistic regression and association with molecular subgroups")
 
-log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-summary(log.reg.meth)                  
-str(log.reg.meth)
+#log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
+#summary(log.reg.meth)                  
+#str(log.reg.meth)
+#log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
+#summary(log.reg.meth7) 
 
-log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-summary(log.reg.meth7) 
+log.reg.meth  <- logisticRegression(matched.test.pData$meth, matched.goi.vsd, matched.test.pData)
+print(log.reg.meth)
 
+log.reg.meth7  <- logisticRegression(matched.test.pData$meth7, matched.goi.vsd, matched.test.pData)
+print(log.reg.meth)
   
 ### visualise distribution of biomarker in cohort
 
@@ -565,24 +582,18 @@ qqnorm(matched.goi.vsd)
 ### visualise relationship between biomarker and methylation groups
 
 meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 4 molecular subgroups")
-
 meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("yellow","green","red","blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 7 molecular subgroups")
-
 
 ### if biomarker is normally distributed, can use ANOVA (one-way ANOVA)
 
-meth7.aov <- aov (matched.goi.vsd ~ matched.test.pData$meth7, data = matched.test.pData)
-summary(meth7.aov)
-plot(meth7.aov)
-
-
-
+#meth7.aov <- aov (matched.goi.vsd ~ matched.test.pData$meth7, data = matched.test.pData)
+#summary(meth7.aov)
+#plot(meth7.aov)
 
 ### post-hoc tests for methylation
 
 ### pairwise t-test to determine where the difference lies between the groups
 meth.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth)
-
 meth.pw
 
 
@@ -596,7 +607,6 @@ cat ("processing summary stats for 4 molecular subgroups, no age restriction", s
 ### G3
 
 G3 <- matched.test.pData$meth =="G3" 
-View(matched.test.pData$meth)
 G3.group <- matched.test.pData [G3, ]
 summary (G3.group)
 
@@ -663,8 +673,6 @@ cat ("create dataframe for age 3-16 years, curative intent called age.incl.df", 
 Age.incl <- matched.test.pData$age.filter== "TRUE"
 Age.incl.df <- matched.test.pData [Age.incl,]
 summary(Age.incl.df)
-View(Age.incl.df)
-
 
 
 ### compare to prior dataframes to check accuracy of new dataframe
@@ -766,7 +774,6 @@ G3.match.df <- matched.test.incl.pData [G3.match, ]
 G4.match.df <- matched.test.incl.pData [G4.match, ]
 
 G3G4.match.df <- rbind(G3.match.df, G4.match.df)
-View(G3G4.match.df)
 nrow(G3G4.match.df)
 
 index.incl <- match(names(goi.vsd), rownames(G3G4.match.df)) 
