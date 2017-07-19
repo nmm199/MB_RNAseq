@@ -58,10 +58,14 @@ source (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_func
 ### "chi.sq"
 ### "cor.result"
 ### "lin.reg"
+### "logisticRegression"
 ### "km.log.test"
+### "km.log.test.sub"
 ### "km.log.test.OS"
+### "km.log.test.OS.sub"
 ### "cox.result.OS"
 ### "km.log.test.EFS"
+### "km.log.test.EFS.sub"
 
 
 
@@ -440,50 +444,36 @@ age.cont.wilcox
 cat ("processing logistic regression for each variable", sep ="\n")
 
 ### age categorical
-
-#log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#summary(log.reg.age.cat)
-
 log.reg.age.cat <- logisticRegression(matched.test.pData$age.cat.infant, matched.goi.vsd, matched.test.pData)
 print(log.reg.age.cat)
+str(log.reg.age.cat)
 age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
 
 ### sex 
 log.reg.sex <- logisticRegression(matched.test.pData$sex,matched.goi.vsd,matched.test.pData)
 print(log.reg.sex)
-#log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
-#summary(log.reg.sex)
 sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
 
 ### metastatic status
 log.reg.mstatus <- logisticRegression(matched.test.pData$mstatus, matched.goi.vsd, matched.test.pData)
 print(log.reg.mstatus)
-#log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
-#summary(log.reg.mstatus)
 mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
 
 
 ### relapse 
 log.reg.relapse <- logisticRegression(matched.test.pData$relapse, matched.goi.vsd, matched.test.pData)
 print(log.reg.relapse)
-#log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#summary(log.reg.relapse)
 relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
-#str(log.reg.relapse)
 
 ### resection
 log.reg.resection <- logisticRegression(matched.test.pData$resection, matched.goi.vsd, matched.test.pData)
 print(log.reg.resection)
-#log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#summary(log.reg.resection)
 resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
 
 
 ### histopath
 log.reg.histopath <- logisticRegression(matched.test.pData$histopath, matched.goi.vsd, matched.test.pData)
 print(log.reg.histopath)
-#log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-#summary(log.reg.histopath)
 
 histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
 histopath.pw
@@ -493,8 +483,6 @@ histopath.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$histopath, col
 ### visualise relationship between biomarker and LCA pathology
 log.reg.LCA<- logisticRegression(matched.test.pData$LCA, matched.goi.vsd, matched.test.pData)
 print(log.reg.LCA)
-#log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-#summary(log.reg.LCA)
 
 LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
 LCA.pw
@@ -505,15 +493,11 @@ LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blu
 
 log.reg.MYC<- logisticRegression(matched.test.pData$MYC.cat, matched.goi.vsd, matched.test.pData)
 print(log.reg.MYC)
-#log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-#summary(log.reg.MYC)
 MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC expression")
 
 ### MYCN.cat
 log.reg.MYCN<- logisticRegression(matched.test.pData$MYCN.cat, matched.goi.vsd, matched.test.pData)
 print(log.reg.MYCN)
-#log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-#summary(log.reg.MYCN)
 MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
 
 
@@ -522,8 +506,6 @@ MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("
 
 log.reg.MYCMYCN<- logisticRegression(matched.test.pData$MYCMYCN.cat, matched.goi.vsd, matched.test.pData)
 print(log.reg.MYCMYCN)
-#log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-#summary(log.reg.MYCMYCN)
 
 MYCMYCN.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$MYCMYCN.cat)
 MYCMYCN.pw
@@ -533,8 +515,6 @@ MYCMYCNN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, co
 ### TP53
 log.reg.TP53  <- logisticRegression(matched.test.pData$TP53.cat, matched.goi.vsd, matched.test.pData)
 print(log.reg.TP53)
-#log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
-#summary(log.reg.TP53)
 TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "Correlation between biomarker and TP53 mutational status")
 
 
@@ -543,9 +523,6 @@ TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("
 ### TERT (may need to specific subgroup)
 log.reg.TERT  <- logisticRegression(matched.test.pData$TERT.cat, matched.goi.vsd, matched.test.pData)
 print(log.reg.TERT)
-#log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData)
-#summary(log.reg.TP53)
-
 TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT status", ylab = "Biomarker expression", main = "Correlation between biomarker and TERT status")
 
 ###q13 loss
@@ -560,12 +537,6 @@ q13.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$q13loss, col = c("Re
 
 ### includes some more detailed assumption testing and post-hoc analysis
 cat ("logistic regression and association with molecular subgroups")
-
-#log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-#summary(log.reg.meth)                  
-#str(log.reg.meth)
-#log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-#summary(log.reg.meth7) 
 
 log.reg.meth  <- logisticRegression(matched.test.pData$meth, matched.goi.vsd, matched.test.pData)
 print(log.reg.meth)
@@ -746,7 +717,7 @@ summary (SHH.old.incl)
 
 ##########################
 
-### survival analysis using functions from source file "clinical_data_functions.R"
+### survival analysis using functions from source file "clinical_data_functions_v2.R"
 
 ##########################
 
@@ -808,7 +779,7 @@ cat("running km survival curve for PFS and biomarker, graphical output to PDF", 
 km.log.test.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
 km.log.test.all
 
-km.log.test.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+km.log.test.G3G4 <- km.log.test.sub(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
 km.log.test.G3G4
 
 ### cox regression analysis
@@ -817,11 +788,11 @@ cat("cox regression analysis, PFS, biomarker, age 3-16 years treated with curati
 
 cox.relapse.incl <- coxph (Surv(matched.test.incl.pData$PFS, relapse.bin.incl) ~ matched.goi.vsd.cat.incl)
 summary(cox.relapse.incl)$logtest
-summary(cox.relapse.incl)
+print(summary(cox.relapse.incl))
 
 cox.relapse.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$PFS, relapse.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
 summary(cox.relapse.incl.G3G4)$logtest
-summary(cox.relapse.incl.G3G4)
+print(summary(cox.relapse.incl.G3G4))
 
 
 ##########################################
@@ -832,7 +803,7 @@ cat ("km analysis for OS for children aged 3-16 years, treated with curative int
 
 km.log.test.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl )
 
-km.log.test.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+km.log.test.OS.G3G4 <- km.log.test.OS.sub(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
 km.log.test.OS.G3G4
 
 ### cox regression analysis
@@ -841,10 +812,10 @@ cat("cox regression on age 3-16 years, curative", sep = "\n")
 
 
 cox.result.OS.all <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-cox.result.OS.all 
+print(cox.result.OS.all) 
         
 cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-summary(cox.result.OS.G3G4)
+print(summary(cox.result.OS.G3G4))
 
 
 
@@ -855,7 +826,7 @@ summary(cox.result.OS.G3G4)
 cat ("km analysis for EFS for children aged 3-16 years, treated with curative intent", sep = "\n")
 
 km.log.test.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-km.log.test.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
+km.log.test.EFS.G3G4 <- km.log.test.EFS.sub(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
 
 ### cox regression analysis
 
@@ -863,12 +834,12 @@ cat ("cox regression for EFS on age 3-16 years", sep = "\n")
 
 cox.EFS.incl <- coxph (Surv(matched.test.incl.pData$EFS, EFS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
 summary(cox.EFS.incl)$logtest
-summary(cox.EFS.incl)
+print(summary(cox.EFS.incl))
 
 
 cox.EFS.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$EFS, EFS.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
 summary(cox.EFS.incl.G3G4)$logtest
-summary(cox.EFS.incl.G3G4)
+print(summary(cox.EFS.incl.G3G4))
 
 
 ###################################
