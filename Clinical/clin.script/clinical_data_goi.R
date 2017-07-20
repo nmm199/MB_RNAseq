@@ -53,11 +53,17 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/clinical_data_funct
 ### "chi.sq"
 ### "cor.result"
 ### "lin.reg"
+### "logisticRegression"
 ### "km.log.test"
+### "km.log.test.sub"
 ### "km.log.test.OS"
+### "km.log.test.OS.sub"
 ### "cox.result.OS"
 ### "km.log.test.EFS"
+### "km.log.test.EFS.sub"
 ### "updatepData"
+### "clinPathAssess"
+
 
 ### External files required
 
