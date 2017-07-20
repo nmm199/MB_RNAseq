@@ -444,7 +444,7 @@ age.cont.wilcox
 cat ("processing logistic regression for each variable", sep ="\n")
 
 ### age categorical
-log.reg.age.cat <- logisticRegression(matched.test.pData$age.cat.infant, matched.goi.vsd, matched.test.pData)
+log.reg.age.cat <- logisticRegression(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd, data= matched.test.pData)
 print(log.reg.age.cat)
 str(log.reg.age.cat)
 age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
@@ -529,6 +529,7 @@ TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("
 log.reg.q13loss  <- logisticRegression(matched.test.pData$q13loss, matched.goi.vsd, matched.test.pData)
 print(log.reg.q13loss)
 q13.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$q13loss, col = c("Red", "Blue"), xlab = "Cytogenetic arm q13 status", ylab = "Biomarker expression", main = "Correlation between biomarker and q13 loss")
+
 
 
 ##################################################
