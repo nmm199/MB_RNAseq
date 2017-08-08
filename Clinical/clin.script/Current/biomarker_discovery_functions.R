@@ -1,6 +1,6 @@
 ### File information:
 
-### This is a list of functions that were written for the "clinical_data_4_update.R" script analysis
+### This is a list of functions that were written for the "Biomarker_asses.R" script analysis
 ### Many of these functions are generic for survival analysis
 ### Aims of this document are to provide tools to perform univariate analysis in a group of children treated for medulloblastoma. 
 ### All kaplan-meier survival analyses provide graphical output with labelled axes and p value
@@ -8,6 +8,7 @@
 
 ### Author: Dr Marion Mateos
 ### Date: 19 July 2017
+### File subsequently updated with input from Dr Louise Pease
 
 
 
@@ -155,16 +156,16 @@ km.log.test <- function(time, event, marker, out.file = "none"){
     pdf(out.file)
   }
 }
-  km.PFS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
-  plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-  PFS.names <- c("biomarker - high", "biomarker - low")
-  legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
-  axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
-  PFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
-  1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
-  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
-  if(out.file!="none"){
-    pdf(out.file)
-    dev.off()
-  }
-}
+  #km.PFS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+  #plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
+  #PFS.names <- c("biomarker - high", "biomarker - low")
+  #legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
+  #axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
+  #PFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+  #1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
+  #text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  #if(out.file!="none"){
+   # pdf(out.file)
+  #  dev.off()
+  #}
+#}
