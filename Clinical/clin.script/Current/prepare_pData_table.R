@@ -1,5 +1,5 @@
 ### File introduction
-### File name: clinical_data_6.R
+### File name: prepare_PData_table.R
 
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
@@ -10,7 +10,9 @@
 
 ### Author: Dr Marion Mateos
 ### Date: July 19 2017
-### this file was created by modifying clinical_data_4.R
+### this file was created by modifying clinical_data_4.R and subsequent 'for loops' added by Dr Louise Pease
+### this file needs to be run witih the biomarker_discovery_functions.R file ("nmm199/home/R/MB_RNAseq/Clinical/clin.script/Current/biomarker_discovery_functions.R")
+### both this pData file and the biomarker discovery function file need to be run prior to the Biomarker_assess.R file ("nmm199/home/R/MB_RNAseq/Clinical/clin.script/Current/Biomarker_assess.R")
 
 
 ### R version 3.4.0 (2017-04-21)
@@ -89,11 +91,18 @@ library('survival')
 ### Read in pData 
 ### add in row names to original database file
 cat ("reading in clinical database", sep ="\n")
-pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
+#pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
+pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617.csv", row.names = 1)
+
+#meth.data <- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
+#cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
+#RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt"
 
 ### Read in methylation data
-meth.data <- "/home/nlp71/Marion/all7subgroupCalls.csv"
-cytogen.data <- "/home/nlp71/Marion/arm_calls_clean280617.txt"
+#meth.data <- "/home/nlp71/Marion/all7subgroupCalls.csv"
+meth.data<- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
+#cytogen.data <- "/home/nlp71/Marion/arm_calls_clean280617.txt"
+cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
 
 ### reading in files
 cat ("reading in expression data", sep ="\n")
@@ -107,9 +116,10 @@ mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt")
 #pdf("marker.results.pdf", width = 10, height = 10) 
 
 ####  providing a putative biomarker
-### hashed out as now in main script to set one goi.vsd per gene
+### hashed out as now in main script to set one goi.vsd per gene (unhashed 7/8)
 #goi <- "ENSG00000136997"
 
+### unhash the line below if wish to run all goi results in RNAseq data (7/8/17)
 #goi.vsd <- as.numeric(mb.vsd[goi,]) 
 
 ### the output would be a vector with a continuous variable, names equal NMB numbers
@@ -286,6 +296,9 @@ subgroup4fac[data=="G4"]="G4"
 subgroup4fac[data=="G3"]="G3"
 subgroup4fac[data=="SHH"]="SHH"
 subgroup4fac[data=="WNT"]="WNT"
+data=pData$X450K_R
+group3or4fac=rep(NA,length(data))
+group3or4fac[data=="G3" | data=="G4"]= "G3G4"
 #### This command generates a new variable facs, this variable combines the age and gender factors such that they do not take account of sex differences in developmental stage 
 #facs = paste(agefac, sexfac, subgroup, sep=".")
 #f = factor(facs)
@@ -293,7 +306,7 @@ subgroup4fac[data=="WNT"]="WNT"
 #facs = paste(agefac, sexfac, subgroup, sep=".")
 #facs = paste(agegrpfac, subgroupfac, sep=".")
 #f = factor(facs)
-#### We can get the sammary statistics from the data using the table function
+#### We can get the summary statistics from the data using the table function
 #### When puberty ages are set as different for males and females it becomes apparent Juniors are mostly affected and far more males than females
 #table(agegrpfac)
 #### Again Juniors mostly affected
@@ -317,6 +330,7 @@ test.pData <- data.frame(NMB,
                          sexfac,
                          agegrpfac,
                          subgroup4fac,
+                         group3or4fac,
                          childfac,
                          mstatus,
                          resection,
