@@ -9,6 +9,7 @@ library('survival')
 
 load("pData_saved.RData")
 #source (file = "/home/nlp71/Marion/biomarker_discovery_functions.R")
+#source (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/Current/biomarker_discovery_functions.R")
 options(warn=-1)
 options(browserNLdisabled = TRUE)
 cox_hazard_results_df <- data.frame()
@@ -19,17 +20,22 @@ Chi_squared_sig_results_df <- data.frame()
 #### Can read in a list of genes to test 
 #gene_list <- read.csv(file ="genes.csv")
 #### check a single gene of interest
-#gene_list <- as.list("ENSG00000136997")
-#"ENSG00000124693"
+#gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
+
+#gene_list <- as.list(c("ENSG00000001036", "ENSG00000001497", "ENSG00000002016"))
+
+#test_data <- rownames(Chi_squared_results_df %in% gene_list)
+#"ENSG00000136997"
 #### check a list of genes 
-gene_list <- as.list(c("ENSG00000136997", "ENSG00000197561", "ENSG00000000003"))
+#gene_list <- as.list(c("ENSG00000136997", "ENSG00000197561", "ENSG00000000003"))
 #gene_list <- as.list(c("ENSG00000136997", "ENSG00000197561", "ENSG00000000003", "ENSG00000150991", "ENSG00000101665", "ENSG00000116039", "ENSG00000182979", "ENSG00000133026", "ENSG00000123384", "ENSG00000000005", "ENSG00000000419", "ENSG00000000457", "ENSG00000000460", "ENSG00000000938"))
 #### to check every gene in the RNAseq data unhash here (slow!)
-#gene_list <- as.list(rownames(mb.vsd))
-####gene_list <- gsub("\\..*","",gene_list)
+gene_list <- as.list(rownames(mb.vsd))
+#gene_list <- gsub("\\..*","",gene_list)
+#gene_list <- unique(gene_list)
 for (gene in 1:length(gene_list)){
   #### unhash sink and pdf lines below to output a sink and pdf file per gene in the list
-  sink(paste("pDatalog",gene_list[[gene]],".txt"))
+  #sink(paste("pDatalog",gene_list[[gene]],".txt"))
   pdf(paste("marker.results",gene_list[[gene]],".pdf"), width = 10, height = 10)
   #### create an ordered list of variables measured in the matched data 
   index <- match(colnames(mb.vsd), rownames(test.pData))
@@ -41,10 +47,11 @@ for (gene in 1:length(gene_list)){
   #goi.vsd <- colnames(mb.vsd[goi,])
   #goi.vsd <- as.numeric(mb.vsd[goi,])
   #index <- match(names(goi.vsd), rownames(test.pData)) 
-  #### Since the matched data is based on sample ids in common between RNAseq and pheno data no need to ammend this part
+  #### Since the matched data is based on sample ids in common between RNAseq and pheno data no need to amend this part
   matched.test.pData <- test.pData[index[!is.na(index)],] 
   matched.goi.vsd <- Seq_goi.vsd[!is.na(index)] 
   matched.goi.vsd.cat <- ifelse(matched.goi.vsd>median(Seq_goi.vsd, na.rm = T), "high","low")
+  Matched_pDATA_G3G4 <- matched.test.pData[which(matched.test.pData$group3or4fac =="G3G4"),]
   #### now assign these to names prefixed for grouping and append the gene identifier to each of the objects
   assign(paste0("Gene_Seq ",gene_list[[gene]]), Seq_goi.vsd)
   assign(paste0("Seq_gene_matched ",gene_list[[gene]]), matched.goi.vsd)
@@ -57,6 +64,7 @@ for (gene in 1:length(gene_list)){
   MATCHED_TEST_PDATA <- as.list(mget(ls(pattern="^Matched_pDATA")))
   #### Generate a list of variables that we can use in the loop to run the chi.sq function
   variable_list <- list()
+  
   variable_list <- append(variable_list, names(matched.test.pData))
   #### Exlude the nmb column from the list
   variable_list2 <- variable_list[!variable_list =="NMB"]
@@ -78,10 +86,11 @@ for (gene in 1:length(gene_list)){
       assign(paste0("chi_res_",variable_list[[v]]), res)
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})  #### prints the error message to screen
   }
-  #### create a list containing all of the results of the chi.squared test
-  chi.sq.results <- as.list(mget(ls(pattern="^chi_res_")))
+  #### create a list containing all of th e results of the chi.squared test
+ chi.sq.results <- as.list(mget(ls(pattern="^chi_res_")))
   #### determine the results in the list that are significant 
   significant_chi_results <- list()
+  table_chi_results <- data.frame()
   #### create a matrix of defined size to hold the chisquare test results
   m <- matrix(0, ncol = 33, nrow = 1)
   #### Convert matrix m to a data frame 
@@ -98,8 +107,11 @@ for (gene in 1:length(gene_list)){
     #### extract the pvalue for all of the chi squared tests whether they are significant not
     #sig[[c]] <- chi.sq.results[[c]][[1]]$p.value
     sig <- chi.sq.results[[c]][[1]]$p.value
+    tbl <- chi.sq.results[[c]][[2]]
+    tbl_df <- as.data.frame(tbl)
     #### add the result from each chi square test to a list 
     significant_chi_results <- append(significant_chi_results, sig)
+    table_chi_results <- rbind(table_chi_results, tbl_df)
   }
  
   #### turn the list into a data frame 
@@ -112,6 +124,8 @@ for (gene in 1:length(gene_list)){
   rownames(chisqout) <- gene_list[[gene]]
   #### create a large data frame with the results from each gene
   Chi_squared_results_df <- rbind(Chi_squared_results_df, chisqout)
+  ### add additional script here to define other outputs including list (proportions) for chi squared
+  
   #Chi_squared_results_df <- rbind(Chi_squared_results_df, chisqout)
   cat ("Ordering chi squared tests", sep ="\n")
   child_significant <- Chi_squared_results_df[order(Chi_squared_results_df$chi_res_childfac),]
@@ -136,6 +150,34 @@ for (gene in 1:length(gene_list)){
       chsq_significant_in_sexes <- append(chsq_significant_in_sexes, sig)
     }
   }
+  
+  ### additional text added 8/8/17
+  ### relapse
+  
+  cat (paste("Extracting significant results for relapse from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_relapse <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_relapse)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_relapse[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_relapse[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_relapse <- append(chsq_significant_in_relapse, sig)
+    }
+  }
+  
+  ###
+  cat (paste("Extracting significant results for 4 subgroup methylation from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_meth4 <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_meth)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_meth[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_meth[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_meth4 <- append(chsq_significant_in_meth4, sig)
+    }
+  }
+  
+  ###
   
   cat (paste("Extracting significant results for 7 subgroup methylation from chi squared tests",gene_list[[gene]]), sep ="\n")
   chsq_significant_in_meth7 <- list()
@@ -170,6 +212,91 @@ for (gene in 1:length(gene_list)){
     }
   }
   
+  ###
+  
+  cat (paste("Extracting significant results for MYCMYCN from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_MYCMYCN <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_MYCMYCN.cat)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_MYCMYCN.cat[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_MYCMYCN.cat[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_MYCMYCN <- append(chsq_significant_in_MYCMYCN, sig)
+    }
+  }
+  
+  
+  ###
+  
+  cat (paste("Extracting significant results for LCA from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_LCA <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_MYCMYCN.cat)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_MYCMYCN.cat[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_MYCMYCN.cat[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_MYCMYCN <- append(chsq_significant_in_MYCMYCN, sig)
+    }
+  }
+  
+  ### 
+
+  cat (paste("Extracting significant results for metastatic status from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_mstatus <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_mstatus)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_mstatus[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_mstatus[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_mstatus <- append(chsq_significant_in_mstatus, sig)
+    }
+  }
+  
+  ###
+  
+  
+  cat (paste("Extracting significant results for resection status from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_resection <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_resection)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_resection[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_resection[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_resection <- append(chsq_significant_in_resection, sig)
+    }
+  }
+  
+  
+  
+  ###
+  ### TP53
+  
+  cat (paste("Extracting significant results for TP53 status from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_TP53 <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_TP53.cat)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_TP53.cat[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_TP53.cat[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_TP53 <- append(chsq_significant_in_TP53, sig)
+    }
+  }
+  
+  ### TERT
+  cat (paste("Extracting significant results for TP53 status from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_TERT <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_TERT.cat)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_TERT.cat[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_TERT.cat[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_TERT <- append(chsq_significant_in_TERT, sig)
+    }
+  }
+  
+  
+  
+  ###
   cat (paste("Extracting significant results for q13 loss from chi squared tests",gene_list[[gene]]), sep ="\n")
   chsq_significant_in_q13loss <- list()
   for (rw in 1:length(Chi_squared_results_df$chi_res_q13loss)){
@@ -180,18 +307,59 @@ for (gene in 1:length(gene_list)){
       chsq_significant_in_q13loss <- append(chsq_significant_in_q13loss, sig)
     }
   }
+  
+  ### is this biomarker overrepresented in group that received RTX or CSI, or those classified as curative
+  
+  cat (paste("Extracting significant results for RTX from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_RTX <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_RTX)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_RTX[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_RTX[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_RTX <- append(chsq_significant_in_RTX, sig)
+    }
+  }
+  
+  
+  cat (paste("Extracting significant results for CSI from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_CSI <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_CSI)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_CSI[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_CSI[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_CSI <- append(chsq_significant_in_CSI, sig)
+    }
+  }
+  
+  
+  cat (paste("Extracting significant results for curative from chi squared tests",gene_list[[gene]]), sep ="\n")
+  chsq_significant_in_curative <- list()
+  for (rw in 1:length(Chi_squared_results_df$chi_res_curative)){
+    #print(rownames(Chi_squared_results_df[rw, ]))
+    if(Chi_squared_results_df$chi_res_curative[[rw]] < 0.05){
+      sig <- Chi_squared_results_df$chi_res_curative[[rw]]
+      names(sig) <- rownames(Chi_squared_results_df[rw ,])
+      chsq_significant_in_curative <- append(chsq_significant_in_curative, sig)
+    }
+  }
+  
+  ###creating a list that outputs all the chisquare results
+  
+  ###creating a list that outputs all the significant chisquare results
   significant_chisquare_results <- as.list(mget(ls(pattern="chsq_significant_in_")))
   #### hashed out as unused, can be unhashed if needed
   #### Because we have a list of significant results each item within contains the table data, we can now run fishers test on each table in the list 
   #### First create a list to hold the results of the analyses 
  #fishers_results <- list()
-  cat (paste("Extracting fishers test results for histopathology ",gene_list[[gene]]), sep ="\n")
-  for (s in 1:nrow(Chi_squared_results_df)){
-  table <- table(as.factor(MATCHED_TEST_PDATA[[gene]]$histopath), as.factor(CAT_SEQ_LIST[[gene]]))
-  result <- fisher.test(table)
-  assign(paste0("Fishers_test_histopath ",gene_list[[gene]]), result)
-  }
-  fishers_results <- as.list(mget(ls(pattern="Fishers_test_histopath")))
+  #cat (paste("Extracting fishers test results for histopathology ",gene_list[[gene]]), sep ="\n")
+ # for (s in 1:nrow(Chi_squared_results_df)){
+ # table <- table(as.factor(MATCHED_TEST_PDATA[[gene]]$histopath), as.factor(CAT_SEQ_LIST[[gene]]))
+ # result <- fisher.test(table)
+ # assign(paste0("Fishers_test_histopath ",gene_list[[gene]]), result)
+ # }
+ # fishers_results <- as.list(mget(ls(pattern="Fishers_test_histopath")))
 
   
   cat (paste("Generating Boxplots ",gene_list[[gene]]), sep ="\n")
@@ -341,7 +509,8 @@ for (gene in 1:length(gene_list)){
   for (cur in 1:length(curatives)){
     km_results_log.test<- km.log.test(time = curatives[[cur]]$PFS, event = relapse_binaries[[cur]], marker = genesofinterest[[cur]])
     assign(paste0("Kaplan_Meier_",named_relapse_binaries[[cur]]), km_results_log.test)
-    km.PFS.incl <- survfit(Surv(curatives[[cur]]$PFS, binaries[[cur]])~genesofinterest[[cur]], type = "kaplan-meier", conf.type = "log")
+    km.PFS.incl <- survfit(Surv(curatives[[cur]]$PFS, relapse_binaries[[cur]])~genesofinterest[[cur]], type = "kaplan-meier", conf.type = "log")
+    #km.PFS.incl <- survfit(Surv(curatives[[cur]]$PFS, binaries[[cur]])~genesofinterest[[cur]], type = "kaplan-meier", conf.type = "log")
     plot(km.PFS.incl, yaxt="n", col = c("red", "blue"), xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = paste("Expression of ", gene_list[[gene]]," and progression-free survival (PFS)",groups[[cur]]), lty = 1:2)
     PFS.names <- c("biomarker - high", "biomarker - low")
     legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
@@ -349,7 +518,8 @@ for (gene in 1:length(gene_list)){
     PFS.incl.logrank <- survdiff(Surv(curatives[[cur]]$PFS, binaries[[cur]]) ~ genesofinterest[[cur]])
     1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
     text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
-    assign(paste0("Survival_Fit_",named_relapse_binaries[[cur]]), km.PFS.incl)
+    assign(paste0("Survival_Fit_",named_relapse_binaries[[cur]],gene_list[[gene]]), km.PFS.incl)
+    assign(paste0("Survival_pval_",named_relapse_binaries[[cur]],gene_list[[gene]]), surv.p.val)
   }
   cat (paste("Running Kaplan-Meier estimates for curative data for Overall survival ",gene_list[[gene]]), sep = "\n")
   #### Overall survival
@@ -364,7 +534,8 @@ for (gene in 1:length(gene_list)){
     PFS.incl.logrank <- survdiff(Surv(curatives[[cur]]$Followup, binaries[[cur]]) ~ genesofinterest[[cur]])
     1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
     text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
-    assign(paste0("Survival_Fit_",named_OS_binaries[[cur]]), km.PFS.incl)
+    assign(paste0("Survival_Fit_",named_OS_binaries[[cur]],gene_list[[gene]]), km.PFS.incl)
+    assign(paste0("Survival_pval_",named_OS_binaries[[cur]],gene_list[[gene]]), surv.p.val)
   }
   cat (paste("Running Kaplan-Meier estimates for curative data for Event free survival ",gene_list[[gene]]), sep = "\n")
   #### Event free survival
@@ -380,8 +551,8 @@ for (gene in 1:length(gene_list)){
     PFS.incl.logrank <- survdiff(Surv(curatives[[cur]]$EFS, binaries[[cur]]) ~ genesofinterest[[cur]])
     1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
     text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
-    assign(paste0("Survival_Fit_",named_EFS_binaries[[cur]]), km.PFS.incl)
-    assign(paste0("Survival_pval_",named_EFS_binaries[[cur]]), surv.p.val)
+    assign(paste0("Survival_Fit_",named_EFS_binaries[[cur]],gene_list[[gene]]) km.PFS.incl)
+    assign(paste0("Survival_pval_",named_EFS_binaries[[cur]],gene_list[[gene]]), surv.p.val)
   }
   
   cat (paste("extracting the 5 year survival statistics for the biomarker ",gene_list[[gene]]), sep = "\n")
@@ -464,8 +635,14 @@ for (gene in 1:length(gene_list)){
     most_significant_Log_Reg <- ALL_Log_Reg_Results[[lr]][which(ALL_Log_Reg_Results[[lr]]$lr.pvalue < 0.05)]
   }
 }
-sink()
-dev.off()
+
+#significant_chisquare_results_df <- data.frame()
+significant_chisquare_results_df = as.data.frame(do.call(rbind, significant_chisquare_results)) 
+for (rw in 1:nrow(significant_chisquare_results_df)){
+  significant_chisquare_results_df[, rw] <- as.numeric(significant_chisquare_results_df[, rw])
+}
+#sink()
+#dev.off()
 biomarkers_greater_than_5_years <- as.list(mget(ls(pattern = "greater_than_5_years_")))
 biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years)
   #### write a table of significant results to output 
@@ -474,5 +651,9 @@ biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years
   write.table(most_significant_Cox, file="most_significant_Cox_hazard_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)               
   write.table(biomarkers_greater_than_5_years_df , file="most_significant_survival_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
   write.table(significant_in_children, file="most_significant_Chi_squared_results_for_children.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
-  write.table(significant_chisquare_results, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+  write.table(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+  
+  ###
+ ### want to have G3G4 output for the above as well
+  #write(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\n")
   
