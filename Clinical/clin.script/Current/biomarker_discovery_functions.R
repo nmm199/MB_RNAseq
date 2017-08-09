@@ -1,6 +1,6 @@
 ### File information:
 
-### This is a list of functions that were written for the "Biomarker_asses.R" script analysis
+### This is a list of functions that were written for the "Biomarker_assess_09_08_2017.R" script analysis
 ### Many of these functions are generic for survival analysis
 ### Aims of this document are to provide tools to perform univariate analysis in a group of children treated for medulloblastoma. 
 ### All kaplan-meier survival analyses provide graphical output with labelled axes and p value

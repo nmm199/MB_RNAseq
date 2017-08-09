@@ -296,9 +296,10 @@ subgroup4fac[data=="G4"]="G4"
 subgroup4fac[data=="G3"]="G3"
 subgroup4fac[data=="SHH"]="SHH"
 subgroup4fac[data=="WNT"]="WNT"
-data=pData$X450K_R
-group3or4fac=rep(NA,length(data))
-group3or4fac[data=="G3" | data=="G4"]= "G3G4"
+#data=pData$X450K_R
+#group3or4fac=rep(NA,length(data))
+#group3or4fac[data=="G3" | data=="G4"]= "G3G4"
+
 #### This command generates a new variable facs, this variable combines the age and gender factors such that they do not take account of sex differences in developmental stage 
 #facs = paste(agefac, sexfac, subgroup, sep=".")
 #f = factor(facs)
@@ -330,7 +331,7 @@ test.pData <- data.frame(NMB,
                          sexfac,
                          agegrpfac,
                          subgroup4fac,
-                         group3or4fac,
+                         #group3or4fac,
                          childfac,
                          mstatus,
                          resection,
