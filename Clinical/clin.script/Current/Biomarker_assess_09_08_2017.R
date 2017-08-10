@@ -84,7 +84,12 @@ Chi_squared_sig_results_df <- data.frame()
 #gene_list <- read.csv(file ="genes.csv")
 
 #### check a single gene of interest
-gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
+#gene_list <- "ENSG00000000003.14_1"
+gene_list <- "ENSG00000000005.5_1"
+
+### check a defined list of genes of interest
+#gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
+
 
 #gene_list <- as.list(c("ENSG00000001036", "ENSG00000001497", "ENSG00000002016"))
 #### check a list of genes 
@@ -434,9 +439,14 @@ for (gene in 1:length(gene_list)){
   relapse.boxplot <- boxplot(SEQ_GENE_MATCHED[[gene]] ~ MATCHED_TEST_PDATA[[gene]]$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
   resection.boxplot <- boxplot(SEQ_GENE_MATCHED[[gene]] ~  MATCHED_TEST_PDATA[[gene]]$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
   
+  ### currently methylation subgroup boxplots are turned off, however can be generated later for goi, colours correspond to Schwalbe 2017 7 molecular subgroups
+  
+  #meth.boxplot <- boxplot(SEQ_GENE_MATCHED[[gene]] ~  MATCHED_TEST_PDATA[[gene]]$meth, col = c("yellow","green","red","blue"), xlab = "4 group methylation status", ylab = "Biomarker expression", main = "Correlation between biomarker and methylation status")
+  #meth7.boxplot <- boxplot(SEQ_GENE_MATCHED[[gene]] ~  MATCHED_TEST_PDATA[[gene]]$subgroup7fac, col = c("yellow","pink", "green","light green", "red", "orange","blue", "cyan"), xlab = "7 group methylation status", ylab = "Biomarker expression", main = "Correlation between biomarker and methylation status")
+  
   
   #### This stoped working when the output of chi squared tests was changed, new loop above only for histopath
-  #### Now itterate through each of the items in the significant  results list 
+  #### Now iterate through each of the items in the significant  results list 
   #for (s in 1:length(significant_chi_results)){
   #for (s in 1:nrow(Chi_squared_results_df)){
   #### create the individual tables
@@ -479,22 +489,42 @@ for (gene in 1:length(gene_list)){
   for(i in 1:length(test_factors)){
     fac <- append(fac, as.name(paste0("matched.test.pData$",test_factors[[i]], sep="")))
   }
-  fac2 <- fac[c(8,13,26,14,19,20,22,23,24,25,34)]
+  #fac2 <- fac[c(6,8,9,11,13,14,15,16,17,20,21,23,24,25,26,27,34,35)]
+  #fac2 <- fac[c(8,13,26,14,19,20,22,23,24,25,34)]
+  #fac2 <- fac[c(6,7,8,13,26,14,19,20,22,23,24,25,34)]##this worked
+  #fac2 <- c(6,7,8,13,26,14,19,20,22,23,24,25,34)
   #### itterate through each of the factors in the list s and run a lofgistic regression on each 
-  for(t in 3:length(fac2)){
+  #for(t in 1:length(fac2)){ #was 3
+  #  print(t)
     #### For a single gene 
     #regression <- logisticRegression(matched.test.pData[, t], matched.goi.vsd, matched.test.pData)
     #### For a list of genes 
-    regression <- logisticRegression(matched.test.pData[, t], SEQ_GENE_MATCHED[[gene]], matched.test.pData)
+  #  regression <- logisticRegression(matched.test.pData[, t], SEQ_GENE_MATCHED[[gene]], matched.test.pData)
     #### rename the output variable from each run through the loop so that the factor tested is attached to the object 
-    assign(paste0("log_reg_",test_factors[[t]]), regression)
+  #  assign(paste0("log_reg_",test_factors[[t]]), regression)
+  #}
+  #regression <- logisticRegression(matched.test.pData$relapse, SEQ_GENE_MATCHED[[gene]], matched.test.pData)
+  #assign(paste0("log_reg_relapse",gene_list[[gene]]), regression)
+
+  
+  subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,9,11,15,16,17,21,27,35)]
+  names_reg_log <- colnames(subset_df)
+  
+  for(n in 1:ncol(subset_df)){ #was 3
+    #### For a single gene 
+    #regression <- logisticRegression(matched.test.pData[, t], matched.goi.vsd, matched.test.pData)
+    #### For a list of genes 
+    regression <- logisticRegression(subset_df[, n], SEQ_GENE_MATCHED[[gene]], subset_df)
+    #### rename the output variable from each run through the loop so that the factor tested is attached to the object 
+    assign(paste0("log_reg_",names_reg_log[[n]]), regression)
   }
   
   
   #### errors produced for logistic regression solved
   #### warnings() exlcluded using options (prevents the program crashing due to warning messages)
   #### create a list of all the logistic regression outputs based on the prefix assigned to the objects
-  reg.log.list <- as.list(mget(ls(pattern="log_reg_")))
+  #reg.log.list <- as.list(mget(ls(pattern="log_reg_")))
+  reg.log.list <- as.list(mget(ls(pattern="log_reg")))
   #print(reg.log.list)
   cat (paste("processing pairwise t test for each variable and creating a list of results ",gene_list[[gene]]), sep ="\n")
   for(t in 3:length(fac)){
@@ -639,7 +669,7 @@ for (gene in 1:length(gene_list)){
     cox.relapse.incl <- coxph (Surv(curatives[[cur]]$EFS, EFS_binaries[[cur]]) ~ genesofinterest[[cur]])
     assign(paste0("cox_relapse_",named_EFS_binaries[[cur]]), cox.relapse.incl)
   }
-  #### Cox haxards ratio test for overlall survival
+  #### Cox haxards ratio test for overall survival
   for (cur in 1:length(curatives)){
     cox.relapse.incl <- coxph (Surv(curatives[[cur]]$Followup, OS_binaries[[cur]]) ~ genesofinterest[[cur]])
     assign(paste0("cox_relapse_",named_OS_binaries[[cur]]), cox.relapse.incl)
@@ -689,10 +719,14 @@ for (gene in 1:length(gene_list)){
     lr.OR <- reg.log.list[[res]][2, 1]
     lr.CI.97.5 <- reg.log.list[[res]][2, 3]
     lr.CI.2.5 <- reg.log.list[[res]][2, 2]
+    LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
+    rownames(LR_DF) <- paste(gene_list[[gene]],names_reg_log[[res]])
   }
   
-  LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
-  rownames(LR_DF) <- gene_list[[gene]]
+  #LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
+  #rownames(LR_DF) <- gene_list[[gene]]
+  #all_LR <- data.frame()
+  #all_LR <- rbind(all_LR, LR_DF)
   assign(paste0("LR_data_frame_", gene_list[[gene]],names_reg_log[[res]]), LR_DF)
   ALL_Log_Reg_Results <- as.list(mget(ls(pattern="^LR_data_frame")))
   cat (paste("logistic regression data frame created ",gene_list[[gene]]), sep = "\n")
@@ -707,8 +741,11 @@ significant_chisquare_results_df = as.data.frame(do.call(rbind, significant_chis
 for (rw in 1:nrow(significant_chisquare_results_df)){
   significant_chisquare_results_df[, rw] <- as.numeric(significant_chisquare_results_df[, rw])
 }
-#sink()
-#dev.off()
+
+### if having difficulty loading the pdf or viewing the output, make sure that sink and dev.off are turned off, unhash the two lines below
+sink()
+dev.off()
+
 biomarkers_greater_than_5_years <- as.list(mget(ls(pattern = "greater_than_5_years_")))
 biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years)
   #### write a table of significant results to output 
@@ -719,7 +756,5 @@ biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years
   #write.table(significant_in_children, file="most_significant_Chi_squared_results_for_children.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
   write.table(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
   
-  ###
- ### want to have G3G4 output for the above as well
-  #write(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\n")
+  
   
