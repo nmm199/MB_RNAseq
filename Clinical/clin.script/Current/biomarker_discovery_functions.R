@@ -31,17 +31,39 @@ chi.sq <- function(x,y){
   table.temp.perc <- prop.table(table.temp)*100
   summary.table(table.temp)
   chi.test.temp <- chisq.test(table.temp) 
+  chi.test.temp$p.adjust <- p.adjust(chi.test.temp$p.value, method = "BH")
   chi.test.temp.stat <- c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value) 
   chi.test.temp.res <- chi.test.temp$residuals
   aheatmap(chi.test.temp$residuals, Rowv=NA, Colv = NA)
   list.temp <- list  (chi.test.temp,
                       table.temp, 
                       table.temp.perc,
-                      chi.test.temp.res
+                      chi.test.temp.res,
+                      p.adjust=chi.test.temp$p.adjust
   )
   
   return(list.temp)
 }
+
+
+### old chisq function, without the adjusted p.value
+#chi.sq <- function(x,y){
+#table.temp <- table(x, y) 
+#table.temp.perc <- prop.table(table.temp)*100
+#summary.table(table.temp)
+#chi.test.temp <- chisq.test(table.temp) 
+#chi.test.temp.stat <- c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value) 
+#chi.test.temp.res <- chi.test.temp$residuals
+#aheatmap(chi.test.temp$residuals, Rowv=NA, Colv = NA)
+#list.temp <- list  (chi.test.temp,
+                   # table.temp, 
+                   # table.temp.perc,
+                   # chi.test.temp.res
+#)
+
+#return(list.temp)
+#}
+
 
 
 
