@@ -11,7 +11,21 @@
 ### Author: Dr Marion Mateos
 ### Date: July 3 2017
 
+##################################################################################
 ### Subsequent updates with input from Dr Louise Pease, based on clinical_data_4.R
+
+#################################################################################
+### note as of 10/08/17: FILE REMAINS IN DEVELOPMENT
+### introduction: the "Biomarker_assess10082017v2.R" is not functional, suggest adding the functional changes made within "Biomarker_assess10082017v2.R" to this current file  (ie comparing to the correct file with notepad)
+### look at creating one large function for biomarker assess
+### also suggest going back to previous function file (or updating the current commit with the p adjust removed)
+### can then add in p adjust to the bottom of each file
+### check that logistic regression is generating all results and not just the last line
+### check that the group3/4 data can be generated in chisq (may need to unhash the G3G4 part of the dataframe matching below)
+### check that the cox regression is outputting all results and not just the last line
+### can consider running G3/G4 data in separate script
+
+##################################################################################
 
 ### R version 3.4.0 (2017-04-21)
 ### Platform: x86_64-pc-linux-gnu (64-bit)
@@ -117,6 +131,8 @@ for (gene in 1:length(gene_list)){
   #goi.vsd <- as.numeric(mb.vsd[goi,])
   #index <- match(names(goi.vsd), rownames(test.pData)) 
   #### Since the matched data is based on sample ids in common between RNAseq and pheno data no need to amend this part
+  ### hash out the line below (matched.test.pData <- test.pData[index[!is.na(index)],]) if you wish to just generate G3/G4 dataframe to then extract the chisq results from. 
+  ### otherwise the chi.sq.results will only output those for the entire group
   matched.test.pData <- test.pData[index[!is.na(index)],] 
   matched.goi.vsd <- Seq_goi.vsd[!is.na(index)] 
   matched.goi.vsd.cat <- ifelse(matched.goi.vsd>median(Seq_goi.vsd, na.rm = T), "high","low")
@@ -507,7 +523,8 @@ for (gene in 1:length(gene_list)){
   #assign(paste0("log_reg_relapse",gene_list[[gene]]), regression)
 
   
-  subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,9,11,15,16,17,21,27,35)]
+  #subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,9,11,15,16,17,21,27,35)]
+  subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,15,16,17,21,27,35)] ### removed 9 (sexfac), removed 11 (subgroup4fac), note meth = 19, TERT.cat=26
   names_reg_log <- colnames(subset_df)
   
   for(n in 1:ncol(subset_df)){ #was 3
