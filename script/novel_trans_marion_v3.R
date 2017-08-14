@@ -23,7 +23,9 @@ library(scatterplot3d)
 ### means it sets up all parallel functions to use 10 cores
 registerDoParallel(cores = 10)
 ### load in description of all novel transcripts
-novel.gtf <- import("/media/microarray/output_cufflinks/cuffmerge/merged_asm/unknown.merged.gtf", format ="gtf")
+#novel.gtf <- import("/media/microarray/output_cufflinks/cuffmerge/merged_asm/unknown.merged.gtf", format ="gtf")
+novel.gtf <- import ("/home/dan/novel.mb.merged.gtf", form = "gtf") ### this is the updated file August 2018
+
 
 ### you can subset like a matrix e.g.
 ### novel.gtf[1:3,]
