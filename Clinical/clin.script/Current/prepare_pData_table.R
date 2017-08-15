@@ -11,7 +11,7 @@
 ### Author: Dr Marion Mateos
 ### Date: July 19 2017
 ### this file was created by modifying clinical_data_4.R and subsequent 'for loops' added by Dr Louise Pease
-### this file needs to be run witih the biomarker_discovery_functions.R file ("nmm199/home/R/MB_RNAseq/Clinical/clin.script/Current/biomarker_discovery_functions.R")
+### this file needs to be run before the biomarker_discovery_functions.R file ("nmm199/home/R/MB_RNAseq/Clinical/clin.script/Current/biomarker_discovery_functions.R")
 ### both this pData file and the biomarker discovery function file need to be run prior to the Biomarker_assess.R file ("nmm199/home/R/MB_RNAseq/Clinical/clin.script/Current/Biomarker_assess.R")
 
 
@@ -93,6 +93,8 @@ library('survival')
 cat ("reading in clinical database", sep ="\n")
 #pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
 pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617.csv", row.names = 1)
+#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617_v2.csv", row.names = 1)
+### updated the file to remove relapse to death as example to see if improves chi_square output
 
 #meth.data <- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
 #cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
@@ -201,7 +203,7 @@ OS.cat <-pData$OS_R
 ### continuous survival times PFS (years) and Followup (OS in years)
 Followup <- pData$Followup_R
 PFS <-pData$PFS_yr_R
-Relapsetodeath <- pData$relapsetodeath_R
+#Relapsetodeath <- pData$relapsetodeath_R
 Event <- pData$Event_R
 EFS <- pData$EFS_R
 
@@ -350,7 +352,7 @@ test.pData <- data.frame(NMB,
                          OS.cat,
                          PFS,
                          Followup,
-                         Relapsetodeath,
+                         #Relapsetodeath,
                          Event,
                          EFS
 )
