@@ -206,19 +206,19 @@ for (gene in 1:length(gene_list)){
     #adj_pval_chi_results <- append(adj_pval_chi_results, sig.p.adjust) ###not currently generating p.adjust
     #table_chi_results <- rbind(table_chi_results, tbl_df)    ### this does not provide meaningful output, use chi.sq.results
   }
- 
+  
   ###################
   ### duplicate of working for loop above: 
   
- # for (c in 1:length(chsqnm)){
-    #### extract the pvalue for all of the chi squared tests whether they are significant not
-   # sig <- chi.sq.results[[c]][[1]]$p.value
-    #tbl <- chi.sq.results[[c]][[2]]
-    #tbl_df <- as.data.frame(tbl)
-    #### add the result from each chi square test to a list 
-    #significant_chi_results <- append(significant_chi_results, sig)
-   # table_chi_results <- rbind(table_chi_results, tbl_df)
-#  }
+  # for (c in 1:length(chsqnm)){
+  #### extract the pvalue for all of the chi squared tests whether they are significant not
+  # sig <- chi.sq.results[[c]][[1]]$p.value
+  #tbl <- chi.sq.results[[c]][[2]]
+  #tbl_df <- as.data.frame(tbl)
+  #### add the result from each chi square test to a list 
+  #significant_chi_results <- append(significant_chi_results, sig)
+  # table_chi_results <- rbind(table_chi_results, tbl_df)
+  #  }
   
   ##############
   #### turn the list into a data frame 
@@ -242,7 +242,7 @@ for (gene in 1:length(gene_list)){
   #### turn the list into a data frame 
   #chisqout <- as.data.frame(do.call(cbind, significant_chi_results))
   #### set the appropriate column names 
- # colnames(chisqout) <- chsqnm
+  # colnames(chisqout) <- chsqnm
   #### remove named NA values from the data frame (created from the earlier matrix)
   #chisqout <- chisqout[!is.na(names(chisqout))]
   #### assign the gene name to rownames so we know which gene was tested
@@ -341,7 +341,7 @@ for (gene in 1:length(gene_list)){
   }
   
   ### mstatus
-
+  
   cat (paste("Extracting significant results for metastatic status from chi squared tests",gene_list[[gene]]), sep ="\n")
   chsq_significant_in_mstatus <- list()
   for (rw in 1:length(Chi_squared_results_df$chi_res_mstatus)){
@@ -355,7 +355,7 @@ for (gene in 1:length(gene_list)){
   
   ### see additional /home/nmm199/R/MB_RNAseq/Clinical/clin.script/chi_sq_significant_R
   
- 
+  
   ###creating a list that outputs all the chisquare results
   
   ###creating a list that outputs all the significant chisquare results
@@ -363,15 +363,15 @@ for (gene in 1:length(gene_list)){
   #### hashed out as unused, can be unhashed if needed
   #### Because we have a list of significant results each item within contains the table data, we can now run fishers test on each table in the list 
   #### First create a list to hold the results of the analyses 
- #fishers_results <- list()
+  #fishers_results <- list()
   #cat (paste("Extracting fishers test results for histopathology ",gene_list[[gene]]), sep ="\n")
- # for (s in 1:nrow(Chi_squared_results_df)){
- # table <- table(as.factor(MATCHED_TEST_PDATA[[gene]]$histopath), as.factor(CAT_SEQ_LIST[[gene]]))
- # result <- fisher.test(table)
- # assign(paste0("Fishers_test_histopath ",gene_list[[gene]]), result)
- # }
- # fishers_results <- as.list(mget(ls(pattern="Fishers_test_histopath")))
-
+  # for (s in 1:nrow(Chi_squared_results_df)){
+  # table <- table(as.factor(MATCHED_TEST_PDATA[[gene]]$histopath), as.factor(CAT_SEQ_LIST[[gene]]))
+  # result <- fisher.test(table)
+  # assign(paste0("Fishers_test_histopath ",gene_list[[gene]]), result)
+  # }
+  # fishers_results <- as.list(mget(ls(pattern="Fishers_test_histopath")))
+  
   
   cat (paste("Generating Boxplots ",gene_list[[gene]]), sep ="\n")
   histopath.boxplot <- boxplot(SEQ_GENE_MATCHED[[gene]] ~ MATCHED_TEST_PDATA[[gene]]$histopath, col = c("red", "blue"), xlab = "Histopathology subtype", ylab = "Biomarker expression", main = "Correlation between biomarker and histopathology")
@@ -439,19 +439,19 @@ for (gene in 1:length(gene_list)){
   #### iterate through each of the factors in the list s and run a logistic regression on each 
   #for(t in 1:length(fac2)){ #was 3
   #  print(t)
-    #### For a single gene 
-    #regression <- logisticRegression(matched.test.pData[, t], matched.goi.vsd, matched.test.pData)
-    #### For a list of genes 
+  #### For a single gene 
+  #regression <- logisticRegression(matched.test.pData[, t], matched.goi.vsd, matched.test.pData)
+  #### For a list of genes 
   #  regression <- logisticRegression(matched.test.pData[, t], SEQ_GENE_MATCHED[[gene]], matched.test.pData)
-    #### rename the output variable from each run through the loop so that the factor tested is attached to the object 
+  #### rename the output variable from each run through the loop so that the factor tested is attached to the object 
   #  assign(paste0("log_reg_",test_factors[[t]]), regression)
   #}
   #regression <- logisticRegression(matched.test.pData$relapse, SEQ_GENE_MATCHED[[gene]], matched.test.pData)
   #assign(paste0("log_reg_relapse",gene_list[[gene]]), regression)
-
+  
   
   #subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,9,11,15,16,17,21,27,35)]
-  subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,15,16,17,21,27,35)] 
+  subset_df <- matched.test.pData[c(7,8,13,26,14,19,20,22,23,24,25,34,15,16,17,21,27,35)]  
   ### removed 9 (sexfac), removed 11 (subgroup4fac), note meth = 19, TERT.cat=26, relapse = 27
   names_reg_log <- colnames(subset_df)
   
@@ -488,7 +488,7 @@ for (gene in 1:length(gene_list)){
   Curative_Treated_all_groups <- test.pData[which(test.pData$curative == "curative" & test.pData$childfac == "Child.M" | test.pData$childfac == "Child.F"),]
   
   Curative_Treated_G3G4 <- test.pData[which(test.pData$curative == "curative" & test.pData$childfac == "Child.M" | test.pData$childfac == "Child.F" & test.pData$subgroup4fac == "G3" | test.pData$subgroup4fac == "G4"),]
-
+  
   
   #### Creating matched data frames containing RNAseq expression data and curative data for samples in test.pData
   treat_grps <- as.list(mget(ls(pattern="Curative_Treated_")))
@@ -693,13 +693,12 @@ dev.off()
 
 biomarkers_greater_than_5_years <- as.list(mget(ls(pattern = "greater_than_5_years_")))
 biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years)
-  #### write a table of significant results to output 
-  #write.table(most_significant_Cox, file=paste("most_significant_Cox",names_sig_cox), sep="\t", quote=FALSE)
-  write.table(most_significant_Log_Reg, file="most_significant_logistic_regression_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
-  write.table(most_significant_Cox, file="most_significant_Cox_hazard_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)               
-  write.table(biomarkers_greater_than_5_years_df , file="most_significant_survival_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
-  #write.table(significant_in_children, file="most_significant_Chi_squared_results_for_children.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
-  write.table(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
-  
-  
-  
+#### write a table of significant results to output 
+#write.table(most_significant_Cox, file=paste("most_significant_Cox",names_sig_cox), sep="\t", quote=FALSE)
+write.table(most_significant_Log_Reg, file="most_significant_logistic_regression_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+write.table(most_significant_Cox, file="most_significant_Cox_hazard_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)               
+write.table(biomarkers_greater_than_5_years_df , file="most_significant_survival_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+#write.table(significant_in_children, file="most_significant_Chi_squared_results_for_children.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+write.table(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+
+
