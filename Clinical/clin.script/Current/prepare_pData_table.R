@@ -92,8 +92,8 @@ library('survival')
 ### add in row names to original database file
 cat ("reading in clinical database", sep ="\n")
 #pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
-pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617.csv", row.names = 1)
-#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617_v2.csv", row.names = 1)
+pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617.csv", row.names = 1)   
+#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617_v2.csv", row.names = 1) ### has relapsetodeath column removed
 ### updated the file to remove relapse to death as example to see if improves chi_square output
 
 #meth.data <- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
@@ -203,7 +203,7 @@ OS.cat <-pData$OS_R
 ### continuous survival times PFS (years) and Followup (OS in years)
 Followup <- pData$Followup_R
 PFS <-pData$PFS_yr_R
-#Relapsetodeath <- pData$relapsetodeath_R
+Relapsetodeath <- pData$relapsetodeath_R  ### consider hashing
 Event <- pData$Event_R
 EFS <- pData$EFS_R
 
@@ -352,7 +352,7 @@ test.pData <- data.frame(NMB,
                          OS.cat,
                          PFS,
                          Followup,
-                         #Relapsetodeath,
+                         Relapsetodeath,
                          Event,
                          EFS
 )
