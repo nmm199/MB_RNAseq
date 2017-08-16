@@ -1,12 +1,11 @@
 ### File introduction
-### File name: Biomarker_assess_09_08_2017.R
+### File name: Biomarker_assess_16_08_2017.R
 
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
 # 2. Analyse genes of interest in relation to univariate and multivariate risk prediction models for survival (overall, event-free and progression-free)
 # 3. This script covers analysis up to and including univariate risk factor analysis
 # 4. Multivariate analysis / AUC will be covered by a separate script
-
 
 ### Author: Dr Marion Mateos
 ### Date: July 3 2017
@@ -15,17 +14,35 @@
 ### Subsequent updates with input from Dr Louise Pease, based on clinical_data_4.R
 
 #################################################################################
-### note as of 10/08/17: FILE REMAINS IN DEVELOPMENT
-### introduction: the "Biomarker_assess10082017v2.R" is not functional, suggest adding the functional changes made within "Biomarker_assess10082017v2.R" to this current file  (ie comparing to the correct file with notepad)
-### look at creating one large function for biomarker assess
-### also suggest going back to previous function file (or updating the current commit with the p adjust removed)
-### can then add in p adjust to the bottom of each file
-### check that logistic regression is generating all results and not just the last line
+### note as of 16/08/17: FILE REMAINS IN DEVELOPMENT
+### can then add in p adjust to the bottom of each file (apply to Chi_squared_results_df, DF_LR)
 ### check that the group3/4 data can be generated in chisq (may need to unhash the G3G4 part of the dataframe matching below)
-### check that the cox regression is outputting all results and not just the last line
+### check that the cox regression is outputting all results and not just relapse G3G4 results (although logistic regression is a good surrogate)
 ### can consider running G3/G4 data in separate script
 
 ##################################################################################
+
+### INPUTS
+### need pData ("prepare_pData_table.R" script generate "pData_saved.RData")
+
+### OUTPUTS
+### Chi-squared analyses (overall cohort only currently)
+### chi_squared_results_df: chi squared results unselected (raw p values) - could apply adjusted p value (bh) to these
+### Significant_chisquare_results: chi squared results p<0.05 (unadjusted p values)
+### most_significant_Chi_squared_results_for_all_test_categories.txt: text file with goi with sig chi sq values p<0.05 (unadjusted)
+
+
+### Logistic regression (overall cohort only currently):
+### DF_LR: all results for logistic regression for all goi (unadjusted)
+### most_significant_logistic_regression_results.txt: text file with goi with sig log regression p<0.05 (unadjusted)
+
+### Cox regression (relapse G3G4 only)
+### COX_DF
+
+### survival (overall and G3G4)
+### survival_pvals_df
+
+####################################################
 
 ### R version 3.4.0 (2017-04-21)
 ### Platform: x86_64-pc-linux-gnu (64-bit)
@@ -49,7 +66,6 @@
 
 
 ### Libraries required
-
 library(NMF)
 #source("http://bioconductor.org/biocLite.R")
 #biocLite(c("gplots", "car"))
@@ -60,11 +76,9 @@ library('survival')
 # library(scales)
 
 
-
 ### Names of functions used:
 #source (file = "/home/nlp71/Marion/biomarker_discovery_functions.R")
 #source (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/Current/biomarker_discovery_functions.R")
-
 
 ### "chi.sq"
 ### "cor.result"
@@ -74,7 +88,7 @@ library('survival')
 ### "cox.result.OS"
 ### "km.log.test.EFS"
 
-
+##################################################################################################
 ### Will need to run "biomarker_discovery_functions.R" file and "prepare_pData_table.R" files 
 ### can choose to load an individual gene/transcript (goi) or a list of genes/transcripts. See instructions for unhashing relevant sections below
 ### ideally in initial biomarker discovery phase, will unhash sink and PDF outputs, due to large volume of data that will be generated
@@ -93,17 +107,15 @@ Chi_squared_results_df <- data.frame()
 logistic_regression_results_df <- data.frame()
 Chi_squared_sig_results_df <- data.frame()
 
-
 #### Can read in a list of genes to test 
 #gene_list <- read.csv(file ="genes.csv")
 
 #### check a single gene of interest
 #gene_list <- "ENSG00000000003.14_1"
-gene_list <- "ENSG00000000005.5_1"
+#gene_list <- "ENSG00000000005.5_1"
 
 ### check a defined list of genes of interest
-#gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
-
+gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
 
 #gene_list <- as.list(c("ENSG00000001036", "ENSG00000001497", "ENSG00000002016"))
 #### check a list of genes 
@@ -112,8 +124,8 @@ gene_list <- "ENSG00000000005.5_1"
 
 #### to check every gene in the RNAseq data unhash here (slow!)
 #gene_list <- as.list(rownames(mb.vsd))
-#gene_list <- gsub("\\..*","",gene_list)
-#gene_list <- unique(gene_list)
+#gene_list <- gsub("\\..*","",gene_list) ### keep this unhashed otherwise this will create problems with duplicate gene names
+#gene_list <- unique(gene_list)          ### keep this unhashed otherwise this will create problems with duplicate gene names
 #groups <- c("G3G4", "others")
 
 for (gene in 1:length(gene_list)){
@@ -233,25 +245,13 @@ for (gene in 1:length(gene_list)){
   rownames(chisqout) <- gene_list[[gene]]
   #### create a large data frame with the results from each gene
   Chi_squared_results_df <- rbind(Chi_squared_results_df, chisqout)
+  
+  #Chi_squared_results_df_padj <- as.data.frame(p.adjust(Chi_squared_results_df, method = "BH"))
+  
   ### add additional script here to define other outputs including list (proportions) for chi squared
   
   ##############################################
-  
-  
-  #### duplicate of working script above
-  #### turn the list into a data frame 
-  #chisqout <- as.data.frame(do.call(cbind, significant_chi_results))
-  #### set the appropriate column names 
-  # colnames(chisqout) <- chsqnm
-  #### remove named NA values from the data frame (created from the earlier matrix)
-  #chisqout <- chisqout[!is.na(names(chisqout))]
-  #### assign the gene name to rownames so we know which gene was tested
-  #rownames(chisqout) <- gene_list[[gene]]
-  #### create a large data frame with the results from each gene
-  #Chi_squared_results_df <- rbind(Chi_squared_results_df, chisqout)
-  
   ### add additional script here to define other outputs including list (proportions) for chi squared
-  
   
   ### relapse
   
@@ -580,7 +580,21 @@ for (gene in 1:length(gene_list)){
     assign(paste0("Survival_pval_",named_EFS_binaries[[cur]],gene_list[[gene]]), surv.p.val)
   }
  
+  
+  
   #########################################################################
+  ### kaplan meier survival summaries for overall and G3/G4
+  
+  cat (paste("extracting the significant survival statistics for the biomarker ",gene_list[[gene]]), sep = "\n")
+  #### extract significant survival analysis results 
+  survival_pvals <- as.list(mget(ls(pattern="Survival_pval_")))
+  survival_pvals_df <- as.data.frame(do.call("rbind",survival_pvals)) 
+  colnames(survival_pvals_df) <- ("p.value")
+  significant_survival_pvals_df <- as.data.frame(survival_pvals_df[which(survival_pvals_df$p.value < 0.05), drop=FALSE,])
+  
+  #########################################################################
+  
+  ### to determine the 5-year OS and SE for the relevant goi
   
   cat (paste("extracting the 5 year survival statistics for the biomarker ",gene_list[[gene]]), sep = "\n")
   #### extract the 5 year survival statistics for the biomarker
@@ -594,6 +608,10 @@ for (gene in 1:length(gene_list)){
     greater_than_5_yrs <- tbl[which(tbl$time > 5),]
     assign(paste0("greater_than_5_years_",gene_list[[gene]]),greater_than_5_yrs)
   }
+  
+  ###################################################################
+  ### cox regression
+  
   cat (paste("Running Cox haxards ratio test for event free survival ",gene_list[[gene]]), sep = "\n")
   #### Cox haxards ratio test for event free survival
   for (cur in 1:length(curatives)){
@@ -672,7 +690,7 @@ for (gene in 1:length(gene_list)){
   cat (paste("Extracting significant Logistic Regression results ",gene_list[[gene]]), sep = "\n")
   most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
  }
-} ## check about this last bracket 160817
+ ## removed last bracket 160817
   ###############################################
   
 
@@ -694,8 +712,42 @@ biomarkers_greater_than_5_years_df <- data.frame(biomarkers_greater_than_5_years
 #write.table(most_significant_Cox, file=paste("most_significant_Cox",names_sig_cox), sep="\t", quote=FALSE)
 write.table(most_significant_Log_Reg, file="most_significant_logistic_regression_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
 write.table(most_significant_Cox, file="most_significant_Cox_hazard_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)               
-write.table(biomarkers_greater_than_5_years_df , file="most_significant_survival_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
+#write.table(biomarkers_greater_than_5_years_df , file="most_significant_survival_results.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
 #write.table(significant_in_children, file="most_significant_Chi_squared_results_for_children.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
 write.table(significant_chisquare_results_df, file="most_significant_Chi_squared_results_for_all_test_categories.txt", sep="\t", quote=FALSE, col.names=TRUE, row.names=TRUE)
 
+### the "most_significant_Chi_squared_results_for_all_test_categories.txt" file is useful
 
+
+##########################################
+### yet to determine method to apply p adjust to a dataframe
+
+#Chi_squared_results_df_padj <- data.frame()
+#for(i in 1:ncol(Chi_squared_results_df){ 
+   # chi.p.adjust <- p.adjust(Chi_squared_results_df[[i]], method = "BH")
+    #colnames(Chi_squared_results_df_padj)<- colnames(Chi_squared_results_df)
+   # Chi_squared_results_df_padj<- as.data.frame(chi.p.adjust)         
+#}
+                        
+### first need to convert dataframe to a matrix
+### example     as.matrix(sapply(SFI, as.numeric)) where SFI is the name of a dataframe
+
+#Chi_squared_matrix <- as.matrix(sapply(Chi_squared_results_df, as.numeric), rownames= -1) ### rownames which are the genes are not retained with this formula
+#Chi_squared_matrix_padj <- p.adjust(Chi_squared_matrix, method = "BH") ### this will do padjust on all the data
+#names_chi_squared_padj <-paste(names(Chi_squared_matrix_padj), gene_list[[gene]]) ### trying to name the columns according to gene names 
+#Chi_squared_padj_df <- as.data.frame(Chi_squared_matrix_padj) ### question is how best to get this data out of the matrix into a dataframe to export p values
+
+######### online example below
+
+##gene <- colnames(Fisher)
+##gene.pair <- paste(gene[row(Fisher)], gene[col(Fisher)], sep=".")
+##i <- lower.tri(Fisher)
+##Dat <- data.frame(gene.pair[i], p.value=Fisher[i])
+##Dat$Holm <- p.adjust(Dat$p.value, method="holm")
+##Dat           
+#############################
+
+### Determining the output from overall and G3G4 = i.e which is which ? still get the same output whether or not line 146 is hashed or unhashed
+#logreg_relapse_all <- glm(matched.test.incl.pData$relapse ~ matched.goi.vsd.incl, family = binomial(link='logit'), data=matched.test.incl.pData)
+# summary(logreg_relapse_all)
+### unsure what this output means

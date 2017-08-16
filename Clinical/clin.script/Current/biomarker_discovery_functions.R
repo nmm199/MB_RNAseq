@@ -191,3 +191,4 @@ km.log.test <- function(time, event, marker, out.file = "none"){
   #  dev.off()
   #}
 #}
+
