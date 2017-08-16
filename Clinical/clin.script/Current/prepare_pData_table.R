@@ -109,6 +109,8 @@ cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
 ### reading in files
 cat ("reading in expression data", sep ="\n")
 mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt")
+#mb.vsd <- read.delim (file = "/home/dan/rna_seq_mb/paper/vsd.novel.txt") ###  for novel genes  - work on this on 17/8/17
+
 
 #############################################
 ### setting up output files for log, messages and PDF files
