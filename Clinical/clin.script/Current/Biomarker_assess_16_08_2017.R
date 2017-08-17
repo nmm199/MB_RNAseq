@@ -113,6 +113,7 @@ Chi_squared_sig_results_df <- data.frame()
 #### check a single gene of interest
 #gene_list <- "ENSG00000000003.14_1"
 #gene_list <- "ENSG00000000005.5_1"
+gene_list <- "ENSG00000001084.10_2"
 
 ### check a defined list of genes of interest
 #gene_list <- as.list(c("ENSG00000000003.14_1", "ENSG00000000005.5_1", "ENSG00000000419.12_1"))
@@ -121,7 +122,7 @@ Chi_squared_sig_results_df <- data.frame()
 #### check a list of genes 
 #gene_list <- as.list(c("ENSG00000136997", "ENSG00000197561", "ENSG00000000003", "ENSG00000124693"))
 #gene_list <- as.list(c("ENSG00000136997", "ENSG00000197561", "ENSG00000000003", "ENSG00000150991", "ENSG00000101665", "ENSG00000116039", "ENSG00000182979", "ENSG00000133026", "ENSG00000123384", "ENSG00000000005", "ENSG00000000419", "ENSG00000000457", "ENSG00000000460", "ENSG00000000938"))
-gene_list <- as.list(c("ENSG00000001167.14_1", "ENSG00000001461.16_1", "ENSG00000001497.16_1","ENSG00000001561.6_1", "ENSG00000002586.18_2","ENSG00000000938.12_1", "ENSG00000001036.13_1","ENSG00000001084.10_2", "ENSG00000001460.17_1"))   ### survival160817
+#gene_list <- as.list(c("ENSG00000001167.14_1", "ENSG00000001461.16_1", "ENSG00000001497.16_1","ENSG00000001561.6_1", "ENSG00000002586.18_2","ENSG00000000938.12_1", "ENSG00000001036.13_1","ENSG00000001084.10_2", "ENSG00000001460.17_1"))   ### survival160817
 
 #### to check every gene in the RNAseq data unhash here (slow!)
 #gene_list <- as.list(rownames(mb.vsd))
@@ -131,8 +132,8 @@ gene_list <- as.list(c("ENSG00000001167.14_1", "ENSG00000001461.16_1", "ENSG0000
 
 for (gene in 1:length(gene_list)){
   #### unhash sink and pdf lines below to output a sink and pdf file per gene in the list
-  #sink(paste("pDatalog",gene_list[[gene]],".txt"))
-  #pdf(paste("marker.results",gene_list[[gene]],".pdf"), width = 10, height = 10)
+  sink(paste("pDatalog",gene_list[[gene]],".txt"))
+  pdf(paste("marker.results",gene_list[[gene]],".pdf"), width = 10, height = 10)
   #### create an ordered list of variables measured in the matched data 
   index <- match(colnames(mb.vsd), rownames(test.pData))
   #goi.vsd <- as.numeric(mb.vsd[goi,]) 
@@ -756,11 +757,11 @@ write.table(significant_chisquare_results_df, file="most_significant_Chi_squared
 ######################################################################################
 ### to save the desired files for logistic regression, km survival, cox regression, chi squared:
 
-#write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/LogReg160817.csv", DF_LR, row.names=TRUE)
-#write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Survpval160817.csv", survival_pvals_df, row.names=TRUE)
-#write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Sig_Survpval160817.csv", significant_survival_pvals_df, row.names=TRUE)
-#write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/chisq160817.csv", Chi_squared_results_df, row.names=TRUE)
-#write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/cox_rel_G3G4_160817.csv", COX_DF, row.names=TRUE)
+write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/LogReg170817.csv", DF_LR, row.names=TRUE)
+write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Survpval170817.csv", survival_pvals_df, row.names=TRUE)
+write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Sig_Survpval170817.csv", significant_survival_pvals_df, row.names=TRUE)
+write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/chisq170817.csv", Chi_squared_results_df, row.names=TRUE)
+write.csv(file="/home/nmm199/R/MB_RNAseq/Clinical/clin.results/cox_rel_G3G4_170817.csv", COX_DF, row.names=TRUE)
 
 ######################################################################################
 
