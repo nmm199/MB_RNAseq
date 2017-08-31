@@ -1,6 +1,7 @@
 ### File introduction
 ### File name: prepare_PData_table.R
 
+
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
 # 2. Analyse genes of interest in relation to univariate and multivariate risk prediction models for survival (overall, event-free and progression-free)
@@ -86,13 +87,14 @@ library('survival')
 # cat ()
 
 #pdf("marker.results.pdf", width = 10, height = 10) 
-
+# setwd = "/home/nmm199/R/MB_RNAseq/"
 
 ### Read in pData 
 ### add in row names to original database file
 cat ("reading in clinical database", sep ="\n")
 #pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
-pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617.csv", row.names = 1)   
+#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617.csv", row.names = 1)
+pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617_310817.csv", row.names = 1) 
 #pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617_v2.csv", row.names = 1) ### has relapsetodeath column removed
 ### updated the file to remove relapse to death as example to see if improves chi_square output
 
