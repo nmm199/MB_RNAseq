@@ -92,19 +92,19 @@ library('survival')
 ### add in row names to original database file
 cat ("reading in clinical database", sep ="\n")
 #pData <- read.csv(file="/home/nlp71/Marion/database270617.csv", row.names = 1)
-pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617.csv", row.names = 1)   
-#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input data/database270617_v2.csv", row.names = 1) ### has relapsetodeath column removed
+pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617.csv", row.names = 1)   
+#pData <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Input_data/database270617_v2.csv", row.names = 1) ### has relapsetodeath column removed
 ### updated the file to remove relapse to death as example to see if improves chi_square output
 
-#meth.data <- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
-#cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
+#meth.data <- "/home/nmm199/R/MB_RNAseq/Input_data/all7subgroupCalls.csv"
+#cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input_data/arm_calls_clean280617.txt"
 #RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt"
 
 ### Read in methylation data
 #meth.data <- "/home/nlp71/Marion/all7subgroupCalls.csv"
-meth.data<- "/home/nmm199/R/MB_RNAseq/Input data/all7subgroupCalls.csv"
+meth.data<- "/home/nmm199/R/MB_RNAseq/Input_data/all7subgroupCalls.csv"
 #cytogen.data <- "/home/nlp71/Marion/arm_calls_clean280617.txt"
-cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input data/arm_calls_clean280617.txt"
+cytogen.data <- "/home/nmm199/R/MB_RNAseq/Input_data/arm_calls_clean280617.txt"
 
 ### reading in files
 cat ("reading in expression data", sep ="\n")
@@ -124,7 +124,7 @@ mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt")
 #goi <- "ENSG00000136997"
 
 ### unhash the line below if wish to run all goi results in RNAseq data (7/8/17)
-#goi.vsd <- as.numeric(mb.vsd[goi,]) 
+goi.vsd <- as.numeric(mb.vsd[goi,]) 
 
 ### the output would be a vector with a continuous variable, names equal NMB numbers
 #names(goi.vsd) <- gsub("T","",names(mb.vsd))
@@ -410,5 +410,7 @@ age.mean.goi <- plotmeans(test.pData$age.cont ~ test.pData$meth, data=test.pData
 age.df <- data.frame(NMB, age.filter, age.cont)
 summary(age.df)
 
-save.image("pData_saved.RData")
+#save.image("pData_saved.RData")
+save.image ("/home/nmm199/R/MB_RNAseq/pData_saved.RData")
+
 
