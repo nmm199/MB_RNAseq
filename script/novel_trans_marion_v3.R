@@ -1,7 +1,8 @@
+setwd="/home/nmm199/R/MB_RNAseq/RNA_classes/"
 
 #### first time you run you need to install this package
-# install.packages(c("foreach", "doParallel"))
-#
+#install.packages(c("foreach", "doParallel"))
+
 
 library(foreach)
 library(doParallel)
@@ -23,7 +24,7 @@ library(scatterplot3d)
 ### means it sets up all parallel functions to use 10 cores
 registerDoParallel(cores = 10)
 ### load in description of all novel transcripts
-#novel.gtf <- import("/media/microarray/output_cufflinks/cuffmerge/merged_asm/unknown.merged.gtf", format ="gtf")
+#novel.gtf.old <- import("/media/microarray/output_cufflinks/cuffmerge/merged_asm/unknown.merged.gtf", format ="gtf")
 novel.gtf <- import ("/home/dan/novel.mb.merged.gtf", form = "gtf") ### this is the updated file August 2018
 
 
@@ -49,8 +50,6 @@ c(tcons.linc.remove,tcons.refgene.remove) -> tcons.all.remove
 novel.gtf[-which(novel.gtf$transcript_id%in%tcons.all.remove),] -> filt.novel.gtf
 ################################################################################################
 
-
-
 ### assign levels to each transcript (isoform)
 levels(as.factor(novel.gtf$transcript_id)) -> levs
 
@@ -62,8 +61,22 @@ ex.no <- foreach(i = levs)%dopar%{
 ex.no <- unlist(ex.no)
 
 ###  extract each sequence as a DNAString
+### need to exclude those transcripts that do not have a defined position within GenomicRanges. This is done by grepping for *random within the required gtf file
+random.gtf <- grep(pattern = "*random", novel.gtf)   
+
+### can treat gtf like a dataframe, by removing lines that are indicated by the random.gtf file
+nonrandom.novel.gtf <- novel.gtf[-random.gtf,]
+  
+### check with novel gtf file should be used below (filt.novel.gtf or novel.gtf, original file uses novel.gtf) 29/8/17
+#seqs <- foreach(i = levs)%dopar%{
+ # novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
+ # temp.seqs <- getSeq(Hsapiens, temp.grange)
+ # unlist(temp.seqs) -> temp.seqs
+ # return(temp.seqs)
+#}
+
 seqs <- foreach(i = levs)%dopar%{
-  novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange
   temp.seqs <- getSeq(Hsapiens, temp.grange)
   unlist(temp.seqs) -> temp.seqs
   return(temp.seqs)
@@ -73,26 +86,53 @@ seqs <- foreach(i = levs)%dopar%{
 DNAStringSet(seqs) -> seqs.set
 names(seqs.set) <- levs
 
+
 ### write out various versions of the sequence strings
 # old script: writeXStringSet(seqs.set, file="./temp.seqs.fasta", format = "fasta", width=80)
-writeXStringSet(seqs.set, file="/home/nmm199/R/MB_Data/temp.seqs.fasta", format = "fasta", width=80)
-writeXStringSet(seqs.set[ex.no>1], file="./temp.seqs.ex.no.fasta", format = "fasta", width=80)
+writeXStringSet(seqs.set, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.fasta", format = "fasta", width=80)
+writeXStringSet(seqs.set[ex.no>1], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.ex.no.fasta", format = "fasta", width=80)
 
-### have decided not to run #writeXStringSet(seqs.set[1:100], file="./temp.seqs.100.fasta", format = "fasta", width=80)
-#writeXStringSet(seqs.set[1:10], file="./temp.seqs.10.fasta", format = "fasta", width=80)
+#dir.create("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/split_fasta")
+1:length(seqs.set) -> d
+split(d, ceiling(seq_along(d)/100)) -> splits
+
+for(i in 1:length(splits)){
+writeXStringSet(seqs.set[splits[[i]]], file=paste0("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/split_fasta/temp.seqs.",names(splits)[i],".fasta"), format = "fasta", width=80)
+}
+
+
+### run this to break down the larger seqs.set file to run PFAM more easily 31/8/17, replaced by for loop above 31/8/17
+#writeXStringSet(seqs.set[1:100], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.100.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[1:2000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.2000.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[2001:2000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.2000.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[1:1000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.1000.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[1:1000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.1000.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[1:1000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.1000.fasta", format = "fasta", width=80)
+#writeXStringSet(seqs.set[1:1000], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.1000.fasta", format = "fasta", width=80)
+
+### could run this first to check it is working before running it overnight
+#writeXStringSet(seqs.set[1:10], file="./temp.seqs.10.fasta", format = "fasta", width=80) 
 
 
 #### NOW GO AND PERFORM PFAM SEARCH ON SERVER ###
-### read back in pfam results
-pfam <- read.table(file="/home/dan/pfam/pfam.res.10.txt", header = TRUE)   
+### tips: make sure use script created within atom to ensure runs currently on server using screen session. see within Desktop/Bioinformatics/CPAT/PFAM
+### script from Dan, and the same file is then used in the trinotate annotation script section below
 
+### perl /home/dan/pfam/PfamScan/pfam_scan.pl -translate orf -cpu 10 –fasta home/nmm199/R/MB_RNAseq/RNA classes/working files/temp.seqs.100.fasta -dir ./dat -outfile /home/nmm199/R/MB_RNAseq/RNA classes/working files/outfile.pfam
+
+### read back in pfam results
+#pfam <- read.table(file="/home/dan/pfam/pfam.res.10.txt", header = TRUE)   ### this is not needed 30/8/17
+pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/outfile.pfam", header = TRUE)
 
 #### RUN CPAT ON MAC ###
 
-# load("~R/Data/data/CPAT/Human_logitModel.RData") Required opening folder on MAC in downloads directly to open file
+# load("~R/Data/data/CPAT/Human_logitModel.RData") ### did not use this in the most recent run 30/08/17
+### note on file input: export current FASTA files from R studio on Macbook into Macbook downloads, and then move to folder /Users/Marion/Desktop/Bioinformatics/CPAT on macbook. 
+### then run terminal on Macbook
 ### see shell script (cpat.sh) files on Atom on macbook
+### then reexport files from Macbook onto R studio
 
-read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results
+cpat.results <- read.delim(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.results.txt")   
 
 #### set probability limit as defined in Landscape of drawing some graphs to visualise results
 prob.limit = 0.5242
@@ -102,7 +142,7 @@ scatterplot3d(cpat.results$ORF_size,cpat.results$Fickett_score,cpat.results$Hexa
 
 cpat.results[cpat.results$coding_prob>prob.limit,] -> cod.cpat.results
 cod.cpat.results[order(cod.cpat.results$coding_prob, decreasing = TRUE),] -> order.cod.cpat.results
-write.table(order.cod.cpat.results, file = "/home/nmm199/R/MB_Data/results/order.cod.cpat.results.txt", sep = "\t")
+write.table(order.cod.cpat.results, file= "/home/nmm199/R/MB_RNAseq/RNA_classes/order.cod.cpat.results.txt", sep = "\t")
 
 
 #toi <- "TCONS_00318898"
@@ -258,6 +298,7 @@ gc()
 ####################################################
 
 ### loading in all of the data, note PhyloP data from home/nmm199/R
+### Dan needs to look for these files 31/8/17
 
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.isoforms.Rdata")
@@ -279,6 +320,7 @@ read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results
 registerDoParallel(cores = 6)
 
 ### check length of transcripts
+### 31/8/17 I think will need to use nonrandom.novel.gft file instead of novel.gtf for the below script, multiple usages
 length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
   novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
@@ -300,7 +342,7 @@ gene.id <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 }
 
 ### load Matt's Trinotate annotation (note default home folder for dan is home/dan/mygit/rna_seq_mb/)
-trinotate.annot <- read.delim(file="/home/dan/mygit/rna_seq_mb/trinotate_annotation_report.tab")
+trinotate.annot <- read.delim(file="/home/dan/mygit/rna_seq_mb/trinotate_annotation_report.tab") ### this is where you update the name of the PFAM results file to use 30/8/17
 
 ### check if it has a pfam entry
 any.pfam <- foreach(i = 1:length(levs), .combine=c)%dopar%{
