@@ -124,3 +124,26 @@ out <- foreach(i = 1:10)%dopar%{
   return(clinPathAssess(test.pData,x))
 }
 toc()
+
+### some script from earlier that may help, to look into 060917
+
+#head(mb.vsd)
+#apply(mb.vsd,1,function(x){clinPathAssess(test.pData,x)}) -> results.multiple
+
+#library(foreach)
+#library(doParallel)
+#registerDoParallel(10)
+#out <- foreach(i = 1:10)%dopar%{
+#  x <- as.numeric(mb.vsd[i,])
+#  names(x) <- colnames(mb.vsd)
+#  clinPathAssess(test.pData, x )
+#}
+
+#library(foreach)
+#library(doParallel)
+#registerDoParallel(10)
+#out <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+#  x <- as.numeric(mb.vsd[i,])
+#  names(x) <- colnames(mb.vsd)
+#  clinPathAssess(test.pData, x )
+#}
