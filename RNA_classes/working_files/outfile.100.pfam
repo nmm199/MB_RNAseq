@@ -1,0 +1,119 @@
+# pfam_scan.pl,  run at Thu Aug 31 12:50:14 2017
+#
+# Copyright (c) 2009 Genome Research Ltd
+# Freely distributed under the GNU 
+# General Public License
+#
+# Authors: Jaina Mistry (jm14@sanger.ac.uk), John Tate (jt6@sanger.ac.uk), 
+#          Rob Finn (rdf@sanger.ac.uk)
+#
+# This is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <http://www.gnu.org/licenses/>. 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#      query sequence file: /home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.100.fasta.translated
+#     cpu number specified: 20
+#        searching against: ./dat/Pfam-A.hmm, with cut off --cut_ga
+#    resolve clan overlaps: on
+#     predict active sites: off
+#   translate DNA sequence: orf
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#
+# <seq id> <alignment start> <alignment end> <envelope start> <envelope end> <hmm acc> <hmm name> <type> <hmm start> <hmm end> <hmm length> <bit score> <E-value> <significance> <clan> <strand> <nt start> <nt end>
+
+TCONS_00000282.35     30     51     30     51 PF13900.2   GVQW              Domain     1    22    48     35.5   8.1e-09   1 CL0093   + 2960 3023
+TCONS_00000282.36      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     47.1     2e-12   1 CL0093   + 3029 3101
+TCONS_00000282.91     16     62     16     63 PF13900.2   GVQW              Domain     1    47    48    113.9   2.8e-33   1 CL0093   - 2814 2673
+TCONS_00000350.62     29     72     29     72 PF13900.2   GVQW              Domain     1    48    48     88.5   2.4e-25   1 CL0093   - 387 258
+TCONS_00000488.43     21     60     21     60 PF13900.2   GVQW              Domain     1    40    48     93.9   4.6e-27   1 CL0093   + 3533 3650
+TCONS_00000489.2     21     68     21     68 PF13900.2   GVQW              Domain     1    48    48    113.7     3e-33   1 CL0093   + 199 340
+TCONS_00000489.3     24     53     16     55 PF13900.2   GVQW              Domain    19    48    48     49.4   3.9e-13   1 CL0093   + 553 670
+TCONS_00000489.37     27     46     27     49 PF13900.2   GVQW              Domain     1    20    48     39.2   5.6e-10   1 CL0093   + 524 590
+TCONS_00000489.41      3     25      2     25 PF13900.2   GVQW              Domain    26    48    48     34.8   1.4e-08   1 CL0093   + 905 974
+TCONS_00000489.58     14     61     14     61 PF13900.2   GVQW              Domain     1    48    48    101.2   2.5e-29   1 CL0093   + 4130 4271
+TCONS_00000489.58     75    106     75    106 PF13900.2   GVQW              Domain     1    32    48     60.1   1.7e-16   1 CL0093   + 4313 4406
+TCONS_00000489.72     16     63     16     63 PF13900.2   GVQW              Domain     1    48    48    101.3   2.4e-29   1 CL0093   + 699 840
+TCONS_00000489.95      2     25      1     25 PF13900.2   GVQW              Domain    25    48    48     33.8   2.8e-08   1 CL0093   + 4515 4587
+TCONS_00000489.124      1     43      1     43 PF13900.2   GVQW              Domain     6    48    48     45.5   6.1e-12   1 CL0093   - 1726 1600
+TCONS_00000489.133      1     35      1     35 PF13900.2   GVQW              Domain    14    48    48     66.5   1.7e-18   1 CL0093   - 6338 6236
+TCONS_00000489.140    177    209    177    209 PF13900.2   GVQW              Domain     1    32    48     30.3   3.4e-07   1 CL0093   - 4859 4763
+TCONS_00000489.189      1     40      1     40 PF13900.2   GVQW              Domain     9    48    48     79.7   1.3e-22   1 CL0093   - 1413 1296
+TCONS_00000568.7      3     21      1     25 PF13900.2   GVQW              Domain    26    44    48     31.2   1.9e-07   1 CL0093   + 1258 1330
+TCONS_00000568.43    128    175    128    175 PF13900.2   GVQW              Domain     1    48    48     94.9   2.4e-27   1 CL0093   + 1055 1196
+TCONS_00000568.70     15     45     14     45 PF13900.2   GVQW              Domain     2    32    48     65.4   3.9e-18   1 CL0093   + 7025 7118
+TCONS_00000569.7      3     21      1     25 PF13900.2   GVQW              Domain    26    44    48     31.2   1.9e-07   1 CL0093   + 1258 1330
+TCONS_00000569.14    128    175    128    175 PF13900.2   GVQW              Domain     1    48    48     94.9   2.4e-27   1 CL0093   + 1055 1196
+TCONS_00000570.20     15     45     14     45 PF13900.2   GVQW              Domain     2    32    48     65.4   3.9e-18   1 CL0093   + 3973 4066
+TCONS_00000600.7     25     72     25     72 PF13900.2   GVQW              Domain     1    48    48    108.1   1.8e-31   1 CL0093   + 1195 1336
+TCONS_00000659.82     11     32     11     32 PF13900.2   GVQW              Domain     1    22    48     41.1   1.5e-10   1 CL0093   - 2350 2287
+TCONS_00000659.83      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     48.0   1.1e-12   1 CL0093   - 2281 2209
+TCONS_00000825.31      3     29      1     29 PF13900.2   GVQW              Domain    22    48    48     56.8   1.8e-15   1 CL0093   - 1250 1166
+TCONS_00000828.24     41     87     41     88 PF13900.2   GVQW              Domain     1    47    48    105.2   1.4e-30   1 CL0093   + 323 464
+TCONS_00000831.10     10     28     10     28 PF08333.7   DUF1725           Family     1    19    19     39.1   3.5e-10   1 No_clan  + 1768 1822
+TCONS_00000831.74      1     40      1     40 PF13900.2   GVQW              Domain     9    48    48     68.8   3.2e-19   1 CL0093   + 3789 3906
+TCONS_00000833.17      1     40      1     40 PF13900.2   GVQW              Domain     9    48    48     68.8   3.2e-19   1 CL0093   + 3337 3454
+TCONS_00000833.33     10     28     10     28 PF08333.7   DUF1725           Family     1    19    19     39.1   3.5e-10   1 No_clan  + 1316 1370
+TCONS_00000890.25      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     30.8   2.5e-07   1 CL0093   + 2336 2408
+TCONS_00000902.44      6     52      6     54 PF13900.2   GVQW              Domain     1    47    48    106.2     7e-31   1 CL0093   + 504 648
+TCONS_00000903.115     26     61     25     62 PF13900.2   GVQW              Domain    12    47    48     73.8   8.9e-21   1 CL0093   + 9731 9842
+TCONS_00000904.70     26     61     25     62 PF13900.2   GVQW              Domain    12    47    48     73.8   8.9e-21   1 CL0093   + 2202 2313
+TCONS_00001105.18     13     44     13     44 PF13900.2   GVQW              Domain     1    32    48     71.0   6.9e-20   1 CL0093   + 3709 3802
+TCONS_00001234.32      2     25      1     25 PF13900.2   GVQW              Domain    25    48    48     30.5   3.1e-07   1 CL0093   + 993 1065
+TCONS_00001234.52      1     33      1     33 PF13900.2   GVQW              Domain    16    48    48     34.9   1.3e-08   1 CL0093   - 497 401
+TCONS_00001461.71     87    134     87    134 PF13900.2   GVQW              Domain     1    48    48     81.5   3.7e-23   1 CL0093   + 3432 3573
+TCONS_00001789.310     31    110     11    111 PF02994.10  Transposase_22    Family   273   350   351    116.8   8.8e-34   1 No_clan  - 2129 1829
+TCONS_00001789.381      4     64      1     64 PF02994.10  Transposase_22    Family   152   212   351     81.1   6.3e-23   1 No_clan  - 2442 2253
+TCONS_00001789.382      1     58      1     66 PF02994.10  Transposase_22    Family   219   276   351     92.5   2.2e-26   1 No_clan  - 2232 2037
+TCONS_00001790.18      4     25      2     25 PF13900.2   GVQW              Domain    27    48    48     31.2   1.8e-07   1 CL0093   + 2998 3067
+TCONS_00001790.104     17     55     17     55 PF13900.2   GVQW              Domain     1    39    48     89.1   1.5e-25   1 CL0093   + 2790 2904
+TCONS_00001790.254      6     27      6     27 PF13900.2   GVQW              Domain     1    22    48     44.6   1.2e-11   1 CL0093   - 3950 3887
+TCONS_00001790.255      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     52.3   4.8e-14   1 CL0093   - 3881 3809
+TCONS_00002237.64     18     33     18     36 PF08333.7   DUF1725           Family     1    16    19     34.2   1.2e-08   1 No_clan  - 280 226
+TCONS_00002239.100      2     44      1     57 PF02994.10  Transposase_22    Family   228   269   351     46.4   2.3e-12   1 No_clan  - 414 246
+TCONS_00002240.98      2     33      1     36 PF02994.10  Transposase_22    Family   228   259   351     40.5   1.4e-10   1 No_clan  - 256 151
+TCONS_00002483.10     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1753 1879
+TCONS_00002484.10     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1756 1879
+TCONS_00002485.31     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1796 1919
+TCONS_00002486.10     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1666 1789
+TCONS_00002487.48     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1779 1905
+TCONS_00002488.10     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1894 2020
+TCONS_00002489.29     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1742 1865
+TCONS_00002490.45     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1782 1905
+TCONS_00002492.26     32     67     27     69 PF13900.2   GVQW              Domain     9    44    48     62.8   2.5e-17   1 CL0093   + 495 621
+TCONS_00002494.30     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1775 1901
+TCONS_00002495.10     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.0   1.1e-17   1 CL0093   + 1735 1861
+TCONS_00002496.10     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1     1e-17   1 CL0093   + 1735 1861
+TCONS_00002497.31     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1796 1919
+TCONS_00002500.47     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1716 1842
+TCONS_00002501.39     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1     1e-17   1 CL0093   + 1674 1800
+TCONS_00002502.39     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1140 1263
+TCONS_00002503.9     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1639 1765
+TCONS_00002504.29     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1682 1805
+TCONS_00002505.44     15     50     11     52 PF13900.2   GVQW              Domain     9    44    48     62.7   2.6e-17   1 CL0093   + 1620 1743
+TCONS_00002506.29     15     50     10     52 PF13900.2   GVQW              Domain     9    44    48     64.1   9.5e-18   1 CL0093   + 1622 1748
+TCONS_00002508.76     24     61     21     61 PF13900.2   GVQW              Domain    11    48    48     57.8   9.4e-16   1 CL0093   + 5816 5936
+TCONS_00002508.121      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     45.5   6.3e-12   1 CL0093   + 7326 7398
+TCONS_00002830.35      4     18      4     18 PF08333.7   DUF1725           Family     5    19    19     27.8   1.2e-06   1 No_clan  + 912 954
+TCONS_00003045.31     15     36     15     36 PF13900.2   GVQW              Domain     1    22    48     48.4   7.8e-13   1 CL0093   + 1031 1094
+TCONS_00003045.32      1     25      1     26 PF13900.2   GVQW              Domain    24    47    48     45.8     5e-12   1 CL0093   + 1100 1175
+TCONS_00003045.79     17     64     17     64 PF13900.2   GVQW              Domain     1    48    48    104.6   2.2e-30   1 CL0093   - 3896 3755
+TCONS_00003047.121     15     36     15     36 PF13900.2   GVQW              Domain     1    22    48     48.4   7.8e-13   1 CL0093   + 3702 3765
+TCONS_00003047.122      1     25      1     26 PF13900.2   GVQW              Domain    24    47    48     45.8     5e-12   1 CL0093   + 3771 3846
+TCONS_00003047.217     17     64     17     64 PF13900.2   GVQW              Domain     1    48    48    104.6   2.2e-30   1 CL0093   - 6569 6428
+TCONS_00003053.19     14     61     14     61 PF13900.2   GVQW              Domain     1    48    48    105.2   1.4e-30   1 CL0093   + 3298 3439
+TCONS_00003190.90     20     51     20     51 PF13900.2   GVQW              Domain     1    32    48     63.3   1.8e-17   1 CL0093   - 1843 1750
+TCONS_00003620.5     16     37     16     37 PF13900.2   GVQW              Domain     1    22    48     51.1   1.1e-13   1 CL0093   + 928 991
+TCONS_00003620.6      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     47.4   1.6e-12   1 CL0093   + 997 1069
+TCONS_00003626.138     24     41     23     43 PF13900.2   GVQW              Domain     2    19    48     37.1   2.7e-09   1 CL0093   - 4404 4344
+TCONS_00003626.170      1     25      1     25 PF13900.2   GVQW              Domain    24    48    48     33.7     3e-08   1 CL0093   - 4609 4537
+TCONS_00003701.47     45     93     45     93 PF13900.2   GVQW              Domain     1    48    48    104.2     3e-30   1 CL0093   - 1651 1507
+TCONS_00003705.2     27     74     26     74 PF13900.2   GVQW              Domain     2    48    48    104.6   2.1e-30   1 CL0093   + 385 529
+TCONS_00003705.6     23     64     17     64 PF13900.2   GVQW              Domain     7    48    48     66.6   1.6e-18   1 CL0093   + 1273 1414
+TCONS_00003705.83     21     39     21     39 PF08333.7   DUF1725           Family     1    19    19     32.0   5.6e-08   1 No_clan  - 1575 1521
