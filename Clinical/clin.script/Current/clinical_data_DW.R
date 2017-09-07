@@ -75,8 +75,8 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/Current/clinical_da
 ### just for demonstration purposes at the moment
 ###############################################################################
 cat ("reading in expression data", sep ="\n")
-# RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt"
-RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
+RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
+# RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
 #mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt")
 mb.vsd <- read.delim(RNA.data)
 
@@ -106,11 +106,16 @@ log.file = "pDatalog.txt"
 
 ################################################################################
 
-pdf.file <- "marker.results.pdf"
+# setwd = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/"
+pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
 
-results <- clinPathAssess(test.pData,goi.vsd,pdf.file = "marker.results.pdf",log.file = "marker.results.txt")
+results <- clinPathAssess(test.pData,goi.vsd,pdf.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf",log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.txt")
 
 
+
+
+############################
+### run up until here to check clinPathAssess function, then run afterwards redefining the goi of interest 070917
 library(foreach)
 library(tictoc)
 library(parallel)

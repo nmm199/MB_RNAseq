@@ -403,11 +403,23 @@ clinPathAssess <- function(test.pData,
                            log.file = NULL
 ){
   
+  ### attempt with Dan
   #   test.pData = test.pData
-  #  x -> goi.vsd
+  #   x <- goi.vsd  ### changed the direction of x from the original file from Dan. Was recoding error messages. 
   #   pdf.file = NULL
   #   log.file = NULL
     
+  
+  ###attempt MM 070917 
+  #  goi <- "ENSG00000136997"
+  #  goi.vsd <- as.numeric(mb.vsd[goi,]) 
+  ### the output would be a vector with a continuous variable, names equal NMB numbers
+  #  names(goi.vsd) <- gsub("T","",names(mb.vsd))
+  #  test.pData = test.pData
+  #  pdf.file = NULL
+  #  log.file = NULL
+  
+  
   #############################################
   ### setting up output files for log, messages and PDF files
   if(!is.null(log.file)){
@@ -428,6 +440,7 @@ clinPathAssess <- function(test.pData,
   index <- match(names(goi.vsd), rownames(test.pData)) 
   matched.test.pData <- test.pData[index[!is.na(index)],] 
   is.vector(matched.test.pData)
+  #as.data.frame(matched.test.pData) ### added 070917 in attempt to avoid downstream" $ atomic in a vector" error
   matched.goi.vsd <- goi.vsd[!is.na(index)] 
   matched.goi.vsd.cat <- ifelse(matched.goi.vsd>median(goi.vsd, na.rm = T), "high","low") 
   
@@ -440,6 +453,7 @@ clinPathAssess <- function(test.pData,
   age.mean.goi <- plotmeans(matched.test.pData$age.cont ~ matched.test.pData$meth, data=matched.test.pData)
   
   ### summary data for all variables within the age 3-16 yo group, to construct survival cohort
+  
   age.df <- data.frame(test.pData$NMB, test.pData$age.filter, test.pData$age.cont)
   summary(age.df)
   
@@ -449,7 +463,7 @@ clinPathAssess <- function(test.pData,
   
   #matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX")
   #matched.test.pData$CSI <-ifelse(matched.test.pData$CSI=="Yes", "CSI", "No CSI")
-  #matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant")
+  # matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant") ### can trial unhashed 7/9/17
   
   
   list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
