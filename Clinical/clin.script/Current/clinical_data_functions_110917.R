@@ -267,10 +267,14 @@ updatepData <-  function(pData, meth7, cytogen, pdf.file = NULL, log.file = NULL
   resection <- ifelse(resection==1, "Gross total resection", "subtotal resection")
   
   ### RTX
-  RTX <- pData$RTX_R
+  RTX <- pData$RTX_R 
+  RTX <- ifelse(RTX=="Yes", "RTX", "No RTX")  ## changed 12/9/17
+  # RTX <- pData$RTX_R 
   
   ### CSI
-  CSI <-pData$RTXCSI_R
+  CSI <-pData$RTXCSI_R 
+  CSI <- ifelse(pData$CSI=="Yes", "CSI", "No CSI") ## changed 12/9/17
+  #CSI <-pData$RTXCSI_R
   
   ### molecular subgroups
   meth <-pData$X450K_R
@@ -285,7 +289,8 @@ updatepData <-  function(pData, meth7, cytogen, pdf.file = NULL, log.file = NULL
   
   
   #cytogen.ordered <- cytogen[match(rownames(pData), rownames(cytogen)),]
-  cytogen.q13.cat <- ifelse(cytogen.ordered$q13 == "Loss", "Loss", "no loss") 
+  cytogen.q13.cat <- ifelse(cytogen.ordered$q13 == "Loss", "q13 Loss", "no q13 loss") ## changed 12/9/17
+  
   
   ### pathology
   histopath <-pData$path_R
@@ -461,9 +466,9 @@ clinPathAssess <- function(test.pData,
   
   ### Chi squared analysis
   
-  #matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX")
-  #matched.test.pData$CSI <-ifelse(matched.test.pData$CSI=="Yes", "CSI", "No CSI")
-  # matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant") ### can trial unhashed 7/9/17
+  # matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX")
+  # matched.test.pData$CSI <-ifelse(matched.test.pData$CSI=="Yes", "CSI", "No CSI")
+  # matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant") ### can trial unhashed 12/9/17
   
   
   list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
@@ -1034,7 +1039,7 @@ clinPathAssess <- function(test.pData,
                      list.cor.age,
                      lin.reg.age,
                      #log.reg.results,
-                     # reg.log.list, ### think this is the one wihtout the goi names clearly against the results
+                     reg.log.list, ### think this is the with the goi names clearly against the results
                      cox.result.OS.all,
                      cox.result.OS.G3G4,
                      cox.EFS.incl,
