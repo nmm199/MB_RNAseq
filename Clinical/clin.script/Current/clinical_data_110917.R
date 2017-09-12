@@ -1,6 +1,6 @@
 
 ### File introduction
-### File name: clinical_data_070917.R  based on clinical_data_4.R with excerpts from clinical_data_7.R and clinPathAssess_backup.R
+### File name: clinical_data_110917.R  based on clinical_data_4.R with excerpts from clinical_data_7.R and clinPathAssess_backup.R
 
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
@@ -129,4 +129,15 @@ p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
 
 hist(adjusted.p.values)
 
+
+###########################################
+### example from stack overflow
+
+#spam = do.call("rbind", lapply(t1, "[[", 1))
+#> spam
+#[,1] [,2]      
+#[1,] "a"  "control"                                                         
+#[2,] "b"  "disease1" 
+#> unique(spam[,1])
+#[1] "a" "b"
 
