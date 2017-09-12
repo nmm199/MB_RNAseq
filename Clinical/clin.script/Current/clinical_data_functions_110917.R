@@ -594,20 +594,13 @@ clinPathAssess <- function(test.pData,
   
   cat ("processing logistic regression individually", sep ="\n")
   
-  ### cannot make logistic regression function work, error message "y values must be 0 <= y <= 1"
+  ### cannot make logistic regression function work, error message "y values must be 0 <= y <= 1" ### previous logistic regression error resolved and new function written however using original script currently below
+  ### the error was due to the ordering of y and x in the function, should be glm(x ~ y, family = binomial (link='logit'), data=data))
   
-  # x <- matched.test.pData$age.cat.infant
-  # y <- matched.goi.vsd
-  # data.source <-  matched.test.pData
-  
-  # log.reg <- function(x,y,data.source){
-  # log.reg.temp <- glm(y ~ x, family = binomial (link = 'logit'), data = data.source)
-  # summary.temp <-summary(log.reg.temp)
-  # boxplot.temp <- boxplot (y ~ x, col = c("red", "blue"), xlab = "x", ylab = "Biomarker expression", main = "Correlation between biomarker and variable x")
-  # }
-  
-  
-  
+  # logisticRegression <- function(x,y, data) {
+  #  temp.glm <- glm (x ~ y, family = binomial (link = 'logit'), data= data)
+  #  return(cbind(OR=exp(coef(temp.glm)), exp(confint(temp.glm)), summary(temp.glm)$coefficients))
+  #}
   
   
   ### age categorical
@@ -615,7 +608,7 @@ clinPathAssess <- function(test.pData,
   log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
   summary(log.reg.age.cat)
   age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
-  
+ # log.reg.age.cat.result <-  ### look at replicating the output from logistic Regression function above, within each 
   
   ### sex 
   
