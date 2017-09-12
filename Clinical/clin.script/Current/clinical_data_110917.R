@@ -10,7 +10,7 @@
 
 
 ### Author: Dr Marion Mateos
-### Date: July 3 2017
+### Date: Sep 11 2017
 
 
 ### R version 3.4.0 (2017-04-21)
@@ -108,7 +108,7 @@ library(doParallel)
 registerDoParallel(10)
 
 tic()
-out <- foreach(i = 1:1000)%dopar%{
+out <- foreach(i = 1:10)%dopar%{
  as.numeric(mb.vsd[i,]) -> x
  names(x) <- colnames(mb.vsd)
 names(goi.vsd) <- gsub("T","",names(mb.vsd)) 
@@ -116,6 +116,10 @@ return(clinPathAssess(test.pData,x))
 }
 toc()
 
+
+############################################
+
+### examples for how to then extract lists you are interested in
 
 lapply(out, function(x){return(x[[3]][[2]])}) -> extracted.results
 
