@@ -6,7 +6,7 @@ library(survival)
 
 ### File information:
 
-### This is a list of functions that were written for the "clinical_data_4.R" script analysis
+### This is a list of functions that were written for the "clinical_data_4.R" script analysis and then updated for the clinical_data_110917.R script
 ### Many of these functions are generic for survival analysis
 ### Aims of this document are to provide tools to perform univariate analysis in a group of children treated for medulloblastoma. 
 ### All kaplan-meier survival analyses provide graphical output with labelled axes and p value
@@ -15,7 +15,7 @@ library(survival)
 ### Author: Dr Marion Mateos
 ### Date: July 14 2017
 
-
+##############################################################################################
 
 ### Function Number 1
 ### Function entitled "chi.sq"
@@ -51,9 +51,7 @@ chi.sq <- function(x,y){
 }
 
 
-
-
-
+###########################################################################################
 
 ### Function Number 2
 ### Function entitled "cor.result"
@@ -77,6 +75,7 @@ cor.result <- function(x,y){
 
 
 
+#####################################################################################
 
 ### Function Number 3
 ### Function entitled "lin.reg"
@@ -98,6 +97,7 @@ lin.reg <- function(x,y){
   return(list.temp)
 }
 
+###########################################################################################
 
 
 ### Function Number 4
@@ -133,7 +133,7 @@ km.log.test <- function(time, event, marker, out.file = "none"){
 
 
 
-
+############################################################################################
 
 
 ### Function number 5
@@ -169,7 +169,7 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
 
 
 
-
+#######################################################################################
 
 ### Function number 6
 ### Function entitled "cox.result.OS"  to produce cox regression hazard ratio for overall survival in cohort of children
@@ -197,7 +197,7 @@ cox.result.OS <- function (time, event, marker, strata = NULL, data)
   return (summary.cox)
 }
 
-
+################################################################################################
 
 ### Function Number 7
 
@@ -232,7 +232,64 @@ km.log.test.EFS <- function(time, event, marker, out.file = "none"){
   }
 }
 
+
+
+###########################################################################
+
+### Function number 8
+### logisticRegression
+### replaced the hard coded script within previous clinicalPathAssess function 14/9/17, to check if function working
+
+### input
+## x <- dependent variable (must be binary, 0,1)
+## y <- biomarker (independent variable)
+## data <- matched dataset
+
+### output is a dataframe containing: 
+## OR
+## 95% confidence intervals
+## p value for logistic regression
+
+
+#x <- matched.test.pData$age.cat.infant
+#y <- matched.goi.vsd
+#data <- matched.test.pData
+
+logisticRegression <- function(x,y, data) {
+  temp.glm <- glm (x ~ y, family = binomial (link = 'logit'), data= data)
+  summary.temp <- summary(temp.glm)$coefficients  ### contains p value, z value and standard error
+  LR.OR = exp(coef(temp.glm))
+  LR.OR.95CI <- exp(confint(temp.glm))
+  interim.LR <- cbind (LR.OR, LR.OR.95CI, summary.temp)
+  return(list (LR.pval= summary.temp[2,4],
+               interim.LR = interim.LR,  
+               LR.OR.val=interim.LR[2,1],
+               lower.95CI=LR.OR.95CI[2,1], 
+               upper.95CI=LR.OR.95CI [2,2]
+               )
+  )
+}
+
+### note previously was outputting the interim.LR (ie cbind dataframe, and the relevant outputs were:   
+### pattern: OR =log.reg.age.cat[2,1], LCI 95 = log.reg.age.cat [2,2], UCI 95 = log.reg.age.cat[2,3], p value = log.reg.age.cat [2,7])
+### 140917: have now updated logisticRegression function to output the required values, listed below: 
+### including dataframe with raw values
+### OR, pvalue and 95CI:  LR.OR.pval, LR.pval, lower.95CI, upper.95CI respectively
+
+
+#logisticRegression <- function(x,y, data) {
+# temp.glm <- glm (x ~ y, family = binomial (link = 'logit'), data= data)
+# stats.temp <- cbind(OR=exp(coef(temp.glm)), exp(confint(temp.glm)))
+# summary.temp <- list (stats.temp, summary(temp.glm)$coefficients, summary(temp.glm)$data$Event)
+# return(summary.temp)
+#}
+
 ############################################################################
+
+
+### Function number 9
+### updatepData
+### called within the pData_input_2017_09_11.R file, only needed when clinical database file is updated. 
 
 updatepData <-  function(pData, meth7, cytogen, pdf.file = NULL, log.file = NULL){
   #### convert pData object columns into categorical variables
@@ -273,7 +330,7 @@ updatepData <-  function(pData, meth7, cytogen, pdf.file = NULL, log.file = NULL
   
   ### CSI
   CSI <-pData$RTXCSI_R 
-  CSI <- ifelse(pData$CSI=="Yes", "CSI", "No CSI") ## changed 12/9/17
+  CSI <- ifelse(CSI=="Yes", "CSI", "No CSI") ## changed 14/9/17
   #CSI <-pData$RTXCSI_R
   
   ### molecular subgroups
@@ -411,6 +468,11 @@ updatepData <-  function(pData, meth7, cytogen, pdf.file = NULL, log.file = NULL
 
 ###############################################################################
 
+### clinPathAssess function is designed to input a goi.vsd and run that against clinical correlation tests
+### output is a list of list of results
+### important elements within the list of lists are then called out within the clinical_data_110917.R script
+
+### goi.vsd #### name of a group of putative biomarkers or the converted numerical expression data within the RNA seq input file
 
 clinPathAssess <- function(test.pData,
                            goi.vsd,
@@ -424,6 +486,16 @@ clinPathAssess <- function(test.pData,
   #   pdf.file = NULL
   #   log.file = NULL
   
+  ### MM stipulating inputs 140917
+  ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
+  # goi <- "ENSG00000249859"
+  #  goi.vsd <- as.numeric(mb.vsd[goi,]) 
+  ### the output would be a vector with a continuous variable, names equal NMB numbers
+  #  names(goi.vsd) <- gsub("T","",names(mb.vsd))
+  #  test.pData = test.pData
+  #  pdf.file = NULL
+  #  log.file = NULL
+  ### 
   
   #############################################
   ### setting up output files for log, messages and PDF files
@@ -438,8 +510,6 @@ clinPathAssess <- function(test.pData,
   
   #############################################
   
-  
-  ### goi.vsd #### name of a putative biomarker
   ### matching the expression data (goi data) with the initially compiled clinical data with important variables
   
   index <- match(names(goi.vsd), rownames(test.pData)) 
@@ -466,10 +536,9 @@ clinPathAssess <- function(test.pData,
   
   ### Chi squared analysis
   
-  # matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX")
+  # matched.test.pData$RTX <- ifelse(matched.test.pData$RTX=="Yes", "RTX", "No RTX") ### have renamed these objects within the main test.pData file therefore do not need these next 3 lines of code (140917)
   # matched.test.pData$CSI <-ifelse(matched.test.pData$CSI=="Yes", "CSI", "No CSI")
-  # matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant") ### can trial unhashed 12/9/17
-  
+  # matched.test.pData$age.cat.infant <- ifelse(matched.test.pData$age.cat.infant=="TRUE", "infant", "non infant") 
   
   list.age.cat.infant <- chi.sq(x = matched.test.pData$age.cat.infant, y = matched.goi.vsd.cat)
   
@@ -500,9 +569,6 @@ clinPathAssess <- function(test.pData,
   list.TP53 <- chi.sq (x = matched.test.pData$TP53.cat, y = matched.goi.vsd.cat)
   
   list.TERT <- chi.sq (x = matched.test.pData$TERT.cat, y = matched.goi.vsd.cat)
-  
-  
-  ### is the biomarker overrepresented in poor prognostic groups or those who received different therapy
   
   list.RTX <- chi.sq (x = matched.test.pData$RTX, y = matched.goi.vsd.cat)
   
@@ -535,31 +601,11 @@ clinPathAssess <- function(test.pData,
   histopath.result
   
   
-  
-  ### add cytogenetic data to existing data frame, NMB650 to be resolved but will not be included in survival analysis therefore add cytogenetic data at this stage
-  ### duplicate NMB650 data emailed Ed 
-  
-  #cytogen.q13.cat <- cytogen [c("SampleID", "q13")]
-  
-  ### need to convert q13 loss into loss, and rest into "no loss"
-  
-  #cytogen.q13 <- ifelse(cytogen.q13.cat$q13 =="Loss", "Loss", "No loss")
-  
-  ### make q13 loss dataframe
-  
-  #cytogen.q13.df <- data.frame(cytogen.q13.cat[,-1], 
-  #                             row.names=cytogen.q13.cat [,1],
-  #                             cytogen.q13)
-  
-  
-  #matched.test.pData$q13loss <- cytogen.q13.df[match(rownames(matched.test.pData), rownames(cytogen.q13.df)),]$cytogen.q13
-  
   ###################################
   
   ### Correlation coefficients
   
   cat ("correlation coefficients for association between variables", sep ="\n")
-  
   
   list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd)
   list(list.cor.age)
@@ -577,8 +623,6 @@ clinPathAssess <- function(test.pData,
   # predict(lm(matched.test.pData$age.cont ~ matched.goi.vsd, data = matched.test.pData, interval = "confidence"))
   
   
-  
-  
   #################################
   
   ### Mann-whitney U (aka wilcoxon rank sum test) for non-parametric data
@@ -588,31 +632,53 @@ clinPathAssess <- function(test.pData,
   age.cont.wilcox
   
   
-  
   ##################################
   ### logistic regression
   
-  cat ("processing logistic regression individually", sep ="\n")
+  cat ("processing logistic regression within defined logisticRegression function for each variable", sep ="\n")
   
-  ### cannot make logistic regression function work, error message "y values must be 0 <= y <= 1" ### previous logistic regression error resolved and new function written however using original script currently below
-  ### the error was due to the ordering of y and x in the function, should be glm(x ~ y, family = binomial (link='logit'), data=data))
+  log.reg.age.cat <- logisticRegression(x = matched.test.pData$age.cat.infant, y= matched.goi.vsd, data = matched.test.pData)
+  log.reg.age.cat
   
-  # logisticRegression <- function(x,y, data) {
-  #  temp.glm <- glm (x ~ y, family = binomial (link = 'logit'), data= data)
-  #  return(cbind(OR=exp(coef(temp.glm)), exp(confint(temp.glm)), summary(temp.glm)$coefficients))
-  #}
+  log.reg.sex <- logisticRegression (x = matched.test.pData$sex, y = matched.goi.vsd, data= matched.test.pData)
+  log.reg.sex
   
+  ### have now updated logisticRegression function to output the required values, listed below: 
+    ### pvalue [[1]][[1]], raw dataframe with intercept and y values, OR and 95CI:  LR.pval, interim.LR, LR.OR.pval,  lower.95CI, upper.95CI respectively
+  
+  
+  log.reg.results <- list (log.reg.age.cat,
+                           log.reg.sex ) ### interim list
+  
+  ###########
+  #logistic_regression_out <- data.frame(m)
+  #names_reg_log <- toupper(names(reg.log.list))
+  #for (res in 1:length(reg.log.list)){
+   # lr.pval <- reg.log.list[[res]][2, 7]
+   # lr.OR <- reg.log.list[[res]][2, 1]
+   # lr.CI.97.5 <- reg.log.list[[res]][2, 3]
+   # lr.CI.2.5 <- reg.log.list[[res]][2, 2]
+   # LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
+   # assign(paste0("LR_DF_",names_reg_log[[res]],"_",gene_list[[gene]]), LR_DF)
+ # }
+ # LR_list <- as.list(mget(ls(pattern="LR_DF_")))
+ # DF_LR <- as.data.frame(do.call("rbind",LR_list)) 
+  #cat (paste("logistic regression data frame created ",gene_list[[gene]]), sep = "\n")
+ # cat (paste("Extracting significant Logistic Regression results ",gene_list[[gene]]), sep = "\n")
+ # most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
+  ############
+  
+  ##############################
+  ### original logistic regression script from here to ****
+  ### have removed boxplots which are hardcoded and moved to separate section. 
   
   ### age categorical
-  
-  log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-  summary(log.reg.age.cat)
-  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
- # log.reg.age.cat.result <-  ### look at replicating the output from logistic Regression function above, within each 
-  
+  #log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+  #summary(log.reg.age.cat)
+
   ### sex 
   
-  log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
+  #log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
   summary(log.reg.sex)
   sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
   
@@ -719,8 +785,19 @@ clinPathAssess <- function(test.pData,
   reg.log.list <- as.list(mget(ls(pattern="log.reg")))
   # print(reg.log.list)
   
+ ### original script up until here 140917 ****
+    
+  #######################################################################
   
-  ### visualise distribution of biomarker in cohort
+  ### hardcoded boxplots, separated now from logistic regression coding 140917
+  
+  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
+ 
+  
+  
+  #######################################################################
+  
+   ### visualise distribution of biomarker in cohort
   
   message ("visualisation of biomarker and relationship with methylation")
   
@@ -1031,7 +1108,7 @@ clinPathAssess <- function(test.pData,
    result.goi <- list(chi.sq.results,
                      list.cor.age,
                      lin.reg.age,
-                     #log.reg.results,
+                     log.reg.results, ### still updating this output list 140917
                      reg.log.list, ### think this is the with the goi names clearly against the results
                      cox.result.OS.all,
                      cox.result.OS.G3G4,
