@@ -32,16 +32,17 @@ library(survival)
 chi.sq <- function(x,y){
   # x = matched.test.pData$resection 
   # y = matched.goi.vsd.cat
-  
-  table.temp <- table(x, y) 
+  table.temp <- table(x, y) ### check how to label x and y so outputted in list.temp
   table.temp.perc <- prop.table(table.temp)*100
-  summary.table(table.temp)
+  summary.table(table.temp) ### note that the pvalue for independence of all factors is not the p value for the Pearson's chi-squared test, verified 140917
   # chi.test.temp <- chisq.test(table.temp) 
   chi.test.temp <- try(chisq.test(table.temp), silent = T) 
   chi.test.temp.stat <- c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value) 
   chi.test.temp.res <- chi.test.temp$residuals
   try(aheatmap(chi.test.temp$residuals, Rowv=NA, Colv = NA), silent = T)
-  list.temp <- list  (table.temp, 
+  list.temp <- list  (p.value= chi.test.temp$p.value, 
+                      chi.test.temp.stat, 
+                      table.temp, ## does not work if put in variable x or y, here
                       table.temp.perc,
                       chi.test.temp,
                       chi.test.temp.res
@@ -104,14 +105,19 @@ lin.reg <- function(x,y){
 ### Function entitled "km.log.test" to create kaplan meier survival curves for age 3=16 year old children treated with curative intent, MB
 ### input:
 ## time
-## event
 ## marker
+## event
 
 ### output:
 ## km survival curve
 ## p values plotted on graph
 ## y axis with values as %
 ## legend and p value for survival analysis 
+
+### example inputs
+# time <- matched.test.incl.pData$PFS
+# event = relapse.bin.incl
+# marker = matched.goi.vsd.cat.incl
 
 
 km.log.test <- function(time, event, marker, out.file = "none"){
@@ -124,13 +130,16 @@ km.log.test <- function(time, event, marker, out.file = "none"){
   legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
   axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
   PFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
-  1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val
-  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val.PFS
+  text(4,0.1,paste("p =",round(surv.p.val.PFS, 3)), pos = 4, cex = 1)
+  #assign(paste0("Survival_pval_", marker, surv.p.val.PFS)) ### added 140917
+  PFS.surv.table <- summary(km.PFS.incl)
+  return (list(surv.p.val.PFS,
+               PFS.surv.table)) ### added 140917
   if(out.file!="none"){
     dev.off()
   }
 }
-
 
 
 ############################################################################################
@@ -150,6 +159,10 @@ km.log.test <- function(time, event, marker, out.file = "none"){
 ## legend and p value for survival analysis 
 
 
+### example inputs
+# time <- matched.test.incl.pData$Followup
+# event = OS.cat.bin.incl
+# marker = matched.goi.vsd.cat.incl
 km.log.test.OS <- function(time, event, marker, out.file = "none"){
   if(out.file!="none"){
     pdf(out.file)
@@ -160,8 +173,11 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
   legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
   axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
   OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
-  1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val
-  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val.OS
+  text(4,0.1,paste("p =",round(surv.p.val.OS, 3)), pos = 4, cex = 1)
+  OS.surv.table <- summary(km.OS.incl)
+  return (list(surv.p.val.OS, 
+               OS.surv.table))
   if(out.file!="none"){
     dev.off()
   }
@@ -214,6 +230,11 @@ cox.result.OS <- function (time, event, marker, strata = NULL, data)
 ## y axis with values as %
 ## legend and p value for survival analysis 
 
+### example input
+# time <- matched.test.incl.pData$EFS
+# event <- EFS.cat.bin.incl
+# marker <- matched.goi.vsd.cat.incl
+
 
 km.log.test.EFS <- function(time, event, marker, out.file = "none"){
   if(out.file!="none"){
@@ -225,8 +246,11 @@ km.log.test.EFS <- function(time, event, marker, out.file = "none"){
   legend (x="topright", EFS.names,  lty= 1:2, col = c("red","blue"))
   axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
   EFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
-  1 - pchisq(EFS.incl.logrank$chisq, length(EFS.incl.logrank$obs)-1) -> surv.p.val
-  text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1)
+  1 - pchisq(EFS.incl.logrank$chisq, length(EFS.incl.logrank$obs)-1) -> surv.p.val.EFS
+  text(4,0.1,paste("p =",round(surv.p.val.EFS, 3)), pos = 4, cex = 1)
+  EFS.surv.table <- summary(km.EFS.incl)
+  return(list(surv.p.val.EFS, 
+              EFS.surv.table))
   if(out.file!="none"){
     dev.off()
   }
@@ -574,24 +598,26 @@ clinPathAssess <- function(test.pData,
   
   list.CSI <- chi.sq (x = matched.test.pData$CSI, y = matched.goi.vsd.cat)
   
-  chi.sq.results <- list(list.age.cat.infant,
-                         list.sex,
-                         list.mstatus,
-                         list.relapse, 
-                         list.resection, 
-                         list.meth.4,
-                         list.meth.7, 
-                         list.path,
-                         list.LCA, 
-                         list.MYC, 
-                         list.MYCN, 
-                         list.MYCMYCN, 
-                         list.TP53,
-                         list.TERT, 
-                         list.q13loss,
-                         list.RTX,
-                         list.CSI
-  )
+  #chi.sq.results <- list(list.age.cat.infant,
+  #                       list.sex,
+   #                      list.mstatus,
+   #                      list.relapse, 
+   #                      list.resection, 
+   #                      list.meth.4,
+   #                      list.meth.7, 
+   #                      list.path,
+    #                     list.LCA, 
+     #                    list.MYC, 
+      #                   list.MYCN, 
+       #                  list.MYCMYCN, 
+        #                 list.TP53,
+         #                list.TERT, 
+          #               list.q13loss,
+           #              list.RTX,
+            #             list.CSI
+  #)
+  
+  chi.sq.list <- as.list(mget(ls(pattern="list."))) 
   
   ### run Fisher's exact test on those where count < 5 e.g pathology "other"
   
@@ -622,7 +648,6 @@ clinPathAssess <- function(test.pData,
   ### question: how do get 95% confidence interval, tried predict(lin.reg.age, interval = "confidence"), object needs to be as a dataframe
   # predict(lm(matched.test.pData$age.cont ~ matched.goi.vsd, data = matched.test.pData, interval = "confidence"))
   
-  
   #################################
   
   ### Mann-whitney U (aka wilcoxon rank sum test) for non-parametric data
@@ -631,202 +656,73 @@ clinPathAssess <- function(test.pData,
   age.cont.wilcox <- wilcox.test(matched.test.pData$age.cont ~ matched.goi.vsd.cat, exact = F, correct = F)
   age.cont.wilcox
   
-  
   ##################################
   ### logistic regression
   
   cat ("processing logistic regression within defined logisticRegression function for each variable", sep ="\n")
+  ### have now updated logisticRegression function to output the required values, listed below: 
+  ### pvalue [[1]][[1]], raw dataframe with intercept and y values, OR and 95CI:  LR.pval, interim.LR, LR.OR.pval,  lower.95CI, upper.95CI respectively
   
   log.reg.age.cat <- logisticRegression(x = matched.test.pData$age.cat.infant, y= matched.goi.vsd, data = matched.test.pData)
-  log.reg.age.cat
-  
   log.reg.sex <- logisticRegression (x = matched.test.pData$sex, y = matched.goi.vsd, data= matched.test.pData)
-  log.reg.sex
-  
-  ### have now updated logisticRegression function to output the required values, listed below: 
-    ### pvalue [[1]][[1]], raw dataframe with intercept and y values, OR and 95CI:  LR.pval, interim.LR, LR.OR.pval,  lower.95CI, upper.95CI respectively
-  
-  
-  log.reg.results <- list (log.reg.age.cat,
-                           log.reg.sex ) ### interim list
-  
-  ###########
-  #logistic_regression_out <- data.frame(m)
-  #names_reg_log <- toupper(names(reg.log.list))
-  #for (res in 1:length(reg.log.list)){
-   # lr.pval <- reg.log.list[[res]][2, 7]
-   # lr.OR <- reg.log.list[[res]][2, 1]
-   # lr.CI.97.5 <- reg.log.list[[res]][2, 3]
-   # lr.CI.2.5 <- reg.log.list[[res]][2, 2]
-   # LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
-   # assign(paste0("LR_DF_",names_reg_log[[res]],"_",gene_list[[gene]]), LR_DF)
- # }
- # LR_list <- as.list(mget(ls(pattern="LR_DF_")))
- # DF_LR <- as.data.frame(do.call("rbind",LR_list)) 
-  #cat (paste("logistic regression data frame created ",gene_list[[gene]]), sep = "\n")
- # cat (paste("Extracting significant Logistic Regression results ",gene_list[[gene]]), sep = "\n")
- # most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
-  ############
-  
-  ##############################
-  ### original logistic regression script from here to ****
-  ### have removed boxplots which are hardcoded and moved to separate section. 
-  
-  ### age categorical
-  #log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-  #summary(log.reg.age.cat)
-
-  ### sex 
-  
-  #log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
-  summary(log.reg.sex)
-  sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
-  
-  ### metastatic status
-  
-  log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
-  summary(log.reg.mstatus)
-  
-  mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
-  
-  
-  ### relapse 
-  
-  log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-  summary(log.reg.relapse)
-  relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
-  #str(log.reg.relapse)
-  
-  
-  ### resection
-  
-  log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
- print(summary(log.reg.resection))
-  resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
-  
-  
-  
-  ### histopath
-  
-  log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-  summary(log.reg.histopath)
-  
-  histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
-  histopath.pw
-  histopath.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$histopath, col = c("red", "blue"), xlab = "Histopathology subtype", ylab = "Biomarker expression", main = "Correlation between biomarker and histopathology")
-  
-  
-  ### visualise relationship between biomarker and LCA pathology
-  
-  log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-  summary(log.reg.LCA)
-  
-  LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
-  LCA.pw
-  LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blue"),  xlab = "LCA pathology", ylab = "Biomarker expression", main = "Correlation between biomarker and LCA pathology")
-  
-  
-  ### MYC.cat
-  
-  log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-  summary(log.reg.MYC)
-  MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC expression")
-  
-  ### MYCN.cat
-  
-  log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-  summary(log.reg.MYCN)
-  MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
-  
-  
-  
-  ### combined MYC / MYCN amplification group
-  
-  log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-  summary(log.reg.MYCMYCN)
-  
-  MYCMYCN.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$MYCMYCN.cat)
-  MYCMYCN.pw
-  MYCMYCNN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, col = c("Red", "Blue"), xlab = "MYC or MYCN amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
-  
-  
-  ### TP53
-  
-  log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
-  summary(log.reg.TP53)
-  TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "Correlation between biomarker and TP53 mutational status")
-  
-  
-  ### additional subgroup specific tests
-  
-  ### TERT (may need to specific subgroup)
-  
-  log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData)
-  summary(log.reg.TP53)
-  
-  TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT status", ylab = "Biomarker expression", main = "Correlation between biomarker and TERT status")
-  
-  
-  ##################################################
-  
-  ### logistic regression and molecular subgroups
-  
-  ### includes some more detailed assumption testing and post-hoc analysis
-  cat ("logistic regression and association with molecular subgroups")
-  
-  log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-  summary(log.reg.meth)                  
-  
-  
-  log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-  summary(log.reg.meth7) 
-  
-  ### output logistic regression results as a list
-  reg.log.list <- as.list(mget(ls(pattern="log.reg")))
-  # print(reg.log.list)
-  
- ### original script up until here 140917 ****
-    
-  #######################################################################
-  
-  ### hardcoded boxplots, separated now from logistic regression coding 140917
-  
-  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
+  log.reg.mstatus <- logisticRegression(x= matched.test.pData$mstatus, y= matched.goi.vsd, data=matched.test.pData)
+  log.reg.relapse <- logisticRegression(x= matched.test.pData$relapse, y = matched.goi.vsd, data=matched.test.pData)
+  log.reg.resection <- logisticRegression(x =matched.test.pData$resection, y = matched.goi.vsd, data=matched.test.pData)
+  log.reg.histopath <- logisticRegression (x= matched.test.pData$histopath, y= matched.goi.vsd, data=matched.test.pData)
+  log.reg.LCA <- logisticRegression(x=matched.test.pData$LCA, y= matched.goi.vsd, data=matched.test.pData) 
+  log.reg.MYC <- logisticRegression (x= matched.test.pData$MYC.cat, y= matched.goi.vsd,  data=matched.test.pData)
+  log.reg.MYCN <- logisticRegression (x= matched.test.pData$MYCN.cat, y=matched.goi.vsd, data=matched.test.pData)
+  log.reg.MYCMYCN <- logisticRegression (x=matched.test.pData$MYCMYCN.cat, y= matched.goi.vsd, data=matched.test.pData)
+  log.reg.meth <- logisticRegression (x=matched.test.pData$meth, y= matched.goi.vsd, data = matched.test.pData)
+  log.reg.meth7 <- logisticRegression (x = matched.test.pData$meth7, y= matched.goi.vsd, data = matched.test.pData)
+  log.reg.TP53 <- logisticRegression (x= matched.test.pData$TP53.cat, y= matched.goi.vsd, data=matched.test.pData)
+  log.reg.TERT <- logisticRegression (x= matched.test.pData$TERT.cat, y= matched.goi.vsd, data = matched.test.pData)
  
+   ######################################################################
   
+  reg.log.list <- as.list(mget(ls(pattern="log.reg"))) ### this will work 140917
   
-  #######################################################################
-  
-   ### visualise distribution of biomarker in cohort
-  
-  message ("visualisation of biomarker and relationship with methylation")
-  
+  ######################################################################
+
+  ### visualise distribution of biomarker in cohort
+  cat ("visualisation of biomarker and relationship with methylation", sep = "\n")
   qqnorm(matched.goi.vsd)
   
-  ### visualise relationship between biomarker and methylation groups
-  
-  meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 4 molecular subgroups")
-  
-  meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("yellow","green","red","blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 7 molecular subgroups")
-  
+  ### posthoc for multiple categories e.g histopath, meth, meth7
+  ### pairwise t-test to determine where the difference lies between the groups
+  histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
+  LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
+  MYCMYCN.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$MYCMYCN.cat)
+  meth.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth)
+  meth7.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth7.cat)
   
   ### if biomarker is normally distributed, can use ANOVA (one-way ANOVA)
-  
   meth7.aov <- aov (matched.goi.vsd ~ matched.test.pData$meth7, data = matched.test.pData)
   summary(meth7.aov)
   plot(meth7.aov)
   
+  #######################################################
   
-  ### post-hoc tests for methylation
+  ### hardcoded boxplots, separated now from logistic regression coding 140917
   
-  ### pairwise t-test to determine where the difference lies between the groups
-  meth.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth)
+  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "Correlation between biomarker and age (infant vs non infant)")
+  sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "Biomarker expression and gender")
+  mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
+  relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between biomarker and relapse")
+  resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between biomarker and resection status")
+  histopath.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$histopath, col = c("red", "blue"), xlab = "Histopathology subtype", ylab = "Biomarker expression", main = "Correlation between biomarker and histopathology")
+  LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blue"),  xlab = "LCA pathology", ylab = "Biomarker expression", main = "Correlation between biomarker and LCA pathology")
+  MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYC expression")
+  MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
+  MYCMYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, col = c("Red", "Blue"), xlab = "MYC or MYCN amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
   
-  meth.pw
+  meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 4 molecular subgroups")
+  meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("yellow","green","red","blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "Correlation between biomarker and 7 molecular subgroups")
+  TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "Correlation between biomarker and TP53 mutational status")
+  TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT status", ylab = "Biomarker expression", main = "Correlation between biomarker and TERT status")
   
   
-  ###################################
-  
+  #######################################################################
   
   ### summary data for each methylation subgroup (n=4), no age restriction for first analyses
   
@@ -844,7 +740,6 @@ clinPathAssess <- function(test.pData,
   G4 <- matched.test.pData$meth =="G4"
   G4.group <- matched.test.pData [G4, ]
   summary(G4.group)
-  
   
   ### SHH
   
@@ -870,7 +765,6 @@ clinPathAssess <- function(test.pData,
   G3.low.data <- matched.test.pData [G3.low.group, ]
   summary(G3.low.data)
   
-  
   ### G4 subgroups
   
   G4.high.group <- matched.test.pData$meth7 =="Grp4_HighRisk"
@@ -890,7 +784,6 @@ clinPathAssess <- function(test.pData,
   SHH.old.data <- matched.test.pData [SHH.old.group, ]
   summary (SHH.old.data)
   
-  
   #############################################
   
   ### New dataframes for survival analyses
@@ -903,14 +796,11 @@ clinPathAssess <- function(test.pData,
   Age.incl.df <- matched.test.pData [Age.incl,]
   summary(Age.incl.df)
   
-  
   ### compare to prior dataframes to check accuracy of new dataframe
   
   cat ("comparing with previous data frames for accuracy", sep = "\n")
   summary(test.pData)
   summary (matched.test.pData)
-  
-  
   
   ####################################
   
@@ -970,16 +860,13 @@ clinPathAssess <- function(test.pData,
   SHH.old.incl <- Age.incl.df [SHH.old, ]
   summary (SHH.old.incl)
   
-  
-  
   ##########################
   
-  ### survival analysis using functions from source file "clinical_data_functions.R"
+  ### survival analysis using functions from this source file "clinical_data_functions_110917.R" (i.e this file)
   
   ##########################
   
   ### creating dataframe for survival analysis
-  
   cat ("restrict survival analysis for age 3-16 years, curative intent", sep = "\n")
   cat ("creating matched data frame", sep = "\n")
   
@@ -1105,17 +992,18 @@ clinPathAssess <- function(test.pData,
   ###### need to return some objects with results, need to generate matched dataframes to be able to name outputs correctly 070917
   # res <- list (chi.sq.results, log.reg.results) ### add more outputs here, taken from clinical_data_7.R
  
-   result.goi <- list(chi.sq.results,
-                     list.cor.age,
-                     lin.reg.age,
-                     log.reg.results, ### still updating this output list 140917
-                     reg.log.list, ### think this is the with the goi names clearly against the results
+   result.goi <- list(chi.sq.list,
+                      #chi.sq.results, ### replaced by clearer chi.sq.list
+                      reg.log.list, ### think this is the with the goi names clearly against the results
+                     # log.reg.results, ### replaced by clearer reg.log.list
                      cox.result.OS.all,
                      cox.result.OS.G3G4,
                      cox.EFS.incl,
                      cox.EFS.incl.G3G4,
                      cox.relapse.incl,
-                     cox.relapse.incl.G3G4
+                     cox.relapse.incl.G3G4,
+                     list.cor.age,
+                     lin.reg.age
   )
   
   sink()
@@ -1125,6 +1013,56 @@ clinPathAssess <- function(test.pData,
 
 ### also to include p.adjust (method = bh) for dataframes that are generated for survival, logistic regression, cox and chi squared. 
 
+##########################################################
+### some additional script to consider for logistic regression results in output
+### also original logistic regression hardcoded script is below
+
+###########
+#logistic_regression_out <- data.frame(m)
+#names_reg_log <- toupper(names(reg.log.list))
+#for (res in 1:length(reg.log.list)){
+# lr.pval <- reg.log.list[[res]][2, 7]
+# lr.OR <- reg.log.list[[res]][2, 1]
+# lr.CI.97.5 <- reg.log.list[[res]][2, 3]
+# lr.CI.2.5 <- reg.log.list[[res]][2, 2]
+# LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
+# assign(paste0("LR_DF_",names_reg_log[[res]],"_",gene_list[[gene]]), LR_DF)
+# }
+# LR_list <- as.list(mget(ls(pattern="LR_DF_")))
+# DF_LR <- as.data.frame(do.call("rbind",LR_list)) 
+#cat (paste("logistic regression data frame created ",gene_list[[gene]]), sep = "\n")
+# cat (paste("Extracting significant Logistic Regression results ",gene_list[[gene]]), sep = "\n")
+# most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
+############
+
+##############################
+### original logistic regression script from here to ****
+### have removed boxplots which are hardcoded and moved to separate section. 
+
+#log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
+#log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
+#log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
+#log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+
+### visualise relationship between biomarker and LCA pathology
+#  log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+
+### poor prognostic genetics
+# log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
+# log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
+# log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)  ### combined MYC / MYCN amplification group
+# log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
+# log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData) ### TERT (may need to specific subgroup)
+
+
+### logistic regression and molecular subgroups
+#log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
+#log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
+
+### mostly original hardcoded script up until here *** 140917  
+#######################################################################
 
 
 
