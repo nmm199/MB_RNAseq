@@ -134,7 +134,7 @@ km.log.test <- function(time, event, marker, out.file = "none"){
   text(4,0.1,paste("p =",round(surv.p.val.PFS, 3)), pos = 4, cex = 1)
   #assign(paste0("Survival_pval_", marker, surv.p.val.PFS)) ### added 140917
   PFS.surv.table <- summary(km.PFS.incl)
-  return (list(surv.p.val.PFS,
+  return (list(PFS.p.val = surv.p.val.PFS,
                PFS.surv.table)) ### added 140917
   if(out.file!="none"){
     dev.off()
@@ -176,7 +176,7 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
   1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1) -> surv.p.val.OS
   text(4,0.1,paste("p =",round(surv.p.val.OS, 3)), pos = 4, cex = 1)
   OS.surv.table <- summary(km.OS.incl)
-  return (list(surv.p.val.OS, 
+  return (list(OS.p.val = surv.p.val.OS, 
                OS.surv.table))
   if(out.file!="none"){
     dev.off()
@@ -249,7 +249,7 @@ km.log.test.EFS <- function(time, event, marker, out.file = "none"){
   1 - pchisq(EFS.incl.logrank$chisq, length(EFS.incl.logrank$obs)-1) -> surv.p.val.EFS
   text(4,0.1,paste("p =",round(surv.p.val.EFS, 3)), pos = 4, cex = 1)
   EFS.surv.table <- summary(km.EFS.incl)
-  return(list(surv.p.val.EFS, 
+  return(list(EFS.p.val = surv.p.val.EFS, 
               EFS.surv.table))
   if(out.file!="none"){
     dev.off()
@@ -898,9 +898,7 @@ clinPathAssess <- function(test.pData,
   matched.goi.vsd.G3G4.incl <- goi.vsd[!is.na(index.incl)] 
   matched.goi.vsd.cat.G3G4.incl <- ifelse(matched.goi.vsd.G3G4.incl>median(goi.vsd, na.rm = T), "high","low")
   
-  
   summary(matched.G3G4.incl.pData$meth7)
-  
   
   ### creating binary relapse variables labelled 0,1 for event analysis
   
@@ -922,11 +920,13 @@ clinPathAssess <- function(test.pData,
   cat("running km survival curve for PFS and biomarker, graphical output to PDF", sep = "\n")
   
   # km.log.test.all <- km.log.test(time = as.numeric(as.character(matched.test.incl.pData$PFS)), event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
-  km.log.test.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
+  surv.km.PFS.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
   
   # km.log.test.G3G4 <- km.log.test(time = as.numeric(as.character(matched.G3G4.incl.pData$PFS)), event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  km.log.test.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+  surv.km.PFS.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
   
+  
+  ################################################################################
   ### cox regression analysis
   
   cat("cox regression analysis, PFS, biomarker, age 3-16 years treated with curative therapy", sep ="\n")
@@ -946,11 +946,9 @@ clinPathAssess <- function(test.pData,
   
   cat ("km analysis for OS for children aged 3-16 years, treated with curative intent", sep = "\n")
   
-  km.log.test.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl )
-  
-  km.log.test.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  km.log.test.OS.G3G4
-  
+  surv.km.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl )
+  surv.km.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+
   ### cox regression analysis
   
   cat("cox regression on age 3-16 years, curative", sep = "\n")
@@ -962,16 +960,14 @@ clinPathAssess <- function(test.pData,
   cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data =  matched.test.incl.pData)
   summary(cox.result.OS.G3G4)
   
-  
-  
   #####################################
   
   ### EFS: 
   
   cat ("km analysis for EFS for children aged 3-16 years, treated with curative intent", sep = "\n")
   
-  km.log.test.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-  km.log.test.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
+  surv.km.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
+  surv.km.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
   
   ### cox regression analysis
   
@@ -989,10 +985,16 @@ clinPathAssess <- function(test.pData,
   
   ###################################
 
+  surv.p.values.list <- as.list(mget(ls(pattern="surv.km.")))
+  
+  
+  ######################################################################
+  
   ###### need to return some objects with results, need to generate matched dataframes to be able to name outputs correctly 070917
   # res <- list (chi.sq.results, log.reg.results) ### add more outputs here, taken from clinical_data_7.R
  
-   result.goi <- list(chi.sq.list,
+   result.goi <- list(surv.p.values.list, 
+                      chi.sq.list,
                       #chi.sq.results, ### replaced by clearer chi.sq.list
                       reg.log.list, ### think this is the with the goi names clearly against the results
                      # log.reg.results, ### replaced by clearer reg.log.list
