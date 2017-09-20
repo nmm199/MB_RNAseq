@@ -115,7 +115,7 @@ names(goi.vsd) <- gsub("T","",names(mb.vsd))
 return(clinPathAssess(test.pData,x))
 }
 toc()
-
+names(out) <- row.names(mb.vsd)[1:10]
 
 ############################################
 
