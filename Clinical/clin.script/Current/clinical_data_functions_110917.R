@@ -199,6 +199,8 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
 ## "summary.cox" result which includes the coefficients, hazard ratio (exp(coef)), number of patients (n), number of events (nevents)
 
 
+
+
 cox.result.OS <- function (time, event, marker, strata = NULL, data)  
 {
   if(is.null(strata)){
@@ -240,6 +242,7 @@ cox.result.OS <- function (time, event, marker, strata = NULL, data)
 # event <- relapse.bin.incl
 # marker = matched.goi.vsd.cat.incl
 # data <- matched.test.incl.pData
+
 
 cox.result.surv <- function (time, event, marker, strata = NULL, data)  
 {
@@ -997,27 +1000,16 @@ clinPathAssess <- function(test.pData,
   ### cox regression analysis
   
   cat("cox regression analysis, PFS, biomarker, age 3-16 years treated with curative therapy", sep ="\n")
+ 
   
-  # cox.relapse.incl <- cox.result.surv (matched.test.incl.pData$PFS, relapse.bin.incl, matched.goi.vsd.cat.incl, matched.test.incl.pData)
+  surv.cox.relapse.incl <- cox.result.surv (time=matched.test.incl.pData$PFS, event =  relapse.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData)
   
-  cox.relapse.incl <- coxph (Surv(as.numeric(as.character(matched.test.incl.pData$PFS)), relapse.bin.incl) ~ matched.goi.vsd.cat.incl)
-  surv.cox.rel.all.results <- list (cox.p.val = summary(cox.relapse.incl)$logtest[3], ### p value can also be called within cox.temp$coefficients
-                               cox.HR = summary(cox.relapse.incl)$conf.int[1], ### called within cox.temp$coefficients
-                               cox.lower.95CI = summary(cox.relapse.incl)$conf.int[3], 
-                               cox.upper.95CI = summary(cox.relapse.incl)$conf.int[4],
-                               cox.n = summary(cox.relapse.incl)$n,
-                               cox.nevent = summary(cox.relapse.incl)$nevent
-                                 )
-
-  
- cox.relapse.incl.G3G4 <- coxph (Surv(as.numeric(as.character(matched.G3G4.incl.pData$PFS)), relapse.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
- surv.cox.rel.G3G4.results <- list (cox.p.val = summary(cox.relapse.incl.G3G4)$logtest[3], ### p value can also be called within cox.temp$coefficients
-                              cox.HR = summary(cox.relapse.incl.G3G4)$conf.int[1], ### called within cox.temp$coefficients
-                              cox.lower.95CI = summary(cox.relapse.incl.G3G4)$conf.int[3], 
-                              cox.upper.95CI = summary(cox.relapse.incl.G3G4)$conf.int[4],
-                              cox.n = summary(cox.relapse.incl.G3G4)$n,
-                              cox.nevent = summary(cox.relapse.incl.G3G4)$nevent
-                              )
+  surv.cox.relapse.incl.G3G4 <- cox.result.surv (time=matched.G3G4.incl.pData$PFS, event =  relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData)
+ 
+   #cox (Surv(as.numeric(as.character(matched.G3G4.incl.pData$PFS)), relapse.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
+ 
+ 
+ 
   
   
   ##########################################
@@ -1036,6 +1028,7 @@ clinPathAssess <- function(test.pData,
   surv.cox.result.OS.all <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data =  matched.test.incl.pData)
   
   
+
   surv.cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data =  matched.test.incl.pData)
   
   
@@ -1052,24 +1045,13 @@ clinPathAssess <- function(test.pData,
   
   cat ("cox regression for EFS on age 3-16 years", sep = "\n")
   
-  cox.EFS.incl <- coxph (Surv(matched.test.incl.pData$EFS, EFS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
-  surv.cox.EFS.incl <- list (cox.p.val = summary(cox.EFS.incl)$logtest[3], ### p value can also be called within cox.temp$coefficients
-                             cox.HR = summary(cox.EFS.incl)$conf.int[1], ### called within cox.temp$coefficients
-                             cox.lower.95CI = summary(cox.EFS.incl)$conf.int[3], 
-                             cox.upper.95CI = summary(cox.EFS.incl)$conf.int[4],
-                             cox.n = summary(cox.EFS.incl)$n,
-                             cox.nevent = summary(cox.EFS.incl)$nevent)
- 
+  #cox.EFS.incl <- coxph (Surv(matched.test.incl.pData$EFS, EFS.cat.bin.incl) ~ matched.goi.vsd.cat.incl)
   
-  cox.EFS.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$EFS, EFS.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
+  surv.cox.EFS.incl <-  cox.result.surv (time=matched.test.incl.pData$EFS, event =  EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData)
+ 
+  # cox.EFS.incl.G3G4 <- coxph (Surv(matched.G3G4.incl.pData$EFS, EFS.G3G4.bin.incl) ~ matched.goi.vsd.cat.G3G4.incl)
 
-  surv.cox.EFS.incl.G3G4 <- list (cox.p.val = summary(cox.EFS.incl.G3G4)$logtest[3], ### p value can also be called within cox.temp$coefficients
-                                     cox.HR = summary(cox.EFS.incl.G3G4)$conf.int[1], ### called within cox.temp$coefficients
-                                     cox.lower.95CI = summary(cox.EFS.incl.G3G4)$conf.int[3], 
-                                     cox.upper.95CI = summary(cox.EFS.incl.G3G4)$conf.int[4],
-                                     cox.n = summary(cox.EFS.incl.G3G4)$n,
-                                     cox.nevent = summary(cox.EFS.incl.G3G4)$nevent
-  )
+  surv.cox.EFS.incl.G3G4 <- cox.result.surv (time= matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData)
   
   ####################################
   
@@ -1085,10 +1067,10 @@ clinPathAssess <- function(test.pData,
   ###### need to return some objects with results, need to generate matched dataframes to be able to name outputs correctly 070917
   # res <- list (chi.sq.results, log.reg.results) ### add more outputs here, taken from clinical_data_7.R
  
-   result.goi <- list(surv.p.values.list, 
-                      chi.sq.list,
+   result.goi <- list(surv.p.values.list=surv.p.values.list, 
+                      chi.sq.list = chi.sq.list,
                       #chi.sq.results, ### replaced by clearer chi.sq.list
-                      reg.log.list, ### think this is the with the goi names clearly against the results
+                      reg.log.list = reg.log.list, ### think this is the with the goi names clearly against the results
                      # log.reg.results, ### replaced by clearer reg.log.list
                      #cox.result.OS.all,
                      #cox.result.OS.G3G4,
@@ -1096,7 +1078,7 @@ clinPathAssess <- function(test.pData,
                      #cox.EFS.incl.G3G4,
                      #cox.relapse.incl,
                      #cox.relapse.incl.G3G4,
-                     cox.p.values.list,
+                     cox.p.values.list = cox.p.values.list,
                      list.cor.age,
                      lin.reg.age
   )
