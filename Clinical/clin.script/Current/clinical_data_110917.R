@@ -129,6 +129,13 @@ p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
 
 hist(adjusted.p.values)
 
+############################################
+### need to develop better naming
+### example with EFS p value
+extracted.km.EFS.pval <- lapply(out, function(x){return(x[[1]][[1]][[1]][[1]])}) 
+km.EFS.p.extracted <- do.call(rbind, extracted.km.EFS.pval)
+adjusted.p.km.EFS <-p.adjust(km.EFS.p.extracted, method = "BH") 
+histo.p.adj.km.EFS <- hist(adjusted.p.km.EFS)
 
 ###########################################
 ### example from stack overflow
