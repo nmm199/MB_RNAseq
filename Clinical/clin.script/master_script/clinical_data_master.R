@@ -1,6 +1,6 @@
 
 ### File introduction
-### File name: clinical_data_110917.R  based on clinical_data_4.R with excerpts from clinical_data_7.R and clinPathAssess_backup.R
+### File name: clinical_data_master.R  based on clinical_data_110917.R, clinical_data_4.R with excerpts from clinical_data_7.R and clinPathAssess_backup.R
 
 ### Aim of file is to 
 # 1. Run basic descriptive statistics on a cohort of children treated for medulloblastoma, whose details are contained within the local clinical database
@@ -69,9 +69,14 @@
 ###############################################################################
 
 # cat ("reading in expression data", sep ="\n")
-RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
-# RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
-#mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt")
+### unhash to use the following file for all the expression data 
+# RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
+
+### unhash to use the following file for novel RNA transcripts
+RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
+
+# mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### or use this as the whole command in one line
+
 mb.vsd <- read.delim(RNA.data)
 
 
@@ -83,10 +88,12 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### set file for pdf output
-pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
+#pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
+pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
 
 ### set file for log output
-log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
+#log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
+log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
 ### need to define goi.vsd in order to use the ClinPathAsess function
 goi.vsd <- as.numeric(mb.vsd[1,])
@@ -108,10 +115,11 @@ library(doParallel)
 registerDoParallel(10)
 
 tic()
-results.master <- foreach(i = 1:5)%dopar%{
-  #i=25
- as.numeric(mb.vsd[i,]) -> x
- names(x) <- colnames(mb.vsd)
+
+results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+#i=1515
+as.numeric(mb.vsd[i,]) -> x
+names(x) <- colnames(mb.vsd)
 names(goi.vsd) <- gsub("T","",names(mb.vsd))
 #clinPathAssess(test.pData,x)
 return(clinPathAssess(test.pData,x))
@@ -126,30 +134,34 @@ return(clinPathAssess(test.pData,x))
   #return(clinPathAssess(test.pData,x))
 #}
 toc()
-# names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-names(results.master) <- row.names(mb.vsd)[1:5]
+names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
+#names(results.master) <- row.names(mb.vsd)[1:5]
 
+##################################################################
 ### save outputted results
 ### update name according to input file
-### curren naming is for first 1000 goi for the mb.vsd file
 
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds")
- 
+#saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.novel.rds")
+
 ### then reload this when examining the results
-# results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds")
+
+#results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds")
+
 
 
 ############################################
 
 ### examples for how to then extract lists you are interested in
 
-lapply(results.master, function(x){return(x[[3]][[2]])}) -> extracted.results
+#lapply(results.master, function(x){return(x[[3]][[2]])}) -> extracted.results
 
-do.call(rbind, extracted.results) -> compiled.results
+#do.call(rbind, extracted.results) -> compiled.results
 
-p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
+#p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
 
-hist(adjusted.p.values)
+#hist(adjusted.p.values)
 
 ############################################
 
@@ -211,7 +223,7 @@ all.survival.p.bothgroups <- cbind(OS.pvalues.bothgroups, EFS.pvalues.bothgroups
 
 ### extract those goi with p<0.05 in adjusted p values for survival
 
-significant.p.EFS.all <- as.data.frame(EFS.pvalue.all.combined[, 2]<0.05)
+significant.p.EFS.all <- EFS.pvalue.all.combined[which(EFS.pvalue.all.combined[, 2]<0.05),]
 #significant.p.EFS.all <- as.data.frame((EFS.pvalue.all.combined[, 2]<0.05), drop = FALSE)
 
 
@@ -222,14 +234,21 @@ significant.p.EFS.all <- as.data.frame(EFS.pvalue.all.combined[, 2]<0.05)
 
 ### graphical depiction of p values against adjusted p values, may wish to add in abline
 
-histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS)
+histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS.all)
+
+library(density)
+plot(ecdf(adjusted.p.km.EFS.all))
+plot(density(adjusted.p.km.EFS.all))
+hist(km.EFS.p.extract.assembled.all)
+lines(density(km.EFS.p.extract.assembled.all), col = "red")
+
 histo.p.adj.km.EFS.G3G4 <- hist(adjusted.p.km.EFS.G3G4)
 histo.p.adj.km.OS.all <- hist(adjusted.p.km.OS)
 histo.p.adj.km.OS.G3G4 <- hist(adjusted.p.km.OS.G3G4)
 histo.p.adj.km.PFS.all <- hist(adjusted.p.km.PFS.all)
 histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, therefore no histogram generated
 
-### work out how to depict both on same graph
+
 
 
 #################################################
