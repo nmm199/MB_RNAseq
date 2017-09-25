@@ -187,17 +187,37 @@ adjusted.p.km.EFS.G3G4 <-p.adjust(km.EFS.p.extract.assembled.G3G4, method = "BH"
 EFS.pvalue.G3G4.combined <- cbind(km.EFS.p.extract.assembled.G3G4, adjusted.p.km.EFS.G3G4)
 colnames(EFS.pvalue.G3G4.combined) <- c("EFS.p.value.G3G4", "EFS.adjusted.pval.G3G4")
 
+### PFS p value for overall 
+extracted.km.PFS.pval.all <- lapply(results.master, function(x){return(x[[1]][[5]][[1]])})
+km.PFS.p.extract.assembled.all <- do.call(rbind, extracted.km.PFS.pval.all)
+adjusted.p.km.PFS.all <-p.adjust(km.PFS.p.extract.assembled.all, method = "BH") 
+PFS.pvalue.all.combined <- cbind(km.PFS.p.extract.assembled.all, adjusted.p.km.PFS.all)
+colnames(PFS.pvalue.all.combined) <- c("PFS.p.value.all", "PFS.adjusted.pval.all")
 
-### do the same for PFS for overall and G3G4
-
-
-
+### PFS p value for G3G4
+extracted.km.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[1]][[6]][[1]])})
+km.PFS.p.extract.assembled.G3G4 <- do.call(rbind, extracted.km.PFS.pval.G3G4)
+adjusted.p.km.PFS.G3G4 <-p.adjust(km.PFS.p.extract.assembled.G3G4, method = "BH") 
+PFS.pvalue.G3G4.combined <- cbind(km.PFS.p.extract.assembled.G3G4, adjusted.p.km.PFS.G3G4)
+colnames(PFS.pvalue.G3G4.combined) <- c("PFS.p.value.G3G4", "PFS.adjusted.pval.G3G4")
 
 ### combined dataframe with OS, PFS, EFS results for overall and G3G4, unadjusted and adjusted p values
 
-EFS.pvalues.bothgroups <- cbind(EFS.pvalue.all.combined, EFS.pvalue.G3G4.combined)
 OS.pvalues.bothgroups <- cbind(OS.pvalue.all, OS.pvalue.G3G4)
+EFS.pvalues.bothgroups <- cbind(EFS.pvalue.all.combined, EFS.pvalue.G3G4.combined)
+PFS.pvalues.bothgroups <- cbind(PFS.pvalue.all.combined, PFS.pvalue.G3G4.combined)
 
+all.survival.p.bothgroups <- cbind(OS.pvalues.bothgroups, EFS.pvalues.bothgroups, PFS.pvalues.bothgroups)
+
+### extract those goi with p<0.05 in adjusted p values for survival
+
+significant.p.EFS.all <- as.data.frame(EFS.pvalue.all.combined[, 2]<0.05)
+#significant.p.EFS.all <- as.data.frame((EFS.pvalue.all.combined[, 2]<0.05), drop = FALSE)
+
+
+#as.data.frame(EFS.pvalue.all.combined[,2])
+
+#  significant_chisq_res <- as.data.frame(Chi_squared_results_df[which(Chi_squared_results_df$P.value < 0.05), drop=FALSE,])
 
 ### graphical depiction of p values against adjusted p values, may wish to add in abline
 
