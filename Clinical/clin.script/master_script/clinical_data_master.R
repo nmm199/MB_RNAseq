@@ -133,7 +133,7 @@ names(results.master) <- row.names(mb.vsd)[1:5]
 ### update name according to input file
 ### curren naming is for first 1000 goi for the mb.vsd file
 
-# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds")
+#saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds")
  
 ### then reload this when examining the results
 # results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds")
@@ -215,9 +215,10 @@ significant.p.EFS.all <- as.data.frame(EFS.pvalue.all.combined[, 2]<0.05)
 #significant.p.EFS.all <- as.data.frame((EFS.pvalue.all.combined[, 2]<0.05), drop = FALSE)
 
 
-#as.data.frame(EFS.pvalue.all.combined[,2])
+#as.data.frame(EFS.pvalue.all.combined[,2])  ### can we use a "which statement "?
+#as.data.frame(EFS.pvalue.all.combined)
+#significant.p.EFS.all.trial <- as.data.frame(which(EFS.pvalue.all.combined[,2]<0.05), drop = [FALSE, ]))
 
-#  significant_chisq_res <- as.data.frame(Chi_squared_results_df[which(Chi_squared_results_df$P.value < 0.05), drop=FALSE,])
 
 ### graphical depiction of p values against adjusted p values, may wish to add in abline
 
@@ -225,10 +226,17 @@ histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS)
 histo.p.adj.km.EFS.G3G4 <- hist(adjusted.p.km.EFS.G3G4)
 histo.p.adj.km.OS.all <- hist(adjusted.p.km.OS)
 histo.p.adj.km.OS.G3G4 <- hist(adjusted.p.km.OS.G3G4)
+histo.p.adj.km.PFS.all <- hist(adjusted.p.km.PFS.all)
+histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, therefore no histogram generated
 
 ### work out how to depict both on same graph
-### extracted.km.EFS.pval
+
 
 #################################################
 
+### extract cox regression p value and Z score
+
+### extract logistic regression p value 
+
+### extract chi square p value
 
