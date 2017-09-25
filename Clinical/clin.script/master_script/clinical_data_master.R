@@ -165,6 +165,8 @@ results.master <- results.file
 
 ############################################
 
+### delete the section below once the "clinical_data_extract.R" file is finalised. 
+
 ### Extracted dataframes
 ### OS p value for overall group
 
