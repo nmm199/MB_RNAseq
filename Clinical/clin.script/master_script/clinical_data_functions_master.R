@@ -573,10 +573,10 @@ clinPathAssess <- function(test.pData,
 ){
   
   ### attempt with Dan
-    # test.pData = test.pData
-    # x -> goi.vsd  ### changed the direction of x from the original file from Dan. Was recoding error messages. 
-    # pdf.file = NULL
-    # log.file = NULL
+     #test.pData = test.pData
+     #x -> goi.vsd  ### changed the direction of x from the original file from Dan. Was recoding error messages. 
+     #pdf.file = NULL
+     #log.file = NULL
   
   ### MM stipulating inputs 140917
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
@@ -699,7 +699,7 @@ clinPathAssess <- function(test.pData,
   
   ### Correlation coefficients
   
-  cat ("correlation coefficients for association between variables", sep ="\n")
+  #cat ("correlation coefficients for association between variables", sep ="\n")
   
   list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd)
   list(list.cor.age)
@@ -713,9 +713,6 @@ clinPathAssess <- function(test.pData,
   lin.reg.age <- lin.reg(x= matched.test.pData$age.cont, y= matched.goi.vsd)
   lin.reg.age
   
-  ### question: how do get 95% confidence interval, tried predict(lin.reg.age, interval = "confidence"), object needs to be as a dataframe
-  # predict(lm(matched.test.pData$age.cont ~ matched.goi.vsd, data = matched.test.pData, interval = "confidence"))
-  
   #################################
   
   ### Mann-whitney U (aka wilcoxon rank sum test) for non-parametric data
@@ -727,7 +724,7 @@ clinPathAssess <- function(test.pData,
   ##################################
   ### logistic regression
   
-  cat ("processing logistic regression within defined logisticRegression function for each variable", sep ="\n")
+  #cat ("processing logistic regression within defined logisticRegression function for each variable", sep ="\n")
   ### have now updated logisticRegression function to output the required values, listed below: 
   ### pvalue [[1]][[1]], raw dataframe with intercept and y values, OR and 95CI:  LR.pval, interim.LR, LR.OR.pval,  lower.95CI, upper.95CI respectively
   
@@ -753,7 +750,7 @@ clinPathAssess <- function(test.pData,
   ######################################################################
 
   ### visualise distribution of biomarker in cohort
-  cat ("visualisation of biomarker and relationship with methylation", sep = "\n")
+  #cat ("visualisation of biomarker and relationship with methylation", sep = "\n")
   qqnorm(matched.goi.vsd)
   
   ### posthoc for multiple categories e.g histopath, meth, meth7
@@ -794,7 +791,7 @@ clinPathAssess <- function(test.pData,
   
   ### summary data for each methylation subgroup (n=4), no age restriction for first analyses
   
-  cat ("processing summary stats for 4 molecular subgroups, no age restriction", sep ="\n")
+  #cat ("processing summary stats for 4 molecular subgroups, no age restriction", sep ="\n")
   
   ### G3
   
@@ -821,7 +818,7 @@ clinPathAssess <- function(test.pData,
   WNT.group <- matched.test.pData [WNT, ]
   summary(WNT.group)
   
-  cat ("processing summary stats for 7 molecular subgroups, no age restriction", sep = "\n")
+  #cat ("processing summary stats for 7 molecular subgroups, no age restriction", sep = "\n")
   
   ### G3 subgroups
   
@@ -858,7 +855,7 @@ clinPathAssess <- function(test.pData,
   
   ### restrict analysis to age 3-16 yo, treated with curative intent including CSI
   
-  cat ("create dataframe for age 3-16 years, curative intent called age.incl.df", sep = "\n")
+  #cat ("create dataframe for age 3-16 years, curative intent called age.incl.df", sep = "\n")
   
   Age.incl <- matched.test.pData$age.filter== "TRUE"
   Age.incl.df <- matched.test.pData [Age.incl,]
@@ -866,13 +863,13 @@ clinPathAssess <- function(test.pData,
   
   ### compare to prior dataframes to check accuracy of new dataframe
   
-  cat ("comparing with previous data frames for accuracy", sep = "\n")
-  summary(test.pData)
-  summary (matched.test.pData)
+  #cat ("comparing with previous data frames for accuracy", sep = "\n")
+  #summary(test.pData)
+  #summary (matched.test.pData)
   
   ####################################
   
-  cat ("processing summary stats for 3-16 yo for 4 molecular subgroups", sep = "\n")
+  #cat ("processing summary stats for 3-16 yo for 4 molecular subgroups", sep = "\n")
   
   ### G3, aged 3-16 years
   G3.incl <- Age.incl.df$meth =="G3"
@@ -901,7 +898,7 @@ clinPathAssess <- function(test.pData,
   
   ### defining features of 7 molecular groups, group 3 and 4 subgroups
   
-  cat ("processing summary stats for 7 molecular subgroup data, age 3-16 years", sep = "\n")
+  #cat ("processing summary stats for 7 molecular subgroup data, age 3-16 years", sep = "\n")
   
   G3.high <- Age.incl.df$meth7 == "Grp3_HighRisk"
   G3.high.incl <- Age.incl.df [G3.high, ]
@@ -935,8 +932,7 @@ clinPathAssess <- function(test.pData,
   ##########################
   
   ### creating dataframe for survival analysis
-  cat ("restrict survival analysis for age 3-16 years, curative intent", sep = "\n")
-  cat ("creating matched data frame", sep = "\n")
+  #cat ("restrict survival analysis for age 3-16 years, curative intent", sep = "\n")
   
   ### check whether to retain the two dataframes Age.incl.df and matched.test.incl.pData 
   
@@ -948,7 +944,7 @@ clinPathAssess <- function(test.pData,
   
   ### G3 and G4 combined dataframe
   
-  cat ("creating combined dataframe to assess biomarker in G3 G4 combined group, for survival cohort, aged 3-16 years, curative intent", sep = "\n")
+  #cat ("creating combined dataframe to assess biomarker in G3 G4 combined group, for survival cohort, aged 3-16 years, curative intent", sep = "\n")
   
   G3.match <- matched.test.incl.pData$meth=="G3" 
   G4.match <- matched.test.incl.pData$meth=="G4"
@@ -985,24 +981,24 @@ clinPathAssess <- function(test.pData,
   
   #### PFS
   
-  cat("running km survival curve for PFS and biomarker, graphical output to PDF", sep = "\n")
+  #cat("running km survival curve for PFS and biomarker, graphical output to PDF", sep = "\n")
   
   # km.log.test.all <- km.log.test(time = as.numeric(as.character(matched.test.incl.pData$PFS)), event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
-  surv.km.PFS.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
+  try(surv.km.PFS.all <- km.log.test(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl), silent = T)
   
   # km.log.test.G3G4 <- km.log.test(time = as.numeric(as.character(matched.G3G4.incl.pData$PFS)), event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
-  surv.km.PFS.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+  try(surv.km.PFS.G3G4 <- km.log.test(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl), silent = T)
   
   
   ################################################################################
   ### cox regression analysis
   
-  cat("cox regression analysis, PFS, biomarker, age 3-16 years treated with curative therapy", sep ="\n")
+  #cat("cox regression analysis, PFS, biomarker, age 3-16 years treated with curative therapy", sep ="\n")
  
   
-  surv.cox.relapse.incl <- cox.result.surv (time=matched.test.incl.pData$PFS, event =  relapse.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData)
+  try(surv.cox.relapse.incl <- cox.result.surv (time=matched.test.incl.pData$PFS, event =  relapse.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData), silent = T)
   
-  surv.cox.relapse.incl.G3G4 <- cox.result.surv (time=matched.G3G4.incl.pData$PFS, event =  relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData)
+  try(surv.cox.relapse.incl.G3G4 <- cox.result.surv (time=matched.G3G4.incl.pData$PFS, event =  relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData), silent = T)
  
    
   
@@ -1010,35 +1006,35 @@ clinPathAssess <- function(test.pData,
   
   ### OS 
   
-  cat ("km analysis for OS for children aged 3-16 years, treated with curative intent", sep = "\n")
+  #cat ("km analysis for OS for children aged 3-16 years, treated with curative intent", sep = "\n")
   
-  surv.km.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl )
-  surv.km.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl)
+  try(surv.km.OS.all <- km.log.test.OS(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl ), silent = T)
+  try(surv.km.OS.G3G4 <- km.log.test.OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl), silent = T)
 
   ### cox regression analysis
   
   #cat("cox regression on age 3-16 years, curative", sep = "\n")
   
-  surv.cox.result.OS.all <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data =  matched.test.incl.pData)
+  try(surv.cox.result.OS.all <- cox.result.OS (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data =  matched.test.incl.pData), silent = T)
 
-  surv.cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data =  matched.test.incl.pData)
+  try(surv.cox.result.OS.G3G4 <- cox.result.OS (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data =  matched.test.incl.pData), silent = T)
   
   #####################################
   
   ### EFS: 
   
-  cat ("km analysis for EFS for children aged 3-16 years, treated with curative intent", sep = "\n")
+  #cat ("km analysis for EFS for children aged 3-16 years, treated with curative intent", sep = "\n")
   
-  surv.km.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl)
-  surv.km.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) 
+  try(surv.km.EFS.all <- km.log.test.EFS(time = matched.test.incl.pData$EFS, event = EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl), silent = T)
+      try(surv.km.EFS.G3G4 <- km.log.test.EFS(time = matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) , silent = T)
   
   ### cox regression analysis
   
-  cat ("cox regression for EFS on age 3-16 years", sep = "\n")
+  #cat ("cox regression for EFS on age 3-16 years", sep = "\n")
   
-  surv.cox.EFS.incl <-  cox.result.surv (time=matched.test.incl.pData$EFS, event =  EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData)
+  try(surv.cox.EFS.incl <-  cox.result.surv (time=matched.test.incl.pData$EFS, event =  EFS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, data = matched.test.incl.pData), silent = T)
 
-  surv.cox.EFS.incl.G3G4 <- cox.result.surv (time= matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData)
+  try(surv.cox.EFS.incl.G3G4 <- cox.result.surv (time= matched.G3G4.incl.pData$EFS, event = EFS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData), silent = T)
   
   ####################################
   
@@ -1051,7 +1047,6 @@ clinPathAssess <- function(test.pData,
   ######################################################################
   
   ###### need to return some objects with results, need to generate matched dataframes to be able to name outputs correctly 070917
-  # res <- list (chi.sq.results, log.reg.results) ### add more outputs here, taken from clinical_data_7.R
  
    result.goi <- list (surv.p.values.list=surv.p.values.list, 
                       chi.sq.list = chi.sq.list,
@@ -1066,27 +1061,12 @@ clinPathAssess <- function(test.pData,
     return(result.goi) ### used to be # return(res)
 }
 
-### also to include p.adjust (method = bh) for dataframes that are generated for survival, logistic regression, cox and chi squared. 
 
 ##########################################################
 ### some additional script to consider for logistic regression results in output
 ### also original logistic regression hardcoded script is below
 
 ###########
-#logistic_regression_out <- data.frame(m)
-#names_reg_log <- toupper(names(reg.log.list))
-#for (res in 1:length(reg.log.list)){
-# lr.pval <- reg.log.list[[res]][2, 7]
-# lr.OR <- reg.log.list[[res]][2, 1]
-# lr.CI.97.5 <- reg.log.list[[res]][2, 3]
-# lr.CI.2.5 <- reg.log.list[[res]][2, 2]
-# LR_DF <- data.frame(lr.pval, lr.OR, lr.CI.97.5, lr.CI.2.5)
-# assign(paste0("LR_DF_",names_reg_log[[res]],"_",gene_list[[gene]]), LR_DF)
-# }
-# LR_list <- as.list(mget(ls(pattern="LR_DF_")))
-# DF_LR <- as.data.frame(do.call("rbind",LR_list)) 
-#cat (paste("logistic regression data frame created ",gene_list[[gene]]), sep = "\n")
-# cat (paste("Extracting significant Logistic Regression results ",gene_list[[gene]]), sep = "\n")
 # most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
 ############
 
