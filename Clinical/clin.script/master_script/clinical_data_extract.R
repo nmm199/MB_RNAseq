@@ -8,6 +8,10 @@
 results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
 results.master <- results.file
 
+### need to read in functions file
+
+source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
+
 ### file output 
 
 ### dataframes with p value, adjusted p value
@@ -33,10 +37,13 @@ results.master <- results.file
 ### OS p value for overall group
 
 extracted.km.OS.pval <- lapply(results.master, function(x){return(x[[1]][[3]][[1]])}) 
+
 km.OS.p.extract.assembled <- do.call(rbind, extracted.km.OS.pval)
 adjusted.p.km.OS <-p.adjust(km.OS.p.extract.assembled, method = "BH") 
 OS.pvalue.all <- cbind(km.OS.p.extract.assembled, adjusted.p.km.OS)
 colnames(OS.pvalue.all) <- c("OS.p.value.all", "OS.adjusted.pval.all")
+
+
 
 ### OS p value for G3G4
 
@@ -259,4 +266,39 @@ significant.cox.PFS.G3G4 <- cox.PFS.all.df[which(cox.PFS.G3G4.df[, 2]<0.05),]
 #p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
 
 #hist(adjusted.p.values)
+
+
+
+#############################################################################
+### generating function for generating cox dataframe
+
+### master script is below
+### aim to generate using the following
+
+cox.PFS.pval.all <- lapply(results.master, function(x){return(x[[4]][[3]][[1]])})
+cox.PFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[3]][[5]])})
+cox.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[2]])})
+cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[3]])})
+cox.U95CI.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[4]])})
+
+cox.PFS.all.df <- cox.dataframe(pval = cox.PFS.pval.all, Zscore = cox.PFS.Zscore.all, HR = cox.PFS.HR.all, L95CI = cox.L95CI.PFS.HR.all, U95CI = cox.U95CI.PFS.HR.all )
+colnames(cox.PFS.all.df) <- c("cox.PFS.pval.all", "cox.PFS.adj.pval.all", "cox.PFS.Zscore.all", "cox.PFS.HR.all", "cox.PFS.L95CI.all", "cox.PFS.U95CI.all")
+
+cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
+  cox.pval.assembled <- do.call(rbind, pval)
+  adj.cox.pval <- p.adjust(cox.pval.assembled, method = "BH")
+  #cox.pval.combined.df <- cbind(cox.pval.assembled, adj.cox.pval)
+  #colnames(cox.pval.combined.df)<-c("cox.pval", "cox.adj.pval")
+  cox.Zscore.assembled <- do.call(rbind, Zscore)
+  cox.HR.assembled <- do.call(rbind, HR)
+  cox.L95CI.assembled <- do.call(rbind, L95CI)
+  cox.U95CI.assembled <- do.call(rbind, U95CI)
+  cox.allresults.df <- cbind(cox.pval.assembled, adj.cox.pval, cox.Zscore.assembled, cox.HR.assembled, cox.L95CI.assembled, cox.U95CI.assembled)
+  colnames(cox.allresults.df)<- c("cox.pval", "cox.adj.pval", "cox.Zscore","cox.HR", "cox.HR.L95CI", "cox.HR.U95CI" )
+  return (cox.allresults.df)
+}
+
+significant.cox.PFS.all <- cox.PFS.all.df[which(cox.PFS.all.df[, 2]<0.05),]
+#significant.cox.df.all <- cox.allresults.df[which(cox.allresults.df[, 2]<0.05)]
+
 
