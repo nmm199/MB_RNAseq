@@ -1063,6 +1063,43 @@ clinPathAssess <- function(test.pData,
 
 
 ##########################################################
+
+
+#### Function called cox.dataframe
+
+### to extract the relevant elements from within a list to generate the cox dataframe for each goi
+### input
+### p value
+### Z score
+### Hazard ratio (HR)
+### 95CI - upper (U95CI) and lower (L95CI)
+
+### output
+### cox dataframe with labelled columns
+
+
+cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
+  cox.pval.assembled <- do.call(rbind, pval)
+  adj.cox.pval <- p.adjust(cox.pval.assembled, method = "BH")
+  #cox.pval.combined.df <- cbind(cox.pval.assembled, adj.cox.pval)
+  #colnames(cox.pval.combined.df)<-c("cox.pval", "cox.adj.pval")
+  cox.Zscore.assembled <- do.call(rbind, Zscore)
+  cox.HR.assembled <- do.call(rbind, HR)
+  cox.L95CI.assembled <- do.call(rbind, L95CI)
+  cox.U95CI.assembled <- do.call(rbind, U95CI)
+  cox.allresults.df <- cbind(cox.pval.assembled, adj.cox.pval, cox.Zscore.assembled, cox.HR.assembled, cox.L95CI.assembled, cox.U95CI.assembled)
+  colnames(cox.allresults.df)<- c("cox.pval", "cox.adj.pval", "cox.Zscore","cox.HR", "cox.HR.L95CI", "cox.HR.U95CI" )
+  return (cox.allresults.df)
+}
+
+
+
+
+
+
+
+########################################################################################
+
 ### some additional script to consider for logistic regression results in output
 ### also original logistic regression hardcoded script is below
 
@@ -1096,7 +1133,6 @@ clinPathAssess <- function(test.pData,
 #log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
 #log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
 
-### mostly original hardcoded script up until here *** 140917  
 #######################################################################
 
 
