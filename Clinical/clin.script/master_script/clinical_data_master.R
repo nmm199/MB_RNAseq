@@ -115,14 +115,18 @@ registerDoParallel(10)
 
 tic()
 
-results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-#i=1515
+results.master <- foreach(i = 1:100(mb.vsd))%dopar%{
+# i=17                        ### unhash here when trouble shooting
 as.numeric(mb.vsd[i,]) -> x
 names(x) <- colnames(mb.vsd)
 names(goi.vsd) <- gsub("T","",names(mb.vsd))
-#clinPathAssess(test.pData,x)
-return(clinPathAssess(test.pData,x))
+clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+return(clinPathAssess(test.pData,x)) ### hash here when trouble shooting  
 }
+
+
+###Error in eval(a, envir = extra, enclos = obj$evalenv) : 
+###attempt to apply non-function
 
 #results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
   ###i=25
@@ -132,9 +136,12 @@ return(clinPathAssess(test.pData,x))
   ###clinPathAssess(test.pData,x)
   #return(clinPathAssess(test.pData,x))
 #}
+
+names(results.master) <- row.names(mb.vsd)[1:100]
+
 toc()
-names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-#names(results.master) <- row.names(mb.vsd)[1:5]
+#names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
+
 
 ##################################################################
 ### save outputted results
@@ -163,6 +170,8 @@ results.master <- results.file
 
 #hist(adjusted.p.values)
 
+############################################
+#################################################################################################################################################
 ############################################
 
 ### delete the section below once the "clinical_data_extract.R" file is finalised. 
