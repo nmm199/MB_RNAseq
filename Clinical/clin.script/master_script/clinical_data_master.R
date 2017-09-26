@@ -69,12 +69,12 @@
 
 # cat ("reading in expression data", sep ="\n")
 ### unhash to use the following file for all the expression data 
-# RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
+RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
 
 ### unhash to use the following file for novel RNA transcripts
-RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
+#RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
 
-# mb.vsd <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### or use this as the whole command in one line
+mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### or use this as the whole command in one line
 
 mb.vsd <- read.delim(RNA.data)
 
@@ -87,12 +87,12 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### set file for pdf output
-#pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
-pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
+pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
+#pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
 
 ### set file for log output
-#log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
-log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
+log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
+#log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
 ### need to define goi.vsd in order to use the ClinPathAsess function
 goi.vsd <- as.numeric(mb.vsd[1,])
@@ -115,13 +115,19 @@ registerDoParallel(10)
 
 tic()
 
-results.master <- foreach(i = 1:100(mb.vsd))%dopar%{
-# i=17                        ### unhash here when trouble shooting
+### unhash here when trouble shooting
+i=17
+as.numeric(mb.vsd.novel[i,]) -> x
+names(x) <- colnames(mb.vsd.novel)
+names(x) <- gsub("T","",names(mb.vsd.novel))
+clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+
+
+results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
 as.numeric(mb.vsd[i,]) -> x
 names(x) <- colnames(mb.vsd)
-names(goi.vsd) <- gsub("T","",names(mb.vsd))
-clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
-return(clinPathAssess(test.pData,x)) ### hash here when trouble shooting  
+names(x) <- gsub("T","",names(mb.vsd))
+return(clinPathAssess(test.pData,x)) 
 }
 
 
@@ -137,7 +143,10 @@ return(clinPathAssess(test.pData,x)) ### hash here when trouble shooting
   #return(clinPathAssess(test.pData,x))
 #}
 
-names(results.master) <- row.names(mb.vsd)[1:100]
+names(results.master) <- row.names(mb.vsd)
+
+annotate.HTseq.IDs(row.names(mb.vsd)) -> annot
+row.names(mb.vsd)
 
 toc()
 #names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
@@ -149,7 +158,7 @@ toc()
 
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds")
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
-saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.novel.rds")
+saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes50.rds")
 
 ### then reload this when examining the results
 

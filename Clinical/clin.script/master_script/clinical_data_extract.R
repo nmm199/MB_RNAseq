@@ -5,6 +5,7 @@
 
 ### example file input
 
+results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") 
 results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
 results.master <- results.file
 
@@ -132,6 +133,8 @@ cox.PFS.all.df <- cox.dataframe(pval = cox.PFS.pval.all, Zscore = cox.PFS.Zscore
 colnames(cox.PFS.all.df) <- c("cox.PFS.pval.all", "cox.PFS.adj.pval.all", "cox.PFS.Zscore.all", "cox.PFS.HR.all", "cox.PFS.L95CI.all", "cox.PFS.U95CI.all")
 
 significant.cox.PFS.all <- cox.PFS.all.df[which(cox.PFS.all.df[, 2]<0.05),]
+
+#write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_all.csv")
 
 
 ### Cox PFS for G3G4

@@ -37,10 +37,10 @@ chi.sq <- function(x,y){
   summary.table(table.temp) ### note that the pvalue for independence of all factors is not the p value for the Pearson's chi-squared test, verified 140917
   # chi.test.temp <- chisq.test(table.temp) 
   chi.test.temp <- try(chisq.test(table.temp), silent = T) 
-  chi.test.temp.stat <- c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value) 
-  chi.test.temp.res <- chi.test.temp$residuals
+  chi.test.temp.stat <- try(c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value), silent = T) ### added 26/9/17
+  chi.test.temp.res <- try(chi.test.temp$residuals, silent = T)                                         ### added 26/9/17
   try(aheatmap(chi.test.temp$residuals, Rowv=NA, Colv = NA), silent = T)
-  list.temp <- list  (p.value= chi.test.temp$p.value, 
+  list.temp <- list  (p.value= chi.test.temp$p.value,                                                   ### subset chi.test.temp$p.value may not exist
                       chi.test.temp.stat, 
                       table.temp, ## does not work if put in variable x or y, here
                       table.temp.perc,
@@ -570,15 +570,18 @@ clinPathAssess <- function(test.pData,
                            goi.vsd,
                            pdf.file = NULL,
                            log.file = NULL
-){
+)
+  {
   
   ### attempt with Dan
-     #test.pData = test.pData
-     #x -> goi.vsd  ### changed the direction of x from the original file from Dan. Was recoding error messages. 
-     #pdf.file = NULL
-     #log.file = NULL
+     # test.pData = test.pData
+     # x -> goi.vsd   
+     # pdf.file = NULL
+     # log.file = NULL
   
   ### MM stipulating inputs 140917
+  ### goi <- ENSG00000008196.12_1
+
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
   #  goi.vsd <- as.numeric(mb.vsd[goi,]) 
@@ -622,7 +625,7 @@ clinPathAssess <- function(test.pData,
   ### summary data for all variables within the age 3-16 yo group, to construct survival cohort
   
   age.df <- data.frame(test.pData$NMB, test.pData$age.filter, test.pData$age.cont)
-  summary(age.df)
+  # summary(age.df)
   
   ##############################################
   
@@ -689,37 +692,34 @@ clinPathAssess <- function(test.pData,
   
   ### run Fisher's exact test on those where count < 5 e.g pathology "other"
   
-  histopath.table <- table(as.factor(matched.test.pData$histopath), as.factor(matched.goi.vsd.cat))
-  
-  histopath.result <- fisher.test(histopath.table)
-  histopath.result
-  
-  
+  try(histopath.table <- table(as.factor(matched.test.pData$LCA), as.factor(matched.goi.vsd.cat)), silent = T)
+  try(histopath.result <- fisher.test(histopath.table), silent = T)
+ 
   ###################################
   
   ### Correlation coefficients
   
   #cat ("correlation coefficients for association between variables", sep ="\n")
   
-  list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd)
-  list(list.cor.age)
-  list.cor.age[[1]]
+  try(list.cor.age <- cor.result(x = matched.test.pData$age.cont, y = matched.goi.vsd), silent = T)
+  #list(list.cor.age)
+ 
   
   
   ##################################
   
   ###  linear regression
   
-  lin.reg.age <- lin.reg(x= matched.test.pData$age.cont, y= matched.goi.vsd)
-  lin.reg.age
+  try(lin.reg.age <- lin.reg(x= matched.test.pData$age.cont, y= matched.goi.vsd), silent = T)
+  
   
   #################################
   
   ### Mann-whitney U (aka wilcoxon rank sum test) for non-parametric data
   
   ### age continuous 
-  age.cont.wilcox <- wilcox.test(matched.test.pData$age.cont ~ matched.goi.vsd.cat, exact = F, correct = F)
-  age.cont.wilcox
+  try(age.cont.wilcox <- wilcox.test(matched.test.pData$age.cont ~ matched.goi.vsd.cat, exact = F, correct = F), silent = T)
+  
   
   ##################################
   ### logistic regression
@@ -745,7 +745,7 @@ clinPathAssess <- function(test.pData,
  
    ######################################################################
   
-  reg.log.list <- as.list(mget(ls(pattern="log.reg"))) ### this will work 140917
+  reg.log.list <- as.list(mget(ls(pattern="log.reg"))) 
   
   ######################################################################
 
@@ -755,15 +755,15 @@ clinPathAssess <- function(test.pData,
   
   ### posthoc for multiple categories e.g histopath, meth, meth7
   ### pairwise t-test to determine where the difference lies between the groups
-  histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath)
-  LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA")
+  try(histopath.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$histopath), silent = T)
+  try(LCA.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$LCA, level = matched.test.pData$LCA == "Non LCA"), silent = T)
   MYCMYCN.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$MYCMYCN.cat)
   meth.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth)
   meth7.pw <- pairwise.t.test(matched.goi.vsd, matched.test.pData$meth7.cat)
   
   ### if biomarker is normally distributed, can use ANOVA (one-way ANOVA)
   meth7.aov <- aov (matched.goi.vsd ~ matched.test.pData$meth7, data = matched.test.pData)
-  summary(meth7.aov)
+  #summary(meth7.aov)
   plot(meth7.aov)
   
   #######################################################
@@ -798,25 +798,25 @@ clinPathAssess <- function(test.pData,
   G3 <- matched.test.pData$meth =="G3" 
   
   G3.group <- matched.test.pData [G3, ]
-  summary (G3.group)
+  # summary (G3.group)
   
   ## G4
   
   G4 <- matched.test.pData$meth =="G4"
   G4.group <- matched.test.pData [G4, ]
-  summary(G4.group)
+  #summary(G4.group)
   
   ### SHH
   
   SHH <- matched.test.pData$meth =="SHH"
   SHH.group <- matched.test.pData [SHH, ]
-  summary(SHH.group)
+  #summary(SHH.group)
   
   ### WNT
   
   WNT <- matched.test.pData$meth == "WNT"
   WNT.group <- matched.test.pData [WNT, ]
-  summary(WNT.group)
+  #summary(WNT.group)
   
   #cat ("processing summary stats for 7 molecular subgroups, no age restriction", sep = "\n")
   
@@ -824,30 +824,30 @@ clinPathAssess <- function(test.pData,
   
   G3.high.group <- matched.test.pData$meth7 =="Grp3_HighRisk"
   G3.high.data <- matched.test.pData [G3.high.group, ]
-  summary(G3.high.data)
+  #summary(G3.high.data)
   
   G3.low.group <- matched.test.pData$meth7 =="Grp3_LowRisk"
   G3.low.data <- matched.test.pData [G3.low.group, ]
-  summary(G3.low.data)
+  #summary(G3.low.data)
   
   ### G4 subgroups
   
   G4.high.group <- matched.test.pData$meth7 =="Grp4_HighRisk"
   G4.high.data <- matched.test.pData [G4.high.group, ]
-  summary(G4.high.data)
+  #summary(G4.high.data)
   
   G4.low.group <- matched.test.pData$meth7 =="Grp4_LowRisk"
   G4.low.data <- matched.test.pData [G4.low.group, ]
-  summary(G4.low.data)
+  #summary(G4.low.data)
   
   ### SHH
   SHH.inf.group <- matched.test.pData$meth7 == "SHH_Inf"
   SHH.inf.data <- matched.test.pData [SHH.inf.group, ]
-  summary (SHH.inf.data)
+  #summary (SHH.inf.data)
   
   SHH.old.group <- matched.test.pData$meth7 =="SHH_Old"
   SHH.old.data <- matched.test.pData [SHH.old.group, ]
-  summary (SHH.old.data)
+  #summary (SHH.old.data)
   
   #############################################
   
@@ -859,7 +859,7 @@ clinPathAssess <- function(test.pData,
   
   Age.incl <- matched.test.pData$age.filter== "TRUE"
   Age.incl.df <- matched.test.pData [Age.incl,]
-  summary(Age.incl.df)
+  #summary(Age.incl.df)
   
   ### compare to prior dataframes to check accuracy of new dataframe
   
@@ -874,26 +874,26 @@ clinPathAssess <- function(test.pData,
   ### G3, aged 3-16 years
   G3.incl <- Age.incl.df$meth =="G3"
   G3.group.incl <- Age.incl.df [G3.incl, ]
-  summary(G3.group.incl)
-  nrow(G3.group.incl)
+  #summary(G3.group.incl)
+  #nrow(G3.group.incl)
   
   ### G4, aged 3-16 years
   G4.incl <- Age.incl.df$meth =="G4"
   G4.group.incl <- Age.incl.df [G4.incl, ]
-  summary(G4.group.incl)
-  nrow(G4.group.incl)
+  #summary(G4.group.incl)
+  #nrow(G4.group.incl)
   
   ### SHH, aged 3-16 years
   SHH.incl <- Age.incl.df$meth == "SHH"
   SHH.group.incl <- Age.incl.df [SHH.incl, ]
-  summary (SHH.group.incl)
-  nrow(SHH.group.incl)
+  #summary (SHH.group.incl)
+  #nrow(SHH.group.incl)
   
   ### WNT, aged 3-16 years
   WNT.incl <- Age.incl.df$meth == "WNT"
   WNT.group.incl <- Age.incl.df [WNT.incl, ]
-  summary (WNT.group.incl)
-  nrow (WNT.group.incl)
+  #summary (WNT.group.incl)
+  #nrow (WNT.group.incl)
   
   
   ### defining features of 7 molecular groups, group 3 and 4 subgroups
@@ -902,28 +902,28 @@ clinPathAssess <- function(test.pData,
   
   G3.high <- Age.incl.df$meth7 == "Grp3_HighRisk"
   G3.high.incl <- Age.incl.df [G3.high, ]
-  summary(G3.high.incl)
+  #summary(G3.high.incl)
   
   G3.low <- Age.incl.df$meth7 == "Grp3_LowRisk"
   G3.low.incl <- Age.incl.df [G3.low, ]
-  summary(G3.low.incl)
+  #summary(G3.low.incl)
   
   
   G4.high <- Age.incl.df$meth7 =="Grp4_HighRisk"
   G4.high.incl <- Age.incl.df [G4.high, ]
-  summary (G4.high.incl)
+  #summary (G4.high.incl)
   
   G4.low <- Age.incl.df$meth7 =="Grp4_LowRisk"
   G4.low.incl <- Age.incl.df [G4.low, ]
-  summary (G4.low.incl)
+  #summary (G4.low.incl)
   
   SHH.inf <- Age.incl.df$meth7 == "SHH_Inf"
   SHH.inf.incl <- Age.incl.df [SHH.inf, ]
-  summary (SHH.inf.incl)
+  #summary (SHH.inf.incl)
   
   SHH.old <- Age.incl.df$meth7 =="SHH_Old"
   SHH.old.incl <- Age.incl.df [SHH.old, ]
-  summary (SHH.old.incl)
+  #summary (SHH.old.incl)
   
   ##########################
   
@@ -938,7 +938,7 @@ clinPathAssess <- function(test.pData,
   
   index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
   matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
-  is.vector(matched.test.incl.pData)
+  #is.vector(matched.test.incl.pData)
   matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
   matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
   
@@ -958,11 +958,11 @@ clinPathAssess <- function(test.pData,
   
   index.incl <- match(names(goi.vsd), rownames(G3G4.match.df)) 
   matched.G3G4.incl.pData <- G3G4.match.df[index.incl[!is.na(index.incl)],] 
-  is.vector(matched.G3G4.incl.pData)
+  #is.vector(matched.G3G4.incl.pData)
   matched.goi.vsd.G3G4.incl <- goi.vsd[!is.na(index.incl)] 
   matched.goi.vsd.cat.G3G4.incl <- ifelse(matched.goi.vsd.G3G4.incl>median(goi.vsd, na.rm = T), "high","low")
   
-  summary(matched.G3G4.incl.pData$meth7)
+  #summary(matched.G3G4.incl.pData$meth7)
   
   ### creating binary relapse variables labelled 0,1 for event analysis
   
@@ -1051,9 +1051,9 @@ clinPathAssess <- function(test.pData,
    result.goi <- list (surv.p.values.list=surv.p.values.list, 
                       chi.sq.list = chi.sq.list,
                       reg.log.list = reg.log.list, 
-                      cox.p.values.list = cox.p.values.list,
-                      age.correlation = list.cor.age,
-                      linear.reg.age = lin.reg.age
+                      cox.p.values.list = cox.p.values.list
+                      #age.correlation = list.cor.age
+                      #linear.reg.age = lin.reg.age ### linear regression and age correlation hashed out as causing problems with novel transcript expression data
                       )
   
   sink()
@@ -1135,5 +1135,20 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
 
 #######################################################################
 
+library(biomaRt)
 
+annotate.HTseq.IDs<-function(HTseq.IDs){
+  ensemblID <- gsub("\\..*", '', HTseq.IDs)
+  #fetch the annotation information from the Ensembl database
+  ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
+  symbols <- getBM(attributes=c('ensembl_gene_id', 'hgnc_symbol'), filters='ensembl_gene_id', ensemblID, mart=ensembl)
+  #combine the annotation with the RNA-Seq data
+  annotatedix <- match(ensemblID,symbols$ensembl_gene_id)
+  symbols[annotatedix,]->annotatedGenes
+  return(cbind(HTseq.IDs,annotatedGenes))
+}
+
+
+#ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
+#listAttributes(ensembl)
 
