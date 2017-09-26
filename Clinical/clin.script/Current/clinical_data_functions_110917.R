@@ -220,7 +220,7 @@ cox.result.OS <- function (time, event, marker, strata = NULL, data)
   cox.nevent <-summary(cox.temp)$nevent
   summary.OS.cox <- list(cox.OS.p.val = cox.p.val,cox.OS.HR = cox.HR,  cox.OS.lower.95CI = cox.lower.95CI, cox.OS.upper.95CI =cox.upper.95CI, n.OS = cox.n, n.event.OS = cox.nevent)
   
-  return (summary.cox)
+  return (summary.OS.cox) ### changed 260917
 }
 
 
