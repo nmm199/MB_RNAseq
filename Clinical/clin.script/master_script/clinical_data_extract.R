@@ -217,20 +217,51 @@ write.csv(significant.cox.EFS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/c
 ### extract logistic regression p value 
 ### create function like for cox regression dataframe (clinical_data_functions_master.R)
 
-# log.reg.dataframe <- function(pval, Zscore, OR, L95CI, U95CI){
-#  logreg.pval.assembled <- do.call(rbind, pval)
-# logreg.cox.pval <- p.adjust(logreg.pval.assembled, method = "BH")
-# logreg.Zscore.assembled <- do.call(rbind, Zscore)
-# logreg.HR.assembled <- do.call(rbind, HR)
-# logreg.L95CI.assembled <- do.call(rbind, L95CI)
-# logreg.U95CI.assembled <- do.call(rbind, U95CI)
-# logreg.allresults.df <- cbind(cox.pval.assembled, adj.cox.pval, cox.Zscore.assembled, cox.HR.assembled, cox.L95CI.assembled, cox.U95CI.assembled)
-# colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval", "logreg.Zscore","logreg.HR", "logreg.HR.L95CI", "logreg.HR.U95CI" )
-# return (logreg.allresults.df)
-# }
+### example input for logistic regression relapse
+
+log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
+logreg.pval.assembled <- do.call(rbind, pval)
+logreg.adj.pval <- p.adjust(logreg.pval.assembled, method = "BH")
+logreg.HR.assembled <- do.call(rbind, HR)
+logreg.L95CI.assembled <- do.call(rbind, L95CI)
+logreg.U95CI.assembled <- do.call(rbind, U95CI)
+logreg.allresults.df <- cbind(logreg.pval.assembled, logreg.adj.pval, logreg.HR.assembled, logreg.HR.assembled, logreg.L95CI.assembled, logreg.U95CI.assembled)
+colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval","logreg.HR", "logreg.HR.L95CI", "logreg.HR.U95CI" )
+return (logreg.allresults.df)
+}
 
 
-#significant.cox.df.all <- cox.allresults.df[which(cox.allresults.df[, 2]<0.05)]
+### potentially just return p values and adjusted p values for each logistic regression category currently
+
+logreg.LCA.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA)})
+logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])})
+logreg.LCA.df <- do.call(rbind, logreg.LCA.pval) ### possibly do not need this
+logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH")
+logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.df, logreg.LCA.adj.pval)
+
+
+
+logreg.relapse.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse)})
+logreg.relapse.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse[[1]])})
+logreg.relapse.adj.pval <- p.adjust(logreg.relapse.pval, method = "BH")
+logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pval)
+
+
+### could create a foreach loop
+
+#logreg.allresults <- foreach (i = 1:length(results.master[[i]]$reg.log.list)$dopar% {
+ # logreg.pval <- lapply(results.master, function(x){return(x$reg.log.list[[i]][[1]])})
+ # logreg.adj.pval <- p.adjust(logreg.pval, method = "BH")
+ # logreg.combined.pval <- cbind (logreg.pval, logreg.adj.pval)
+ # return(logreg.combined.pval)
+## }
+# )
+
+
+
+### creating log reg list for all variables
+
+#significant.logreg.df.all <- logreg.allresults.df[which(cox.allresults.df[, 2]<0.05)]
 
 
 #######################################################################
