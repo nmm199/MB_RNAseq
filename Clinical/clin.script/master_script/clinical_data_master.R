@@ -89,8 +89,7 @@ log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 
 ################################################################################
 
-### Run of one: need to define goi.vsd in order to use the ClinPathAsess function
-### unhash this section (lines 97 - 115) when running one goi
+### Unhash this section as required (between lines 94 - 110) when running one goi
 
 # goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, or can specify a goi within inverted commas
 
@@ -123,6 +122,7 @@ registerDoParallel(10)
 tic()
 
 ### unhash here when trouble shooting
+
 # i=17
 # as.numeric(mb.vsd.novel[i,]) -> x
 # names(x) <- colnames(mb.vsd.novel)
@@ -191,7 +191,7 @@ results.master <- foreach(i = 1:10)%dopar%{
 toc()
 
 ##################################################################
-### save outputted results
+### save RDS
 
 ### update name according to input file
 
@@ -202,20 +202,11 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 
 ### then reload this when examining the results
 
-#results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
-# results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
-# results.master <- results.file
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
 
-############################################
 
-### examples for how to then extract lists you are interested in: see separate script "clinical_data_extract.R" 
-
-#lapply(results.master, function(x){return(x[[3]][[2]])}) -> extracted.results
-#do.call(rbind, extracted.results) -> compiled.results
-#p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
-#hist(adjusted.p.values)
-
-############################################
+#####################################################################
 
 
 

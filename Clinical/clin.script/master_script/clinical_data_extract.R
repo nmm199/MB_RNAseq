@@ -5,9 +5,9 @@
 
 ### example file input
 
-results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") 
-results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
-results.master <- results.file
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") 
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
+
 
 ### need to read in functions file
 
@@ -36,6 +36,7 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 
 ### Extracted dataframes
 ### OS p value for overall group
+### replicate the subsetting for NA values using the function details below for COX PFS
 
 extracted.km.OS.pval <- lapply(results.master, function(x){return(x[[1]][[3]][[1]])}) 
 km.OS.p.extract.assembled <- do.call(rbind, extracted.km.OS.pval)
@@ -122,11 +123,60 @@ histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, ther
 
 ### Cox PFS overall
 
-cox.PFS.pval.all <- lapply(results.master, function(x){return(x[[4]][[3]][[1]])})
-cox.PFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[3]][[5]])})
-cox.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[2]])})
-cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[3]])})
-cox.U95CI.PFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[3]][[4]])})
+extract.function <- function(x){
+  if(length(x[[4]])==0){
+    NA
+  }else{
+  return(x[[4]][[3]][[1]])
+}
+  }
+
+cox.PFS.pval.all <- lapply(results.master,extract.function)
+
+extract.coxZscore <- function(x){
+  if(length(x[[4]])==0){
+    NA
+  }else{
+    return(x[[4]][[3]][[5]])
+  }
+}
+
+cox.PFS.Zscore.all <- lapply(results.master,function(x){
+  if(length(x[[4]])==0){
+    NA
+  }else{
+    return(x[[4]][[3]][[5]])
+  }
+}         
+)
+
+
+cox.PFS.HR.all <- lapply(results.master, function(x){
+  if(length(x[[4]])==0) {
+    NA
+  } else{
+      return(x[[4]][[3]][[2]])
+    }
+  }
+)
+  
+cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){
+  if(length(x[[4]]) == 0) {
+    NA
+    } else {
+      return(x[[4]][[3]][[3]])
+    }
+  }
+)
+
+cox.U95CI.PFS.HR.all <- lapply(results.master, function(x){
+  if(length(x[[4]]) == 0) {
+    NA
+    } else {
+      return(x[[4]][[3]][[4]])
+    }
+  }
+)
 
 cox.PFS.all.df <- cox.dataframe(pval = cox.PFS.pval.all, Zscore = cox.PFS.Zscore.all, HR = cox.PFS.HR.all, L95CI = cox.L95CI.PFS.HR.all, U95CI = cox.U95CI.PFS.HR.all )
 
@@ -134,10 +184,11 @@ colnames(cox.PFS.all.df) <- c("cox.PFS.pval.all", "cox.PFS.adj.pval.all", "cox.P
 
 significant.cox.PFS.all <- cox.PFS.all.df[which(cox.PFS.all.df[, 2]<0.05),]
 
-write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_all.csv")
+write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_novel.csv")
 
-
+########################################################################################
 ### Cox PFS for G3G4
+### replicate using the NA script above
 
 cox.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[1]])})
 cox.PFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[5]])})
