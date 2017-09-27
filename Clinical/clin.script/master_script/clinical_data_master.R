@@ -165,29 +165,15 @@ results.master <- foreach(i = 1:10)%dopar%{
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
   names(results.master) <- row.names(mb.vsd)[1:10]
 
-###########################################################
-  
-  ### if ongoing errors try this:
-  
-  # tryCatch{ #### This catches the error and outputs it to screen but allows the program to continue running
-  # results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-  #  as.numeric(mb.vsd [i,]) -> x
-  # names(x) <- colnames(mb.vsd)
-  #  names(x) <- gsub("T","",names(mb.vsd)) ### check that this is correct
-  #  error=function(e){cat("ERROR :",conditionMessage(e), "\n")} 
-  #  return(clinPathAssess(test.pData,x)) 
-  # }
-  # }  #### prints the error message to screen
-  
-  
 ############################################################
   
 ### Annotate with known gene sets
-
- annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
+annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
+write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
+  
 toc()
 
 ##################################################################
@@ -207,6 +193,18 @@ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.result
 
 
 #####################################################################
+
+### if ongoing errors try this:
+
+# tryCatch{ #### This catches the error and outputs it to screen but allows the program to continue running
+# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+#  as.numeric(mb.vsd [i,]) -> x
+# names(x) <- colnames(mb.vsd)
+#  names(x) <- gsub("T","",names(mb.vsd)) ### check that this is correct
+#  error=function(e){cat("ERROR :",conditionMessage(e), "\n")} 
+#  return(clinPathAssess(test.pData,x)) 
+# }
+# }  #### prints the error message to screen
 
 
 
