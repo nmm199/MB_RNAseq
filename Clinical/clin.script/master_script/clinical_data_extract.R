@@ -116,7 +116,7 @@ histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, ther
 
 #################################################
 
-### extract cox regression p value and Z scores into dataframe
+### extract cox regression p value and Z scores into individual dataframes
 
 #################################################
 
@@ -134,7 +134,7 @@ colnames(cox.PFS.all.df) <- c("cox.PFS.pval.all", "cox.PFS.adj.pval.all", "cox.P
 
 significant.cox.PFS.all <- cox.PFS.all.df[which(cox.PFS.all.df[, 2]<0.05),]
 
-#write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_all.csv")
+write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_all.csv")
 
 
 ### Cox PFS for G3G4
@@ -146,77 +146,92 @@ cox.U95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[
 cox.L95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[3]])})
 
 cox.PFS.G3G4.df <- cox.dataframe (pval = cox.PFS.pval.G3G4, Zscore = cox.PFS.Zscore.G3G4, HR = cox.PFS.HR.G3G4, L95CI = cox.L95CI.PFS.HR.G3G4 , U95CI = cox.U95CI.PFS.HR.G3G4)
-
 colnames(cox.PFS.G3G4.df) <- c("cox.PFS.pval.G3G4", "cox.PFS.adj.pval.G3G4", "cox.PFS.Zscore.G3G4", "cox.PFS.HR.G3G4", "cox.PFS.L95CI.G3G4", "cox.PFS.U95CI.G3G4")
 
-significant.cox.G3G4.df <- cox.PFS.G3G4.df[which(cox.PFS.G3G4.df[, 2]<0.05),]
+significant.cox.PFS.G3G4 <- cox.PFS.G3G4.df[which(cox.PFS.G3G4.df[, 2]<0.05),]
+
+write.csv(significant.cox.PFS.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_G3G4.csv")
 
 
-### cox OS overall
+### Cox OS overall
+
+cox.OS.pval.all <- lapply (results.master, function(x){return(x[[4]][[5]][[1]])})
+cox.OS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[5]][[5]])})
+cox.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[2]])})
+cox.U95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[4]])})
+cox.L95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[3]])})
+
+cox.OS.all.df <- cox.dataframe(pval = cox.OS.pval.all, Zscore = cox.OS.Zscore.all, HR = cox.OS.HR.all, L95CI = cox.L95CI.OS.HR.all, U95CI = cox.U95CI.OS.HR.all)
+colnames(cox.OS.all.df) <- c("cox.OS.pval.all", "cox.OS.adj.pval.all", "cox.OS.Zscore.all", "cox.OS.HR.all","cox.L95CI.OS.HR.all", "cox.U95CI.OS.HR.all")
+  
+significant.cox.OS.all <- cox.OS.all.df[which(cox.OS.all.df[, 2]<0.05),]
+
+write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.all.csv")
 
 
 ### Cox OS for G3G4
 
+cox.OS.pval.G3G4 <- lapply (results.master, function(x){return(x[[4]][[6]][[1]])})
+cox.OS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[5]])})
+cox.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[2]])})
+cox.U95CI.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[4]])})
+cox.L95CI.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[3]])})
 
-######################################################
+cox.OS.G3G4.df <- cox.dataframe(pval = cox.OS.pval.G3G4, Zscore = cox.OS.Zscore.G3G4, HR = cox.OS.HR.G3G4, L95CI = cox.L95CI.OS.HR.G3G4, U95CI = cox.U95CI.OS.HR.G3G4)
+colnames(cox.OS.G3G4.df) <- c("cox.OS.pval.G3G4", "cox.OS.adj.pval.G3G4", "cox.OS.Zscore.G3G4", "cox.OS.HR.G3G4","cox.L95CI.OS.HR.G3G4", "cox.U95CI.OS.HR.G3G4")
 
-### convert using cox dataframe function
-
-### generating EFS dataframe
-
-
-extracted.cox.EFS.pval <- lapply(results.master, function(x){return(x[[4]][[1]][[1]])})
-cox.EFS.pval.assembled.all <- do.call(rbind, extracted.cox.EFS.pval)
-adjusted.p.cox.EFS.all <-p.adjust(cox.EFS.pval.assembled.all, method = "BH") 
-EFS.cox.p.all.combined <- cbind(cox.EFS.pval.assembled.all, adjusted.p.cox.EFS.all)
-colnames(EFS.cox.p.all.combined) <- c("EFS.cox.pval.all", "EFS.cox.adj.pval.all")
-
-### extract cox Z score
-extracted.cox.EFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[1]][[5]])})
-cox.EFS.extract.Zscore.assembled.all <- do.call(rbind, extracted.cox.EFS.Zscore.all)
-colnames(cox.EFS.extract.Zscore.assembled.all)<- c("EFS.cox.Zscore.all")
-
-### extract Hazard ratio cox
-extracted.EFS.cox.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[2]])})
-cox.EFS.HR.assembled.all <- do.call(rbind,extracted.EFS.cox.HR.all )
-colnames(cox.EFS.HR.assembled.all)<- c("EFS.cox.HR.all")
-
-### extract 95 Confidence intervals
-### upper 95 CI
-
-U95CI.EFS.cox.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[4]])})
-cox.EFS.HR.U95CI.assembled.all <- do.call(rbind, U95CI.EFS.cox.HR.all)
-colnames(cox.EFS.HR.U95CI.assembled.all)<-c("EFS.cox.HR.U95CI")
-
-### lower 95 CI
-L95CI.EFS.cox.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[3]])})
-cox.EFS.HR.L95CI.assembled.all <- do.call(rbind, L95CI.EFS.cox.HR.all)
-colnames(cox.EFS.HR.L95CI.assembled.all)<-c("EFS.cox.HR.L95CI")
-
-### construct cox regression dataframe for all parameters of interest
-
-cox.EFS.HR.95CI.all.df <- cbind(cox.EFS.HR.assembled.all,cox.EFS.HR.L95CI.assembled.all, cox.EFS.HR.U95CI.assembled.all)
-cox.EFS.all.df <- cbind(EFS.cox.p.all.combined, cox.EFS.extract.Zscore.assembled.all, cox.EFS.HR.95CI.all.df)
+significant.cox.OS.G3G4 <- cox.OS.G3G4.df[which(cox.OS.G3G4.df[, 2]<0.05),]
+write.csv(significant.cox.OS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.G3G4.csv")
 
 
-############################
-### replicate cox dataframe for OS, then EFS G3G4
+### Cox EFS for all
 
+cox.EFS.pval.all <- lapply(results.master, function(x){return(x[[4]][[1]][[1]])})
+cox.EFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[1]][[5]])})
+cox.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[2]])})
+cox.U95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[4]])})  
+cox.L95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[3]])})
 
+cox.EFS.all.df <- cox.dataframe(pval = cox.EFS.pval.all, Zscore = cox.EFS.Zscore.all, HR = cox.EFS.HR.all, L95CI = cox.L95CI.EFS.HR.all, U95CI = cox.U95CI.EFS.HR.all)
+colnames(cox.EFS.all.df) <- c("cox.EFS.pval.all", "cox.EFS.adj.pval.all", "cox.EFS.Zscore.all", "cox.EFS.HR.all", "cox.U95CI.EFS.HR.all", "cox.L95CI.EFS.HR.all")
 
+significant.cox.EFS.all <- cox.EFS.all.df[which(cox.EFS.all.df[, 2]<0.05),]
+write.csv(significant.cox.EFS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.EFS.all.csv")
 
+### cox EFS for G3G4
 
+cox.EFS.pval.G3G4  <- lapply(results.master, function(x){return(x[[4]][[2]][[1]])})
+cox.EFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[5]])})
+cox.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[2]])})
+cox.U95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[4]])})  
+cox.L95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[3]])})
 
+cox.EFS.G3G4.df <- cox.dataframe(pval = cox.EFS.pval.G3G4, Zscore = cox.EFS.Zscore.G3G4, HR = cox.EFS.HR.G3G4, L95CI = cox.L95CI.EFS.HR.G3G4, U95CI = cox.U95CI.EFS.HR.G3G4)
+colnames(cox.EFS.G3G4.df) <- c("cox.EFS.pval.G3G4", "cox.EFS.adj.pval.G3G4", "cox.EFS.Zscore.G3G4", "cox.EFS.HR.G3G4", "cox.U95CI.EFS.HR.G3G4", "cox.L95CI.EFS.HR.G3G4")
 
-
-#####################################################################
-### to replicate script above for EFS G3G4, OS overall and OS G3G4
-
-
+significant.cox.EFS.G3G4 <- cox.EFS.G3G4.df[which(cox.EFS.G3G4.df[, 2]<0.05),]
+write.csv(significant.cox.EFS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.EFS.G3G4.csv")
 
 ########################################################################
 
 ### extract logistic regression p value 
+### create function like for cox regression dataframe (clinical_data_functions_master.R)
+
+# log.reg.dataframe <- function(pval, Zscore, OR, L95CI, U95CI){
+#  logreg.pval.assembled <- do.call(rbind, pval)
+# logreg.cox.pval <- p.adjust(logreg.pval.assembled, method = "BH")
+# logreg.Zscore.assembled <- do.call(rbind, Zscore)
+# logreg.HR.assembled <- do.call(rbind, HR)
+# logreg.L95CI.assembled <- do.call(rbind, L95CI)
+# logreg.U95CI.assembled <- do.call(rbind, U95CI)
+# logreg.allresults.df <- cbind(cox.pval.assembled, adj.cox.pval, cox.Zscore.assembled, cox.HR.assembled, cox.L95CI.assembled, cox.U95CI.assembled)
+# colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval", "logreg.Zscore","logreg.HR", "logreg.HR.L95CI", "logreg.HR.U95CI" )
+# return (logreg.allresults.df)
+# }
+
+
+#significant.cox.df.all <- cox.allresults.df[which(cox.allresults.df[, 2]<0.05)]
+
 
 #######################################################################
 
@@ -238,25 +253,10 @@ cox.EFS.all.df <- cbind(EFS.cox.p.all.combined, cox.EFS.extract.Zscore.assembled
 
 
 #############################################################################
-### generating function for generating cox dataframe
 
 
 
-### Function which is now contained in function file (clinical_data_functions_master.R)
-
-# cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
- #  cox.pval.assembled <- do.call(rbind, pval)
-  # adj.cox.pval <- p.adjust(cox.pval.assembled, method = "BH")
-  # cox.Zscore.assembled <- do.call(rbind, Zscore)
-  # cox.HR.assembled <- do.call(rbind, HR)
-  # cox.L95CI.assembled <- do.call(rbind, L95CI)
-  # cox.U95CI.assembled <- do.call(rbind, U95CI)
-  # cox.allresults.df <- cbind(cox.pval.assembled, adj.cox.pval, cox.Zscore.assembled, cox.HR.assembled, cox.L95CI.assembled, cox.U95CI.assembled)
-  # colnames(cox.allresults.df)<- c("cox.pval", "cox.adj.pval", "cox.Zscore","cox.HR", "cox.HR.L95CI", "cox.HR.U95CI" )
-  # return (cox.allresults.df)
-# }
 
 
-#significant.cox.df.all <- cox.allresults.df[which(cox.allresults.df[, 2]<0.05)]
 
 
