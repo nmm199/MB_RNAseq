@@ -582,6 +582,7 @@ clinPathAssess <- function(test.pData,
   ### MM stipulating inputs 140917
   ### goi <- ENSG00000008196.12_1
 
+  # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
   #  goi.vsd <- as.numeric(mb.vsd[goi,]) 

@@ -8,10 +8,8 @@
 # 3. This script covers analysis up to and including univariate risk factor analysis
 # 4. Multivariate analysis / AUC will be covered by a separate script
 
-
 ### Author: Dr Marion Mateos
-### Date: Sep 11 2017
-
+### Date: Sep 11 2017 
 
 ### R version 3.4.0 (2017-04-21)
 ### Platform: x86_64-pc-linux-gnu (64-bit)
@@ -51,6 +49,7 @@
 ### "cox.result.OS"
 ### "km.log.test.EFS"
 ### updatepData
+### clinPathAssess
 
 ### External files required
 
@@ -67,21 +66,15 @@
 ### just for demonstration purposes at the moment
 ###############################################################################
 
-# cat ("reading in expression data", sep ="\n")
 ### unhash to use the following file for all the expression data 
 RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
 
-### unhash to use the following file for novel RNA transcripts
-#RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"  ### updated060917
-
-mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### or use this as the whole command in one line
+mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
 
 mb.vsd <- read.delim(RNA.data)
 
-
 ##############################################################################
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
-
 
 ### loading in clinical data object = test.pData
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
@@ -94,19 +87,33 @@ pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
 log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 #log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
-### need to define goi.vsd in order to use the ClinPathAsess function
-goi.vsd <- as.numeric(mb.vsd[1,])
-names(mb.vsd) -> names(goi.vsd)
+################################################################################
 
-## run of one
-results <- clinPathAssess(test.pData,
-                          goi.vsd,
-                          pdf.file = pdf.file,
-                          log.file = log.file)
+### Run of one: need to define goi.vsd in order to use the ClinPathAsess function
+### unhash this section (lines 97 - 115) when running one goi
+
+# goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, or can specify a goi within inverted commas
+
+# goi <- "ENSG00000008196"                
+# goi.vsd <- as.numeric(mb.vsd[goi, ])    
+# names(mb.vsd) -> names(goi.vsd)        
+
+## results for run of one
+# results <- clinPathAssess(test.pData,
+                         # goi.vsd,
+                         # pdf.file = pdf.file,
+                         # log.file = log.file)
 
 
-############################
-### to run multiple genes
+# names(results)<- row.names(goi.vsd)
+
+# saveRDS (results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
+# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
+
+###############################################################################
+
+### To run multiple genes in the clinPathAssess function 
+
 library(foreach)
 library(tictoc)
 library(parallel)
@@ -116,60 +123,90 @@ registerDoParallel(10)
 tic()
 
 ### unhash here when trouble shooting
-i=17
-as.numeric(mb.vsd.novel[i,]) -> x
-names(x) <- colnames(mb.vsd.novel)
-names(x) <- gsub("T","",names(mb.vsd.novel))
-clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+#i=17
+#as.numeric(mb.vsd.novel[i,]) -> x
+#names(x) <- colnames(mb.vsd.novel)
+#names(x) <- gsub("T","",names(mb.vsd.novel))
+#clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
 
 
-results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-as.numeric(mb.vsd[i,]) -> x
-names(x) <- colnames(mb.vsd)
-names(x) <- gsub("T","",names(mb.vsd))
-return(clinPathAssess(test.pData,x)) 
-}
+### unhash when running the complete transcript set
 
-
-###Error in eval(a, envir = extra, enclos = obj$evalenv) : 
-###attempt to apply non-function
-
-#results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-  ###i=25
-  #as.numeric(mb.vsd[i,]) -> x
-  #names(x) <- colnames(mb.vsd)
-  #names(goi.vsd) <- gsub("T","",names(mb.vsd))
-  ###clinPathAssess(test.pData,x)
-  #return(clinPathAssess(test.pData,x))
+# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+# as.numeric(mb.vsd[i,]) -> x
+#names(x) <- colnames(mb.vsd)
+#names(x) <- gsub("T","",names(mb.vsd))
+#return(clinPathAssess(test.pData,x)) 
 #}
 
-names(results.master) <- row.names(mb.vsd)
 
-annotate.HTseq.IDs(row.names(mb.vsd)) -> annot
-row.names(mb.vsd)
+### unhash when running the novel transcript set
+
+# results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
+ # as.numeric(mb.vsd.novel[i,]) -> x
+ # names(x) <- colnames(mb.vsd.novel)
+ # names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
+#  return(clinPathAssess(test.pData,x)) 
+# }
+
+### this was the previous script that we had, that included goi.vsd
+### subsequent script from dan, we changes (names(goi.vsd) to names(x))
+
+# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+  ### i=25
+  # as.numeric(mb.vsd[i,]) -> x
+  # names(x) <- colnames(mb.vsd)
+  # names(goi.vsd) <- gsub("T","",names(mb.vsd))
+  ### clinPathAssess(test.pData,x)
+  # return(clinPathAssess(test.pData,x))
+# }
+
+
+### previous script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+results.master <- foreach(i = 1:10)%dopar%{
+  as.numeric(mb.vsd[i,]) -> x
+  names(x) <- colnames(mb.vsd)
+  names(x) <- gsub("T","",names(mb.vsd)) 
+  return(clinPathAssess(test.pData,x))
+}
+
+### then unhash the relevant outputs
+
+# names(results.master) <- row.names(mb.vsd)
+# names(results.master) <- row.names(mb.vsd.novel)
+# names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
+
+names(results.master) <- row.names(mb.vsd)[1:10]
+
+###########################################################
+### Annotate with known gene sets
+
+# annot <- annotate.HTseq.IDs(row.names(mb.vsd)) 
+annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
+
+# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
 toc()
-#names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-
 
 ##################################################################
 ### save outputted results
+
 ### update name according to input file
 
-#saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds")
+saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.rds")
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
-saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes50.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
 
 ### then reload this when examining the results
 
 #results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
-results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
-results.master <- results.file
-
+# results.file <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
+# results.master <- results.file
 
 ############################################
 
-### examples for how to then extract lists you are interested in
+### examples for how to then extract lists you are interested in: see separate script "clinical_data_extract.R" 
 
 #lapply(results.master, function(x){return(x[[3]][[2]])}) -> extracted.results
 
@@ -254,7 +291,7 @@ significant.p.PFS.G3G4 <- PFS.pvalue.G3G4.combined[which(PFS.pvalue.G3G4.combine
 
 histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS.all)
 
-library(density)
+# library(density)
 plot(ecdf(adjusted.p.km.EFS.all))
 plot(density(adjusted.p.km.EFS.all))
 hist(km.EFS.p.extract.assembled.all)
