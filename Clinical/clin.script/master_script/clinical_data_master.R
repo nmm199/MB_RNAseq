@@ -50,20 +50,27 @@
 ### "km.log.test.EFS"
 ### updatepData
 ### clinPathAssess
+### cox.dataframe
+### annotate.HTseq.IDs
 
-### External files required
+### input files required
 
 ### clinical database "x.data"
 ### 7 molecular group data "meth.data"
 ### cytogenetic arm data "cytogen.data"
 ### RNA expression data "RNA.data"
+### test.pData file (this has been generated via pData_input_master.R.   If the clinical database file is updated then need to rerun pData_input_master.R)
 
+### output files
+### a defined RDS object from which other dataframes can be extracted using clinical_data_extract.R
 
-###############################################################################
+########################################################################################################################################################
+########################################################################################################################################################
+
 ### deals with making a GOI.vsd vector this is the part that is going to change
 ### at the moment this is just any old expression data
 ### you will plug in your own goi - isoforms, novel genes, etc
-### just for demonstration purposes at the moment
+
 ###############################################################################
 
 ### unhash to use the following file for all the expression data 
@@ -74,6 +81,7 @@ mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"
 mb.vsd <- read.delim(RNA.data)
 
 ##############################################################################
+
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
 
 ### loading in clinical data object = test.pData
@@ -150,6 +158,7 @@ tic()
 
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+
 results.master <- foreach(i = 1:10)%dopar%{
   as.numeric(mb.vsd[i,]) -> x
   names(x) <- colnames(mb.vsd)
@@ -157,17 +166,19 @@ results.master <- foreach(i = 1:10)%dopar%{
   return(clinPathAssess(test.pData,x))
 }
 
+###############################################################################
 
-### then unhash the relevant outputs
+### unhash the relevant name for the output 
 
 # names(results.master) <- row.names(mb.vsd)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
   names(results.master) <- row.names(mb.vsd)[1:10]
 
-############################################################
+###############################################################################
   
 ### Annotate with known gene sets
+
 annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
@@ -176,7 +187,7 @@ write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/re
   
 toc()
 
-##################################################################
+###############################################################################
 ### save RDS
 
 ### update name according to input file
@@ -189,6 +200,7 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 ### then reload this when examining the results
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
+
 results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
 
 

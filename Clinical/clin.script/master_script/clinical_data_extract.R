@@ -3,40 +3,34 @@
 ### Date: September 25 2017
 ### Author: Dr Marion Mateos
 
-### example file input
+### file input
 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") 
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds") 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.5.rds") ### has cox Z score
 
 
-### need to read in functions file
+### read in functions file
 
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
 
 ### file output 
 
 ### dataframes with p value, adjusted p value
-
 ### all.survival.p.bothgroups: includes OS, EFS and PFS for overall group and G3G4 
-
 ### significant adjusted p values for OS, EFS, PFS separately in dataframes for overall group and for G3G4
-
 ### graphical output for adjusted p values compared to p values
-
 ### cox regression p values, Z scores, HR, 95 CI
-
 ### working on logistic regression p values, OR, 95 CI
-
 ### working on chi squared p values, adjusted p values
-
 ### graphical output to include survival curves, relationship to subgroup
 
 
 ##########################################################################
 
 ### Extracted dataframes
-### OS p value for overall group
-### replicate the subsetting for NA values using the function details below for COX PFS
+
+
+###
 
 extracted.km.OS.pval <- lapply(results.master, function(x){return(x[[1]][[3]][[1]])}) 
 km.OS.p.extract.assembled <- do.call(rbind, extracted.km.OS.pval)
@@ -122,16 +116,35 @@ histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, ther
 #################################################
 
 ### Cox PFS overall
+### need to optimise the section below for all the files including complete transcript file
+
+#########################################################
+### this is the prototype of the function that works to extract elements when there is no value for some elements in that position
 
 extract.function <- function(x){
+  return(ifelse(length(x[[4]]) < 3, NA,
+                ifelse(length(x[[4]][[3]])<6, NA, ### changed from <4, to < 6. May need to alter for other RDS input file
+                       ifelse(length(x[[4]][[3]][[4]])<1, NA, ### updated
+                              x[[4]][[3]][[4]]))))
+}
+
+cox.U95CI.PFS.HR.all <- lapply(results.master, extract.function)
+# length(cox.U95CI.PFS.HR.all)
+
+########################################################
+
+
+extract.coxpval<- function (x){
   if(length(x[[4]])==0){
     NA
-  }else{
-  return(x[[4]][[3]][[1]])
-}
+  } else {
+    return (x[[4]][[3]][[1]])
   }
+}  
+### this does not work Error in x[[4]][[3]] : subscript out of bounds
 
-cox.PFS.pval.all <- lapply(results.master,extract.function)
+cox.PFS.pval.all <- lapply(results.master, extract.coxpval)
+
 
 extract.coxZscore <- function(x){
   if(length(x[[4]])==0){
@@ -169,14 +182,7 @@ cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){
   }
 )
 
-cox.U95CI.PFS.HR.all <- lapply(results.master, function(x){
-  if(length(x[[4]]) == 0) {
-    NA
-    } else {
-      return(x[[4]][[3]][[4]])
-    }
-  }
-)
+
 
 cox.PFS.all.df <- cox.dataframe(pval = cox.PFS.pval.all, Zscore = cox.PFS.Zscore.all, HR = cox.PFS.HR.all, L95CI = cox.L95CI.PFS.HR.all, U95CI = cox.U95CI.PFS.HR.all )
 
@@ -264,6 +270,37 @@ significant.cox.EFS.G3G4 <- cox.EFS.G3G4.df[which(cox.EFS.G3G4.df[, 2]<0.05),]
 write.csv(significant.cox.EFS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.EFS.G3G4.csv")
 
 ########################################################################
+
+### OS p value for overall group
+### replicate the subsetting for NA values using the function details below for COX PFS
+
+###
+#extract.function <- function(x){
+#if(length(x[[4]])==0){
+#  NA
+#}else{
+#  return(x[[4]][[3]][[1]])
+# }
+#}
+
+cox.OS.pval.all <- lapply (results.master, function(x){
+  if(length(x[[4]])==0){
+    NA
+  } else {
+    return(x[[4]][[5]][[1]])
+  }
+}
+)
+
+
+cox.OS.Zscore.all <- lapply(results.master,function(x){
+  if(length(x[[4]])==0){
+    NA
+  }else{
+    return(x[[4]][[5]][[5]])  ### same as  x[[4]][[5]]$cox.OS.Zscore
+  }
+}         
+)
 
 ### extract logistic regression p value 
 ### create function like for cox regression dataframe (clinical_data_functions_master.R)

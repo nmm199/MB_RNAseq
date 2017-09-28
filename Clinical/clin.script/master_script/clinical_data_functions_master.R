@@ -1095,46 +1095,10 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
 
 
 
-
-
-
-
 ########################################################################################
 
-### some additional script to consider for logistic regression results in output
-### also original logistic regression hardcoded script is below
-
-###########
-# most_significant_Log_Reg <- DF_LR[which(DF_LR$lr.pval < 0.05),]
-############
-
-##############################
-### original logistic regression script from here to ****
-### have removed boxplots which are hardcoded and moved to separate section. 
-
-#log.reg.age.cat <- glm(age.cat.infant ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#log.reg.sex <- glm (matched.test.pData$sex ~ matched.goi.vsd, family = binomial (link = 'logit'), data= matched.test.pData)
-#log.reg.mstatus <- glm(matched.test.pData$mstatus ~ matched.goi.vsd,  family = binomial(link= 'logit'), data=matched.test.pData)
-#log.reg.relapse <- glm(matched.test.pData$relapse ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#log.reg.resection <- glm (matched.test.pData$resection ~ matched.goi.vsd, family = binomial(link= 'logit'), data=matched.test.pData)
-#log.reg.histopath <- glm (matched.test.pData$histopath ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-
-### visualise relationship between biomarker and LCA pathology
-#  log.reg.LCA <- glm (matched.test.pData$LCA ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-
-### poor prognostic genetics
-# log.reg.MYC <- glm (matched.test.pData$MYC.cat ~ matched.goi.vsd, family = binomial(link='logit'), data=matched.test.pData)
-# log.reg.MYCN <- glm (matched.test.pData$MYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)
-# log.reg.MYCMYCN <- glm (matched.test.pData$MYCMYCN.cat ~ matched.goi.vsd, family = binomial (link='logit'), data=matched.test.pData)  ### combined MYC / MYCN amplification group
-# log.reg.TP53 <- glm (matched.test.pData$TP53.cat ~ matched.goi.vsd,family = binomial (link='logit'), data=matched.test.pData)
-# log.reg.TERT <- glm (matched.test.pData$TERT.cat ~ matched.goi.vsd, family = binomial (link = 'logit'), data = matched.test.pData) ### TERT (may need to specific subgroup)
-
-
-### logistic regression and molecular subgroups
-#log.reg.meth <- glm (matched.test.pData$meth ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-#log.reg.meth7 <- glm (matched.test.pData$meth7 ~ matched.goi.vsd, family = binomial(link='logit'), data = matched.test.pData)
-
-#######################################################################
+### Function called annotate.HTseq.IDs
+### input is a datafile (results.master) generated from clinical_data_master.R 
 
 library(biomaRt)
 
@@ -1151,5 +1115,5 @@ annotate.HTseq.IDs<-function(HTseq.IDs){
 
 
 #ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
-#listAttributes(ensembl)
+#listAttributes(ensembl) ### if wish to add further components to the annotate function that exist within the ensembl database. Adds computing power/time
 
