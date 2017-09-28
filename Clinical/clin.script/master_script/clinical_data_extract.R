@@ -116,10 +116,57 @@ histo.p.adj.km.PFS.G3G4 <- hist(adjusted.p.km.PFS.G3G4) ### all same value, ther
 #################################################
 
 ### Cox PFS overall
-### need to optimise the section below for all the files including complete transcript file
+### cox.U95CI.PFS.HR.all : this is the prototype of the function that works to extract elements when there is no value for some elements in that position
 
 #########################################################
-### this is the prototype of the function that works to extract elements when there is no value for some elements in that position
+
+### cox PFS p value
+
+extract.coxpval<- function (x){
+  return(ifelse(length(x[[4]])< 3, NA,
+      ifelse(length(x[[4]][[3]])<6, NA, 
+                   ifelse(length(x[[4]][[3]][[1]])<1, NA,
+                                 x[[4]][[3]][[1]]))))
+ }
+
+
+cox.PFS.pval.all <- lapply(results.master, extract.coxpval)
+
+### cox Z score
+
+extract.PFS.cox.Zscore <- function(x){
+  return(ifelse(length(x[[4]])<3, NA,
+                ifelse(length(x[[4]][[3]])<6, NA, 
+                       ifelse(length(x[[4]][[3]][[5]])<1, NA,
+                      x[[4]][[3]][[5]]))))
+}
+
+cox.PFS.Zscore.all <- lapply(results.master, extract.PFS.cox.Zscore)
+
+### cox PFS HR
+
+extract.cox.PFS.HR <- function(x){
+  ifelse(length(x[[4]])<3, NA,
+   ifelse(length(x[[4]][[3]])<6, NA, 
+   ifelse(length(x[[4]][[3]][[2]])<1, NA,
+    x[[4]][[3]][[2]])))
+}
+
+cox.PFS.HR.all <- lapply (results.master, extract.cox.PFS.HR)
+
+### cox PFS L95CI
+
+extract.cox.L95CI.HR <- function(x){
+  ifelse(length(x[[4]])<3, NA,  ### get error message if make this < 2
+         ifelse(length(x[[4]][[3]])<6, NA,  ### original script has <4 for this parameter, updated. ### 12109 is where the error is occurring
+                ifelse(length(x[[4]][[3]][[3]])<1, NA,
+                              x[[4]][[3]][[3]])))
+}
+
+cox.L95CI.PFS.HR.all <- lapply (results.master, extract.cox.L95CI.HR)
+
+
+### cox PFS U95CI
 
 extract.function <- function(x){
   return(ifelse(length(x[[4]]) < 3, NA,
@@ -129,60 +176,6 @@ extract.function <- function(x){
 }
 
 cox.U95CI.PFS.HR.all <- lapply(results.master, extract.function)
-# length(cox.U95CI.PFS.HR.all)
-
-########################################################
-
-
-extract.coxpval<- function (x){
-  if(length(x[[4]])==0){
-    NA
-  } else {
-    return (x[[4]][[3]][[1]])
-  }
-}  
-### this does not work Error in x[[4]][[3]] : subscript out of bounds
-
-cox.PFS.pval.all <- lapply(results.master, extract.coxpval)
-
-
-extract.coxZscore <- function(x){
-  if(length(x[[4]])==0){
-    NA
-  }else{
-    return(x[[4]][[3]][[5]])
-  }
-}
-
-cox.PFS.Zscore.all <- lapply(results.master,function(x){
-  if(length(x[[4]])==0){
-    NA
-  }else{
-    return(x[[4]][[3]][[5]])
-  }
-}         
-)
-
-
-cox.PFS.HR.all <- lapply(results.master, function(x){
-  if(length(x[[4]])==0) {
-    NA
-  } else{
-      return(x[[4]][[3]][[2]])
-    }
-  }
-)
-  
-cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){
-  if(length(x[[4]]) == 0) {
-    NA
-    } else {
-      return(x[[4]][[3]][[3]])
-    }
-  }
-)
-
-
 
 cox.PFS.all.df <- cox.dataframe(pval = cox.PFS.pval.all, Zscore = cox.PFS.Zscore.all, HR = cox.PFS.HR.all, L95CI = cox.L95CI.PFS.HR.all, U95CI = cox.U95CI.PFS.HR.all )
 
@@ -190,55 +183,220 @@ colnames(cox.PFS.all.df) <- c("cox.PFS.pval.all", "cox.PFS.adj.pval.all", "cox.P
 
 significant.cox.PFS.all <- cox.PFS.all.df[which(cox.PFS.all.df[, 2]<0.05),]
 
-write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_novel.csv")
+### what is the best way to annotate these genes within R. I can do data manipulation in excel if needed
+
+# annotate.cox.PFS.all <- annotate.HTseq.IDs(significant.cox.PFS.all) ### did not work "row names were found from a short variable and have been discarded"
+# names(annotate.cox.PFS.all)<- gsub ("T", "", names(significant.cox.PFS.all))
+
+# write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.PFS.complete.allgroups.280917.csv")
+write.csv(significant.cox.PFS.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.PFS.complete.allgroups.csv")
 
 ########################################################################################
 ### Cox PFS for G3G4
-### replicate using the NA script above
+### p value
 
-cox.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[1]])})
-cox.PFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[5]])})
-cox.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[2]])})
-cox.U95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[4]])})
-cox.L95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[3]])})
+extract.coxpval.PFS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[4]])<6, NA, 
+                       ifelse(length(x[[4]][[4]][[1]])<1, NA,
+                              x[[4]][[4]][[1]]))))
+}
 
+cox.PFS.pval.G3G4 <- lapply(results.master, extract.coxpval.PFS.G3G4)
+
+### HR
+
+extract.HR.PFS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, 
+                ifelse(length(x[[4]][[4]])<6, NA, 
+                       ifelse(length(x[[4]][[4]][[2]])<1, NA,
+                              x[[4]][[4]][[2]]))))
+}
+
+cox.PFS.HR.G3G4 <- lapply (results.master, extract.HR.PFS.G3G4)
+
+### Z score
+
+extract.Zscore.PFS.G3G4 <- function(x){
+  return (ifelse(length(x[[4]])<5, NA,
+                 ifelse(length(x[[4]][[4]])<6, NA,
+                        ifelse(length(x[[4]][[4]][[5]])<1, NA, 
+                               x[[4]][[4]][[5]]))))
+}
+
+cox.PFS.Zscore.G3G4 <- lapply (results.master, extract.Zscore.PFS.G3G4)
+
+### 95CI
+
+extract.L95CI.PFS.G3G4 <- function(x){
+  return (ifelse(length(x[[4]])<5, NA,
+                 ifelse(length(x[[4]][[4]])<6, NA,
+                        ifelse(length(x[[4]][[4]][[3]])<1, NA, 
+                               x[[4]][[4]][[3]]))))
+}
+
+extract.U95CI.PFS.G3G4 <- function(x){
+  return (ifelse(length(x[[4]])<5, NA,
+                 ifelse(length(x[[4]][[4]])<6, NA,
+                        ifelse(length(x[[4]][[4]][[4]])<1, NA, 
+                               x[[4]][[4]][[4]]))))
+}
+
+cox.L95CI.PFS.HR.G3G4 <- lapply(results.master, extract.L95CI.PFS.G3G4)
+cox.U95CI.PFS.HR.G3G4 <- lapply(results.master, extract.U95CI.PFS.G3G4)
+
+### cox dataframe
 cox.PFS.G3G4.df <- cox.dataframe (pval = cox.PFS.pval.G3G4, Zscore = cox.PFS.Zscore.G3G4, HR = cox.PFS.HR.G3G4, L95CI = cox.L95CI.PFS.HR.G3G4 , U95CI = cox.U95CI.PFS.HR.G3G4)
 colnames(cox.PFS.G3G4.df) <- c("cox.PFS.pval.G3G4", "cox.PFS.adj.pval.G3G4", "cox.PFS.Zscore.G3G4", "cox.PFS.HR.G3G4", "cox.PFS.L95CI.G3G4", "cox.PFS.U95CI.G3G4")
 
 significant.cox.PFS.G3G4 <- cox.PFS.G3G4.df[which(cox.PFS.G3G4.df[, 2]<0.05),]
 
-write.csv(significant.cox.PFS.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant_cox_PFS_G3G4.csv")
+write.csv(significant.cox.PFS.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.PFS.complete.G3G4.csv")
 
 
+########################################################################################
 ### Cox OS overall
+### p value
 
-cox.OS.pval.all <- lapply (results.master, function(x){return(x[[4]][[5]][[1]])})
-cox.OS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[5]][[5]])})
-cox.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[2]])})
-cox.U95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[4]])})
-cox.L95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[3]])})
+extract.coxpval.OS.all<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[5]])<6, NA, 
+                       ifelse(length(x[[4]][[5]][[1]])<1, NA,
+                              x[[4]][[5]][[1]]))))
+}
+
+cox.OS.pval.all <- lapply(results.master, extract.coxpval.OS.all)
+
+
+##########
+### HR
+
+extract.HR.OS.all<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[5]])<6, NA, 
+                       ifelse(length(x[[4]][[5]][[2]])<1, NA,
+                              x[[4]][[5]][[2]]))))
+}
+
+cox.OS.HR.all <- lapply(results.master, extract.HR.OS.all)
+
+### Z score
+
+extract.Zscore.OS.all<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[5]])<6, NA, 
+                       ifelse(length(x[[4]][[5]][[5]])<1, NA,
+                              x[[4]][[5]][[5]]))))
+}
+
+cox.OS.Zscore.all <- lapply(results.master, extract.Zscore.OS.all)
+
+### HR 95 CI
+
+extract.L95CI.OS.all<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[5]])<6, NA, 
+                       ifelse(length(x[[4]][[5]][[3]])<1, NA,
+                              x[[4]][[5]][[3]]))))
+}
+
+cox.L95CI.OS.HR.all<- lapply(results.master, extract.L95CI.OS.all)
+
+
+extract.U95CI.OS.all<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[5]])<6, NA, 
+                       ifelse(length(x[[4]][[5]][[4]])<1, NA,
+                              x[[4]][[5]][[4]]))))
+}
+
+cox.U95CI.OS.HR.all<- lapply(results.master, extract.U95CI.OS.all)
+
+##################
+### cox OS dataframe
 
 cox.OS.all.df <- cox.dataframe(pval = cox.OS.pval.all, Zscore = cox.OS.Zscore.all, HR = cox.OS.HR.all, L95CI = cox.L95CI.OS.HR.all, U95CI = cox.U95CI.OS.HR.all)
 colnames(cox.OS.all.df) <- c("cox.OS.pval.all", "cox.OS.adj.pval.all", "cox.OS.Zscore.all", "cox.OS.HR.all","cox.L95CI.OS.HR.all", "cox.U95CI.OS.HR.all")
-  
+
 significant.cox.OS.all <- cox.OS.all.df[which(cox.OS.all.df[, 2]<0.05),]
 
-write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.all.csv")
+# write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.complete.all.280917.csv")
+write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.complete.all.csv")
 
+
+###########################################################
 
 ### Cox OS for G3G4
 
+extract.coxpval.OS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[6]])<6, NA, 
+                       ifelse(length(x[[4]][[6]][[1]])<1, NA,
+                              x[[4]][[6]][[1]]))))
+}
+
+cox.OS.pval.G3G4 <- lapply(results.master, extract.coxpval.OS.G3G4)
+
+### HR 
+extract.HR.OS.G3G4 <- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[6]])<6, NA, 
+                       ifelse(length(x[[4]][[6]][[2]])<1, NA,
+                              x[[4]][[6]][[2]]))))
+}
+
+cox.OS.HR.G3G4 <- lapply(results.master, extract.HR.OS.G3G4)
+
+### Z score
+
+extract.Zscore.OS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[6]])<6, NA, 
+                       ifelse(length(x[[4]][[6]][[5]])<1, NA,
+                              x[[4]][[6]][[5]]))))
+}
+
+cox.OS.Zscore.G3G4 <- lapply(results.master, extract.Zscore.OS.G3G4)
+
+### 95 CI
+
+extract.L95CI.OS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[6]])<6, NA, 
+                       ifelse(length(x[[4]][[6]][[3]])<1, NA,
+                              x[[4]][[6]][[3]]))))
+}
+
+cox.L95CI.OS.HR.G3G4 <- lapply(results.master, extract.L95CI.OS.G3G4)
+
+extract.U95CI.OS.G3G4<- function (x){
+  return(ifelse(length(x[[4]])< 5, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                ifelse(length(x[[4]][[6]])<6, NA, 
+                       ifelse(length(x[[4]][[6]][[4]])<1, NA,
+                              x[[4]][[6]][[4]]))))
+}
+
+cox.U95CI.OS.HR.G3G4 <- lapply(results.master, extract.U95CI.OS.G3G4)
+
+
+### cox dataframe for OS G3G4
+cox.OS.G3G4.df <- cox.dataframe(pval = cox.OS.pval.G3G4, Zscore = cox.OS.Zscore.G3G4, HR = cox.OS.HR.G3G4, L95CI = cox.L95CI.OS.HR.G3G4, U95CI = cox.U95CI.OS.HR.G3G4)
+colnames(cox.OS.G3G4.df) <- c("cox.OS.pval.G3G4", "cox.OS.adj.pval.G3G4", "cox.OS.Zscore.G3G4", "cox.OS.HR.G3G4","cox.L95CI.OS.HR.G3G4", "cox.U95CI.OS.HR.G3G4")
+
+significant.cox.OS.G3G4 <- cox.OS.G3G4.df[which(cox.OS.G3G4.df[, 2]<0.05),]
+# write.csv(significant.cox.OS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.G3G4.280917.csv")
+
+write.csv(significant.cox.OS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.G3G4.csv")
+
+
+
+###
 cox.OS.pval.G3G4 <- lapply (results.master, function(x){return(x[[4]][[6]][[1]])})
 cox.OS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[5]])})
 cox.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[2]])})
 cox.U95CI.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[4]])})
 cox.L95CI.OS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[6]][[3]])})
 
-cox.OS.G3G4.df <- cox.dataframe(pval = cox.OS.pval.G3G4, Zscore = cox.OS.Zscore.G3G4, HR = cox.OS.HR.G3G4, L95CI = cox.L95CI.OS.HR.G3G4, U95CI = cox.U95CI.OS.HR.G3G4)
-colnames(cox.OS.G3G4.df) <- c("cox.OS.pval.G3G4", "cox.OS.adj.pval.G3G4", "cox.OS.Zscore.G3G4", "cox.OS.HR.G3G4","cox.L95CI.OS.HR.G3G4", "cox.U95CI.OS.HR.G3G4")
-
-significant.cox.OS.G3G4 <- cox.OS.G3G4.df[which(cox.OS.G3G4.df[, 2]<0.05),]
-write.csv(significant.cox.OS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.G3G4.csv")
 
 
 ### Cox EFS for all
@@ -301,6 +459,9 @@ cox.OS.Zscore.all <- lapply(results.master,function(x){
   }
 }         
 )
+
+
+#################################################################################################
 
 ### extract logistic regression p value 
 ### create function like for cox regression dataframe (clinical_data_functions_master.R)
@@ -373,9 +534,75 @@ logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pv
 
 #############################################################################
 
+### script that worked previously for the novel transcript file that has now been superceded 28/9/17
+
+#extract.coxpval <- function(x){
+#if(length(x[[4]]==0){
+#  NA
+#} else {
+#  return(x[[4]][[3]][[1]])
+#}
+#}
+
+
+# extract.coxZscore <- function(x){
+# if(length(x[[4]])==0){
+#  NA
+# }else{
+#   return(x[[4]][[3]][[5]])
+# }
+# }
+
+# cox.PFS.Zscore.all <- lapply(results.master,function(x){
+# if(length(x[[4]])==0){
+#   NA
+# }else{
+#   return(x[[4]][[3]][[5]])
+# }
+# }         
+# )
+
+# cox.PFS.HR.all <- lapply(results.master, function(x){
+#  if(length(x[[4]])==0) {
+#  NA
+#} else{
+#  return(x[[4]][[3]][[2]])
+# }
+# }
+# )
+
+# cox.L95CI.PFS.HR.all <- lapply(results.master, function(x){
+# if(length(x[[4]]) == 0) {
+# NA
+# } else {
+#   return(x[[4]][[3]][[3]])
+#   }
+#  }
+# )
 
 
 
 
+#########
+# cox.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[1]])})
+# cox.PFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[5]])})
+# cox.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[2]])})
+# cox.U95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[4]])})
+# cox.L95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[3]])})
 
+#########
+### older script for COX OS all
 
+# cox.OS.pval.all <- lapply(results.master, extract.coxpval.OS.all)
+# cox.OS.pval.all <- lapply (results.master, function(x){return(x[[4]][[5]][[1]])})
+# cox.OS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[5]][[5]])})
+# cox.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[2]])})
+# cox.U95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[4]])})
+# cox.L95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[3]])})
+
+# cox.OS.all.df <- cox.dataframe(pval = cox.OS.pval.all, Zscore = cox.OS.Zscore.all, HR = cox.OS.HR.all, L95CI = cox.L95CI.OS.HR.all, U95CI = cox.U95CI.OS.HR.all)
+# colnames(cox.OS.all.df) <- c("cox.OS.pval.all", "cox.OS.adj.pval.all", "cox.OS.Zscore.all", "cox.OS.HR.all","cox.L95CI.OS.HR.all", "cox.U95CI.OS.HR.all")
+
+# significant.cox.OS.all <- cox.OS.all.df[which(cox.OS.all.df[, 2]<0.05),]
+
+# write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.all.csv")
