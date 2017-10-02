@@ -166,6 +166,43 @@ results.master <- foreach(i = 1:10)%dopar%{
   return(clinPathAssess(test.pData,x))
 }
 
+guiltByAssociation <-function(data, associated.gene, cores = 10){
+  library(foreach)
+  library(tictoc)
+  library(parallel)
+  library(doParallel)
+  registerDoParallel(cores)
+  
+  match(names(data), names(associated.gene)) -> index
+  data[,!is.na(index)] -> matched.data
+  associated.gene[index[!is.na(index)]] -> matched.associated.gene
+
+  guiltAssociation <- function(x,y){
+    return(c(cor = cor.test(x,y)$estimate,
+             p.val = cor.test(x,y)$p.value))
+  }
+  
+res <- foreach(i = 1:nrow(data), .combine = rbind)%dopar%{
+  as.numeric(matched.data[i,]) -> x
+  return(guiltAssociation(x,matched.associated.gene))
+}
+
+rownames(res) <- rownames(data)
+return(res)
+}
+
+as.numeric(mb.vsd["ENSG00000136997.15_1",]) -> MYC
+names(MYC) <- colnames(mb.vsd)
+guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
+
+annotate.HTseq.IDs(rownames(guilt.res.MYC)) -> annot
+cbind(guilt.res.MYC, adj.p.val=p.adjust(guilt.res.MYC[,2], method = "BH"), annot) -> guilt.res.MYC
+guilt.res.MYC[!is.na(guilt.res.MYC[,1]),] -> guilt.res.MYC
+head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20)
+tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20)
+
+
+
 ###############################################################################
 
 ### unhash the relevant name for the output 
