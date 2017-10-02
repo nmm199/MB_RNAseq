@@ -48,10 +48,11 @@
 ### "km.log.test.OS"
 ### "cox.result.OS"
 ### "km.log.test.EFS"
-### updatepData
-### clinPathAssess
-### cox.dataframe
-### annotate.HTseq.IDs
+### "cox.result.surv"
+### "updatepData"
+### "clinPathAssess"
+### "cox.dataframe"
+### "annotate.HTseq.IDs"
 
 ### input files required
 
@@ -76,7 +77,7 @@
 ### unhash to use the following file for all the expression data 
 RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
 
-mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
+# mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
 
 mb.vsd <- read.delim(RNA.data)
 

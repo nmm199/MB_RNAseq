@@ -223,7 +223,8 @@ cox.result.OS <- function (time, event, marker, strata = NULL, data)
 
 
 ####################################################################
-### Function number 6a: universal version of function entitled "cox.result.OS"  
+### Function number 6a: universal version of function entitled "cox.result.OS" 
+
 ### to produce cox regression hazard ratio for survival in cohort of children
 ### input
 ## time
@@ -267,20 +268,69 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 }
 
 
-#cox.result.surv <- function (time, event, marker, strata = NULL, data)  
-#{
-#  if(is.null(strata)){
-#    cox.temp <- coxph (Surv(time, event)~marker, data= data)
-#  }else{
- #   cox.temp <- coxph (Surv(time, event)~marker, data= data)
- # }
- #summary.cox <- c(rownames(summary(cox.temp)$coefficients),summary(cox.temp)$coefficients,
-                  # summary(cox.temp)$n,
-                  # summary(cox.temp)$nevent)
- # names(summary.cox) <- c("marker_name","coef", "cox.HR", "se(coef)", "z", "p.val", "n","nevents")
- # return (summary.cox)
-#}
 
+###############################################################################################
+
+### Function number 6b: multivariate cox model
+
+### input variables according to a classic cox regression model Surv(time,event)~ marker, data
+
+#  time <- matched.test.incl.pData$PFS
+# event <- relapse.bin.incl
+# marker <- "ENSG00000008196"   ### TFAP2B
+
+### Factors to include in the multivariate cox regression
+# FacA <- matched.test.incl.pData$LCA
+# FacB <- matched.test.incl.pData$MYC.cat
+# FacC <- matched.test.incl.pData$MYCN.cat
+# FacD <- matched.test.incl.pData$mstatus
+# FacE <- matched.test.incl.pData$resection
+# FacF <- matched.test.incl.pData$q13loss
+# FAcG <- matched.test.incl.pData$TP53.cat
+# FacH <- matched.test.incl.pData$sex
+# FacI ### unspecified
+# FacJ ### unspecified
+# data <- matched.test.incl.pData
+
+cox.multivar.surv <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
+  if(is.null(strata)){
+    cox.temp <- coxph(Surv(time, event)~marker +FacA +FacB +FacC +FacD +FacE +FacF +FacG + FacH, data=data)
+  }else {
+    cox.temp <- coxph(Surv(time, event)~marker +FacA +FacB +FacC +FacD +FacE +FacF +FacG + FacH, data=data)
+  }
+  cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
+  cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
+  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
+  cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
+  cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
+  cox.n <-summary(cox.temp)$n
+  cox.nevent <-summary(cox.temp)$nevent
+  summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
+  return (summary.cox)
+}
+  
+
+###############################################################################################
+### Function number 6c for PNET5 survival markers
+
+cox.multivar.surv.PNET5 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, strata = NULL, data) {
+  if(is.null(strata)){
+    cox.temp <- coxph(Surv(time, event)~marker +FacA +FacB +FacC +FacD +FacE,  data=data)
+  }else {
+    cox.temp <- coxph(Surv(time, event)~marker +FacA +FacB +FacC +FacD +FacE,  data=data)
+  }
+  cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
+  cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
+  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
+  cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
+  cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
+  cox.n <-summary(cox.temp)$n
+  cox.nevent <-summary(cox.temp)$nevent
+  summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
+  return (summary.cox)
+}
+
+ 
 ################################################################################################
 
 ### Function Number 7
@@ -580,7 +630,7 @@ clinPathAssess <- function(test.pData,
      # log.file = NULL
   
   ### MM stipulating inputs 140917
-  ### goi <- ENSG00000008196.12_1
+  ### goi <- "ENSG00000008196.12_1"
 
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
@@ -1002,6 +1052,49 @@ clinPathAssess <- function(test.pData,
   try(surv.cox.relapse.incl.G3G4 <- cox.result.surv (time=matched.G3G4.incl.pData$PFS, event =  relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, data = matched.test.incl.pData), silent = T)
  
    
+  #####################################################################
+  ### cox multivariate with established risk factors per PNET5 and Schwalbe combined
+  
+  cox.multivar.PFS.incl <- coxph (Surv(matched.test.incl.pData$PFS, relapse.bin.incl)~ matched.goi.vsd.cat.incl + matched.test.incl.pData$LCA + matched.test.incl.pData$MYC.cat + matched.test.incl.pData$MYCN.cat + matched.test.incl.pData$mstatus + matched.test.incl.pData$resection + matched.test.incl.pData$q13loss + matched.test.incl.pData$TP53.cat + matched.test.incl.pData$sex, data = matched.test.incl.pData)
+  summary(cox.multivar.PFS.incl)
+  
+  ############
+  cox.p.val.marker <- summary(cox.multivar.PFS.incl)$coefficients[1,5] 
+  cox.p.val.model <- summary(cox.multivar.PFS.incl)$logtest[3] ### this is the p likelihood ratio
+  cox.HR <- summary(cox.multivar.PFS.incl)$conf.int[1] ### this is the hazard ratio for the matched.goi.vsd.cat.incl
+  cox.lower.95CI <- summary(cox.multivar.PFS.incl)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row details for 
+  cox.upper.95CI <- summary(cox.multivar.PFS.incl)$conf.int[1,4]
+  cox.Zscore <- summary(cox.multivar.PFS.incl)$coefficients[1,4] ### added this in to access Z score
+  cox.n <-summary(cox.multivar.PFS.incl)$n
+  cox.nevent <-summary(cox.multivar.PFS.incl)$nevent
+  summary.cox <- list(cox.pval.marker = cox.p.val.marker, cox.p.val.modle = cox.p.val.model,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
+  summary.cox
+  ############################
+  
+  cox.PFS.multivar.incl <- cox.multivar.surv(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYC.cat, FacC= matched.test.incl.pData$MYCN.cat, FacD= matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF= matched.test.incl.pData$q13loss, FacG= matched.test.incl.pData$TP53.cat, FacH=  matched.test.incl.pData$sex, data = matched.test.incl.pData)
+  
+  
+  
+  ### cox multivariate with established risk factors per PNET5 only
+  ### LCA, Mstatus, resection, MYCN
+  
+  cox.multivar.PFS.PNET5<-  coxph (Surv(matched.test.incl.pData$PFS, relapse.bin.incl)~ matched.goi.vsd.cat.incl + matched.test.incl.pData$LCA + matched.test.incl.pData$MYCN.cat + matched.test.incl.pData$mstatus + matched.test.incl.pData$resection + matched.test.incl.pData$sex, data = matched.test.incl.pData)
+  summary(cox.multivar.PFS.PNET5)
+  
+  cox.PFS.multivar.PNET5 <- cox.multivar.surv (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$sex, FacF = NULL, FacG= NULL, FacH = NULL,  data =  data = matched.test.incl.pData)
+  
+  
+  
+  ### cox multivariate with established risk factors per Schwalbe only
+  
+  ### subgroup specific
+  ### Mstatus, TP53 for SHH-child
+  
+  
+  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss
+  ### need to create high risk methylation group (ie HR Group 3 and HR Group 4 combined)
+  
+  # cox.multivar.PFS.Lancet.G3G4 <- 
   
   #####################################################################
   
