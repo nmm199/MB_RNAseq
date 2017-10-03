@@ -96,9 +96,10 @@ pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
 log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 #log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
+### run up to here if wish to interrogate clinPathAssess function, by directly nominating input variables within clinical_data_functions_master.R
 ################################################################################
 
-### Unhash this section as required (between lines 94 - 110) when running one goi
+### Unhash this section as required (between lines 94 - 110) when running one goi within clinPathAssess function
 
 # goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, or can specify a goi within inverted commas
 
@@ -138,7 +139,6 @@ tic()
 # names(x) <- gsub("T","",names(mb.vsd.novel))
 # clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
 
-
 ### unhash when running the complete transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
@@ -156,7 +156,6 @@ tic()
 # names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
 # return(clinPathAssess(test.pData,x)) 
 # }
-
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 
@@ -199,9 +198,8 @@ guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
 annotate.HTseq.IDs(rownames(guilt.res.MYC)) -> annot
 cbind(guilt.res.MYC, adj.p.val=p.adjust(guilt.res.MYC[,2], method = "BH"), annot) -> guilt.res.MYC
 guilt.res.MYC[!is.na(guilt.res.MYC[,1]),] -> guilt.res.MYC
-head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20)
-tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20)
-
+head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the first 20 associated transcripts 
+tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated transcripts
 
 
 ###############################################################################
@@ -221,8 +219,9 @@ annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
-  
+write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.csv")
+# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
+
 toc()
 
 ###############################################################################
@@ -238,23 +237,11 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 ### then reload this when examining the results
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
-
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
 
 
 #####################################################################
 
-### if ongoing errors try this:
-
-# tryCatch{ #### This catches the error and outputs it to screen but allows the program to continue running
-# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-#  as.numeric(mb.vsd [i,]) -> x
-# names(x) <- colnames(mb.vsd)
-#  names(x) <- gsub("T","",names(mb.vsd)) ### check that this is correct
-#  error=function(e){cat("ERROR :",conditionMessage(e), "\n")} 
-#  return(clinPathAssess(test.pData,x)) 
-# }
-# }  #### prints the error message to screen
 
 
 
