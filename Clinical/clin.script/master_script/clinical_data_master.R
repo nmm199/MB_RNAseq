@@ -108,13 +108,13 @@ log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 # names(mb.vsd) -> names(goi.vsd)        
 
 ## results for run of one
-# results <- clinPathAssess(test.pData,
-                         # goi.vsd,
-                         # pdf.file = pdf.file,
+# results.master <- clinPathAssess(test.pData,
+                        #  goi.vsd,
+                        # pdf.file = pdf.file,
                          # log.file = log.file)
 
 
-# names(results)<- row.names(goi.vsd)
+# names(results.master)<- row.names(goi.vsd)
 
 # saveRDS (results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
 # readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
@@ -166,43 +166,8 @@ results.master <- foreach(i = 1:10)%dopar%{
   return(clinPathAssess(test.pData,x))
 }
 
-guiltByAssociation <-function(data, associated.gene, cores = 10){
-  library(foreach)
-  library(tictoc)
-  library(parallel)
-  library(doParallel)
-  registerDoParallel(cores)
-  
-  match(names(data), names(associated.gene)) -> index
-  data[,!is.na(index)] -> matched.data
-  associated.gene[index[!is.na(index)]] -> matched.associated.gene
 
-  guiltAssociation <- function(x,y){
-    return(c(cor = cor.test(x,y)$estimate,
-             p.val = cor.test(x,y)$p.value))
-  }
-  
-res <- foreach(i = 1:nrow(data), .combine = rbind)%dopar%{
-  as.numeric(matched.data[i,]) -> x
-  return(guiltAssociation(x,matched.associated.gene))
-}
-
-rownames(res) <- rownames(data)
-return(res)
-}
-
-as.numeric(mb.vsd["ENSG00000136997.15_1",]) -> MYC
-names(MYC) <- colnames(mb.vsd)
-guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
-
-annotate.HTseq.IDs(rownames(guilt.res.MYC)) -> annot
-cbind(guilt.res.MYC, adj.p.val=p.adjust(guilt.res.MYC[,2], method = "BH"), annot) -> guilt.res.MYC
-guilt.res.MYC[!is.na(guilt.res.MYC[,1]),] -> guilt.res.MYC
-head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the first 20 associated transcripts 
-tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated transcripts
-
-
-###############################################################################
+##############################################################################
 
 ### unhash the relevant name for the output 
 
@@ -219,7 +184,7 @@ annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.csv")
+write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.041017.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
 
 toc()
@@ -229,7 +194,7 @@ toc()
 
 ### update name according to input file
 
-saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.rds")
+saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.1041017.rds")
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
@@ -240,8 +205,49 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
 
 
+###############################################################################
+
+guiltByAssociation <-function(data, associated.gene, cores = 10){
+  library(foreach)
+  library(tictoc)
+  library(parallel)
+  library(doParallel)
+  registerDoParallel(cores)
+  
+  match(names(data), names(associated.gene)) -> index
+  data[,!is.na(index)] -> matched.data
+  associated.gene[index[!is.na(index)]] -> matched.associated.gene
+  
+  guiltAssociation <- function(x,y){
+    return(c(cor = cor.test(x,y)$estimate,
+             p.val = cor.test(x,y)$p.value))
+  }
+  
+  res <- foreach(i = 1:nrow(data), .combine = rbind)%dopar%{
+    as.numeric(matched.data[i,]) -> x
+    return(guiltAssociation(x,matched.associated.gene))
+  }
+  
+  rownames(res) <- rownames(data)
+  return(res)
+}
+
+as.numeric(mb.vsd["ENSG00000136997.15_1",]) -> MYC
+names(MYC) <- colnames(mb.vsd)
+guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
+
+annotate.HTseq.IDs(rownames(guilt.res.MYC)) -> annot
+cbind(guilt.res.MYC, adj.p.val=p.adjust(guilt.res.MYC[,2], method = "BH"), annot) -> guilt.res.MYC
+guilt.res.MYC[!is.na(guilt.res.MYC[,1]),] -> guilt.res.MYC
+head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the first 20 associated transcripts 
+tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated transcripts
+
+
+
 #####################################################################
 
+### compare to a randomised dataframe
 
-
-
+library(NMF)
+mb.vsd.random <- randomize(mb.vsd)
+### then run through the clinPathAssess function
