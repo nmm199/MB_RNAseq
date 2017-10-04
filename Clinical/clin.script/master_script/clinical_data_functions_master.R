@@ -281,21 +281,20 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 
 ### Factors A to I to include in the multivariate cox regression
 # FacA <- matched.test.incl.pData$LCA
-# FacB <- matched.test.incl.pData$MYC.cat
-# FacC <- matched.test.incl.pData$MYCN.cat
-# FacD <- matched.test.incl.pData$mstatus
-# FacE <- matched.test.incl.pData$resection
-# FacF <- matched.test.incl.pData$q13loss
-# FAcG <- matched.test.incl.pData$TP53.cat
-# FacH <- matched.test.incl.pData$sex
-# FacI <- matched.test.incl.pData$meth7
+# FacB <- matched.test.incl.pData$MYCMYCN.cat ### changed to MYCMYCN.cat rather than individual MYC.cat and MYCN.cat as per DW 4/10/17
+# FacC <- matched.test.incl.pData$mstatus
+# FacD <- matched.test.incl.pData$resection
+# FacE <- matched.test.incl.pData$q13loss
+# FAcF <- matched.test.incl.pData$TP53.cat
+# FacG <- matched.test.incl.pData$sex
+# FacH <- matched.test.incl.pData$meth7
 # data <- matched.test.incl.pData
 
-cox.multivar.surv_9 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, FacI,  strata = NULL, data) {
+cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
   if(is.null(strata)){
-    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB + FacC + FacD + FacE + FacF + FacG + FacH + FacI, data=data)
+    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB + FacC + FacD + FacE + FacF + FacG + FacH, data=data)
   }else {
-    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD + FacE + FacF + FacG + FacH + FacI, data=data)
+    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD + FacE + FacF + FacG + FacH, data=data)
   }
   cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
   cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
@@ -314,28 +313,28 @@ cox.multivar.surv_9 <- function (time, event, marker, FacA, FacB, FacC, FacD, Fa
 ### Factors Fac A - FacG
 
 # FacA <- matched.test.incl.pData$LCA
-# FacB <- matched.test.incl.pData$MYC.cat ### keep this in algorithm because of flow diagram includes MYC.cat
-# FacC <- matched.test.incl.pData$MYCN.cat
-# FacD <- matched.test.incl.pData$mstatus
-# FacE <- matched.test.incl.pData$resection
+# FacB <- matched.test.incl.pData$MYCMYCN.cat ### keep this in algorithm because of flow diagram includes MYC.cat
+### FacC <- matched.test.incl.pData$MYCN.cat
+# FacC <- matched.test.incl.pData$mstatus
+# FacD <- matched.test.incl.pData$resection
 ### FacF <- matched.test.incl.pData$TP53.cat ### not technically included in PNET5 algorithm, although mentioned in the study background
-# FacF <- matched.test.incl.pData$sex
-# FacG <- matched.test.incl.pData$meth
+# FacE <- matched.test.incl.pData$sex
+# FacF <- matched.test.incl.pData$meth
 # data <- matched.test.incl.pData
 # time <- matched.test.incl.pData$PFS
 # event <- relapse.bin.incl
 # marker <- matched.goi.vsd.cat.incl
 ### age is not included as we are including only age 3-16 years (and age < 3 years is listed in PNET5)
 ### included factors :
-### LCA, mstatus, MYC, MYCN, R+, sex, methylation subgroup (n=4, rather than WNT vs non WNT). TP53 not included, will be broadly stratified in SHH
+### LCA, mstatus, MYC or MYCN amplification (MYCMYCN.cat as d/w DW), R+, sex, methylation subgroup (n=4, rather than WNT vs non WNT). TP53 not included, will be broadly stratified in SHH
 ### ? include isochromosome 17q and how can this data be derived from matched.test.incl.pData$q17   (levels Gain, Neutral, Loss)
 
 
-cox.multivar.surv.PNET5_7 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, strata = NULL, data) {
+cox.multivar.surv.PNET5_6 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, strata = NULL, data) {
   if(is.null(strata)){
-    cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE +FacF + FacG, data=data)
+    cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE +FacF, data=data)
   }else {
-    cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE + FacF + FacG, data=data)
+    cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE + FacF, data=data)
   }
   cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
   cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
@@ -1169,14 +1168,14 @@ clinPathAssess <- function(test.pData,
   
   ############################
   
-  multivar.cox.PFS.combined.cat <- cox.multivar.surv_9(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYC.cat, FacC= matched.test.incl.pData$MYCN.cat, FacD= matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF= matched.test.incl.pData$q13loss, FacG= matched.test.incl.pData$TP53.cat, FacH=  matched.test.incl.pData$sex, FacI = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
-  multivar.cox.PFS.combined.contin <- cox.multivar.surv_9(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYC.cat, FacC= matched.test.incl.pData$MYCN.cat, FacD= matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF= matched.test.incl.pData$q13loss, FacG= matched.test.incl.pData$TP53.cat, FacH=  matched.test.incl.pData$sex, FacI = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
+  multivar.cox.PFS.combined.cat <- cox.multivar.surv_8(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG=  matched.test.incl.pData$sex, FacH = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
+  multivar.cox.PFS.combined.contin <- cox.multivar.surv_8(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG=  matched.test.incl.pData$sex, FacH = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
   
   ### cox multivariate with established risk factors per PNET5 only
-  ### LCA, mstatus,  MYCN.cat, resection, sex
+  ### LCA, mstatus,  MYCMYCN.cat, resection, sex (after D/W Dan, reinterpretation of the paper)
   
-  multivar.cox.PFS.PNET5.cat <- cox.multivar.surv.PNET5_7 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCN.cat, FacC = matched.test.incl.pData$MYC.cat, FacD = matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF = matched.test.incl.pData$sex, FacG = matched.test.incl.pData$meth, data = matched.test.incl.pData)
-  multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_7 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCN.cat, FacC = matched.test.incl.pData$MYC.cat, FacD = matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF = matched.test.incl.pData$sex, FacG = matched.test.incl.pData$meth, data = matched.test.incl.pData)
+  multivar.cox.PFS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$sex, FacF = matched.test.incl.pData$meth, data = matched.test.incl.pData)
+  multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$sex, FacF = matched.test.incl.pData$meth, data = matched.test.incl.pData)
   
   
   ### cox multivariate with established risk factors per Schwalbe only
@@ -1217,26 +1216,22 @@ clinPathAssess <- function(test.pData,
   try (surv.cox.result.OS.SHH.cat <- cox.result.surv (time = matched.SHH.incl.pData$Followup, event = OS.SHH.bin.incl, marker = matched.goi.vsd.cat.SHH.incl, data = matched.test.incl.pData), silent = T)
   try (surv.cox.result.OS.SHH.contin <- cox.result.surv (time = matched.SHH.incl.pData$Followup, event = OS.SHH.bin.incl, marker = matched.goi.vsd.SHH.incl, data = matched.test.incl.pData), silent = T)
   
-  # try (surv.cox.result.OS.SHH.old.cat <- cox.result.surv (time = matched.SHH.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, data = matched.test.incl.pData), silent = T)
-  # try (surv.cox.result.OS.SHH.old.contin <- cox.result.surv (time = matched.SHH.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, data = matched.test.incl.pData), silent = T)
-  ### need to generate conitnuous variable for SHH.old
-  # change to matched.SHH.old.incl.pData line 1220, line 1221
-  # matched.goi.vsd.cat.SHH.old.incl
-  # matched.goi.vsd.SHH.old.incl
+  try (surv.cox.result.OS.SHH.old.cat <- cox.result.surv (time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, data = matched.test.incl.pData), silent = T)
+  try (surv.cox.result.OS.SHH.old.contin <- cox.result.surv (time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, data = matched.test.incl.pData), silent = T)
+ 
   
   #####################################
-  ### up to here 4/10/17
   
   ### multivariate cox regression for OS, based on categories combined (PNET + Schwalbe all risk factors, PNET5 alone, Schwalbe (lancet) subgroups)
   
-  multivar.cox.OS.combined.cat <- cox.multivar.surv_9(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYC.cat, FacC= matched.test.incl.pData$MYCN.cat, FacD= matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF= matched.test.incl.pData$q13loss, FacG= matched.test.incl.pData$TP53.cat, FacH=  matched.test.incl.pData$sex, FacI = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
-  multivar.cox.OS.combined.contin <- cox.multivar.surv_9(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYC.cat, FacC= matched.test.incl.pData$MYCN.cat, FacD= matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF= matched.test.incl.pData$q13loss, FacG= matched.test.incl.pData$TP53.cat, FacH=  matched.test.incl.pData$sex, FacI = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
+  multivar.cox.OS.combined.cat <- cox.multivar.surv_8(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG=  matched.test.incl.pData$sex, FacH = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
+  multivar.cox.OS.combined.contin <- cox.multivar.surv_8(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG=  matched.test.incl.pData$sex, FacH = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData)
   
   ### cox multivariate with established risk factors per PNET5 only
-  ### LCA, mstatus,  MYCN.cat, resection, sex
+  ### LCA, mstatus,  MYCMYCN.cat, resection, sex
   
-  multivar.cox.OS.PNET5.cat <- cox.multivar.surv.PNET5_7 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCN.cat, FacC = matched.test.incl.pData$MYC.cat, FacD = matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF = matched.test.incl.pData$sex, FacG = matched.test.incl.pData$meth, data = matched.test.incl.pData)
-  multivar.cox.OS.PNET5.contin <- cox.multivar.surv.PNET5_7 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCN.cat, FacC = matched.test.incl.pData$MYC.cat, FacD = matched.test.incl.pData$mstatus, FacE = matched.test.incl.pData$resection, FacF = matched.test.incl.pData$sex, FacG = matched.test.incl.pData$meth, data = matched.test.incl.pData)
+  multivar.cox.OS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$sex, FacF = matched.test.incl.pData$meth, data = matched.test.incl.pData)
+  multivar.cox.OS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$sex, FacF = matched.test.incl.pData$meth, data = matched.test.incl.pData)
   
   
   ### cox multivariate with established risk factors per Schwalbe only
@@ -1245,9 +1240,9 @@ clinPathAssess <- function(test.pData,
   ### Mstatus, TP53 for SHH-child, MYCN, adjust for sex in matched.SHH.old.incl.pData
   
   multivar.cox.OS.SHH.old.cat <- cox.multivar.surv.Schwalbe_4(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, FacD = matched.SHH.old.incl.pData$sex, data = matched.SHH.old.incl.pData )
-  # multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_4(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, FacD = matched.SHH.old.incl.pData$sex, data = matched.SHH.old.incl.pData )
-  ### need t make SHH old continuous variable
+  multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_4(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, FacD = matched.SHH.old.incl.pData$sex, data = matched.SHH.old.incl.pData )
   
+
   ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss, adjust for sex
   ### high risk methylation group (ie HR Group 3 and HR Group 4 combined) in matched.G3G4.incl.pData$G3G4.high.incl for categorical and continuous variable
   
@@ -1267,7 +1262,8 @@ clinPathAssess <- function(test.pData,
   
   
   
-  ### cox regression analysis
+  ### cox regression analysis, decision not to update EFS with categorical/continuous and multivariate 4/10/17
+
   
   #cat ("cox regression for EFS on age 3-16 years", sep = "\n")
   
@@ -1291,10 +1287,12 @@ clinPathAssess <- function(test.pData,
    result.goi <- list (surv.p.values.list=surv.p.values.list, 
                       chi.sq.list = chi.sq.list,
                       reg.log.list = reg.log.list, 
-                      cox.p.values.list = cox.p.values.list
+                      cox.p.values.list = cox.p.values.list,
+                      cox.multivar.p.values.list
+                      
                       #age.correlation = list.cor.age
                       #linear.reg.age = lin.reg.age ### linear regression and age correlation hashed out as causing problems with novel transcript expression data
-                      )
+   )
   
   sink()
   dev.off()
