@@ -6,7 +6,7 @@
 ### file input
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds") 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.rds") ### has cox Z score
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.041017.rds") ### has cox Z score
 
 
 ### read in functions file
@@ -469,7 +469,7 @@ cox.OS.Zscore.all <- lapply(results.master,function(x){
 ### example input for logistic regression relapse
 
 log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
-logreg.pval.assembled <- do.call(rbind, pval)
+logreg.pval.assembled <- do.call(rbind, pval) ### check if recurrent error here when more than one input goi
 logreg.adj.pval <- p.adjust(logreg.pval.assembled, method = "BH")
 logreg.HR.assembled <- do.call(rbind, HR)
 logreg.L95CI.assembled <- do.call(rbind, L95CI)

@@ -159,7 +159,7 @@ tic()
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 
-results.master <- foreach(i = 1:10)%dopar%{
+results.master <- foreach(i = 1:4)%dopar%{
   as.numeric(mb.vsd[i,]) -> x
   names(x) <- colnames(mb.vsd)
   names(x) <- gsub("T","",names(mb.vsd)) 
@@ -174,18 +174,7 @@ results.master <- foreach(i = 1:10)%dopar%{
 # names(results.master) <- row.names(mb.vsd)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-  names(results.master) <- row.names(mb.vsd)[1:10]
-
-###############################################################################
-  
-### Annotate with known gene sets
-
-annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
-
-# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
-
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.041017.csv")
-# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
+  names(results.master) <- row.names(mb.vsd)[1:4]
 
 toc()
 
@@ -193,6 +182,7 @@ toc()
 ### save RDS
 
 ### update name according to input file
+
 
 saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.1041017.rds")
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
@@ -204,6 +194,16 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.1000.rds") ### generated before cox Z score extracted 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds") ### has cox Z score
 
+##############################################################################
+
+### Annotate with known gene sets
+
+annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
+
+# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
+
+write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.041017.csv")
+# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
 
 ###############################################################################
 
@@ -232,7 +232,7 @@ guiltByAssociation <-function(data, associated.gene, cores = 10){
   return(res)
 }
 
-as.numeric(mb.vsd["ENSG00000136997.15_1",]) -> MYC
+MYC <- as.numeric(mb.vsd["ENSG00000136997.15_1",])
 names(MYC) <- colnames(mb.vsd)
 guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
 
