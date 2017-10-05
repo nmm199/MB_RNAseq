@@ -159,7 +159,7 @@ tic()
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 
-results.master <- foreach(i = 1:4)%dopar%{
+results.master <- foreach(i = 1:10)%dopar%{
   as.numeric(mb.vsd[i,]) -> x
   names(x) <- colnames(mb.vsd)
   names(x) <- gsub("T","",names(mb.vsd)) 
@@ -174,7 +174,7 @@ results.master <- foreach(i = 1:4)%dopar%{
 # names(results.master) <- row.names(mb.vsd)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-  names(results.master) <- row.names(mb.vsd)[1:4]
+  names(results.master) <- row.names(mb.vsd)[1:10]
 
 toc()
 
@@ -184,7 +184,7 @@ toc()
 ### update name according to input file
 
 
-saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.1041017.rds")
+saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
 #saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
@@ -202,7 +202,7 @@ annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.041017.csv")
+write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.051017.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
 
 ###############################################################################
