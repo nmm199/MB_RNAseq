@@ -67,7 +67,7 @@ random.gtf <- grep(pattern = "*random", novel.gtf)
 ### can treat gtf like a dataframe, by removing lines that are indicated by the random.gtf file
 nonrandom.novel.gtf <- novel.gtf[-random.gtf,]
   
-### check with novel gtf file should be used below (filt.novel.gtf or novel.gtf, original file uses novel.gtf) 29/8/17
+### check with novel gtf file should be used below (nonrandom.novel.gtf or novel.gtf, original file uses novel.gtf) 29/8/17
 #seqs <- foreach(i = levs)%dopar%{
  # novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
  # temp.seqs <- getSeq(Hsapiens, temp.grange)
@@ -83,7 +83,7 @@ seqs <- foreach(i = levs)%dopar%{
 }
 
 ### make a DNAStringSet
-DNAStringSet(seqs) -> seqs.set
+seqs.set <- DNAStringSet(seqs) 
 names(seqs.set) <- levs
 
 
@@ -221,10 +221,9 @@ registerDoParallel(cores = 6)
 
 ### calculate maximum phast score within 200bp rolling window, script takes a few hours
 
-
 phast.window <- foreach(i = 1:length(levs), .combine=c)%dopar%{
   setTxtProgressBar(pb, i)
-  novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange ### changed from novel.gtf to nonrandom.novel.gtf 5/10/17
   as.character(seqnames(temp.grange))[1] -> chromosome
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
     return(start(temp.grange)[j]:end(temp.grange)[j])
@@ -249,6 +248,11 @@ save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/pha
 # rm(phast.cons.scores)
 # gc()
 
+### 2nd stage of script on server up until here 5/10/17#####################
+
+
+
+
 #### 3/5/17 check you do not need phast.cons from here, remove large memory footprint of phast.cons object. cannot undo rm()
 ### call gc() after a large object has been removed, as this may prompt R to return memory to the operating system
 rm(phast.cons)
@@ -257,9 +261,11 @@ gc()
 ##################################################################################################
 ### list all bigwig phyloP scores
 list.files("/home/dan/cons/phyloP46way", pattern = "*.bigWig", full.names = TRUE) -> phyloP.files
+
 #### remove spurious chromosomes
 phyloP.files[-grep("gl",phyloP.files)] -> phyloP.files
 phyloP.files[-grep("hap",phyloP.files)] -> phyloP.files
+
 library(foreach)
 ### read in bigwig files
 phyloP.cons <- foreach(i = phyloP.files)%do%{
@@ -284,7 +290,7 @@ gc()
 ptm <- proc.time()
 registerDoParallel(cores = 6)
 phyloP.fraction <- foreach(i = levs, .combine=c)%dopar%{
-  novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange  ### changed to nonrandom.novel.gft from novel.gtf 5/10/17
   as.character(seqnames(temp.grange))[1] -> chromosome
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
     return(start(temp.grange)[j]:end(temp.grange)[j])
@@ -295,10 +301,14 @@ phyloP.fraction <- foreach(i = levs, .combine=c)%dopar%{
 proc.time() - ptm
 
 names(phyloP.fraction) <- levs
-save(phyloP.fraction, file="/home/nmm199/R/MB_Data/phyloP.fraction.Rdata")
+saveRDS(phyloP.fraction, file="/home/nmm199/R/MB_Data/phyloP.fraction.rds")
 rm(phyloP.scores)
 gc()
+
+### run here on NICR compsvr from where PFAM file is loaded in, up until here line 303, 5/10/17
+
 ####################################################
+### may need to make changes from here 5/10/17
 
 ### loading in all of the data, note PhyloP data from home/nmm199/R
 ### Dan needs to look for these files 31/8/17
@@ -323,9 +333,9 @@ read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results
 registerDoParallel(cores = 6)
 
 ### check length of transcripts
-### 31/8/17 I think will need to use nonrandom.novel.gtf file instead of novel.gtf for the below script, multiple usages
+### use nonrandom.novel.gtf file instead of novel.gtf for the below script, therefore changed below 5/10/17
 length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange ### changed here 5/10/17
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
     return(start(temp.grange)[j]:end(temp.grange)[j])
   }
@@ -334,17 +344,18 @@ length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 
 ### calculate number of exons
 no.ex <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange  ### changed here 5/10/17
   return(length(temp.grange$exon_number))
 }
 
 ### return name of gene for each transcript
 gene.id <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange
   return(temp.grange$gene_id[1])
 }
 
 ### load Matt's Trinotate annotation (note default home folder for dan is home/dan/mygit/rna_seq_mb/)
+### check: do I need this section  5/10/17 
 trinotate.annot <- read.delim(file="/home/dan/mygit/rna_seq_mb/trinotate_annotation_report.tab") ### this is where you update the name of the PFAM results file to use 30/8/17
 
 ### check if it has a pfam entry
@@ -398,9 +409,9 @@ conservation.scores.remove[conservation.scores.remove$subgroup.spec&(conservatio
 subgroup.specific.cons[order(subgroup.specific.cons$subgroup.isoforms),c(-14,-16)]
 
 
-novel.gtf[novel.gtf$transcript_id%in%rownames(subgroup.specific.cons),]
+nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id%in%rownames(subgroup.specific.cons),] ### changed 5/10/17
 
-novel.gtf[novel.gtf$transcript_id=="TCONS_01254472",]
+nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id=="TCONS_01254472",]
 
 ### only transcripts greater than 250bp
 conservation.scores.remove[conservation.scores.remove$length.transcript.index,] -> conservation.scores.remove.length
