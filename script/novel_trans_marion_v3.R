@@ -1,4 +1,4 @@
-setwd="/home/nmm199/R/MB_RNAseq/RNA_classes/"
+# setwd="/home/nmm199/R/MB_RNAseq/RNA_classes/"
 
 #### first time you run you need to install this package
 #install.packages(c("foreach", "doParallel"))
@@ -115,18 +115,21 @@ writeXStringSet(seqs.set[splits[[i]]], file=paste0("/home/nmm199/R/MB_RNAseq/RNA
 
 
 #### NOW GO AND PERFORM PFAM SEARCH ON SERVER ###
-### tips: make sure use script created within atom to ensure runs currently on server using screen session. see within Desktop/Bioinformatics/CPAT/PFAM
-### script from Dan, and the same file is then used in the trinotate annotation script section below
+### tips: make sure use script created within atom to ensure runs currently on server using screen session. see macbook   Desktop/Bioinformatics/CPAT/PFAM/pfamscan.sh
+### have created PFAM file now (5/10/17) via using FMS cluster. See files on macbook for further information (under Desktop/Bioinformatics/CPAT/PFAM). 
+### this file is then used in the trinotate annotation script section below
+### running here from 5/10/17 onwards, on NICR compsvr using screen
 
-### perl /home/dan/pfam/PfamScan/pfam_scan.pl -translate orf -cpu 10 –fasta home/nmm199/R/MB_RNAseq/RNA classes/working files/temp.seqs.100.fasta -dir ./dat -outfile /home/nmm199/R/MB_RNAseq/RNA classes/working files/outfile.pfam
+### pfam_scan.pl -translate orf -cpu 10 –fasta home/nmm199/R/MB_RNAseq/RNA classes/working files/temp.seqs.100.fasta -dir ./dat -outfile /home/nmm199/R/MB_RNAseq/RNA classes/working files/outfile.pfam
+
 
 ### read back in pfam results
 #pfam <- read.table(file="/home/dan/pfam/pfam.res.10.txt", header = TRUE)   ### this is not needed 30/8/17
-pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/outfile.pfam", header = TRUE)
+pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/all.seqs.fasta.no.head.res", header = TRUE) ### filename updated 5/10/17
+colnames(pfam) <- c("seq_id", "alignment_start", "alignment_end", "envelope_start", "envelope_end", "hmm__acc", "hmm_name", "type", "hmm_start", "hmmend", "hmmlength", "bitscore", "E-value", "significance", "clan", "strand", "nt_start", "nt_end")
 
 #### RUN CPAT ON MAC ###
 
-# load("~R/Data/data/CPAT/Human_logitModel.RData") ### did not use this in the most recent run 30/08/17
 ### note on file input: export current FASTA files from R studio on Macbook into Macbook downloads, and then move to folder /Users/Marion/Desktop/Bioinformatics/CPAT on macbook. 
 ### then run terminal on Macbook
 ### see shell script (cpat.sh) files on Atom on macbook
@@ -240,7 +243,7 @@ close(pb)
 proc.time() - ptm
 names(phast.window) <- levs
 #### save phast window scores
-save(phast.window,file = "./phast.window.Rdata")
+save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.window.Rdata")
 
 ### remove large memory object
 # rm(phast.cons.scores)
@@ -320,7 +323,7 @@ read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results
 registerDoParallel(cores = 6)
 
 ### check length of transcripts
-### 31/8/17 I think will need to use nonrandom.novel.gft file instead of novel.gtf for the below script, multiple usages
+### 31/8/17 I think will need to use nonrandom.novel.gtf file instead of novel.gtf for the below script, multiple usages
 length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
   novel.gtf[novel.gtf$transcript_id==levs[i],] -> temp.grange
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
