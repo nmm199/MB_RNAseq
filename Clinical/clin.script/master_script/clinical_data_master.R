@@ -77,9 +77,9 @@
 ### unhash to use the following file for all the expression data 
 RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
 
-# mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
+mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
 
-mb.vsd <- read.delim(RNA.data)
+# mb.vsd <- read.delim(RNA.data)
 
 ##############################################################################
 
@@ -127,7 +127,7 @@ library(foreach)
 library(tictoc)
 library(parallel)
 library(doParallel)
-registerDoParallel(10)
+registerDoParallel(16) ### best to do in multiples of 8 or 16 as divides easier over the NICR compsvr (32/64 cores)
 
 tic()
 
@@ -150,21 +150,21 @@ tic()
 
 ### unhash when running the novel transcript set
 
-# results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
-# as.numeric(mb.vsd.novel[i,]) -> x
-# names(x) <- colnames(mb.vsd.novel)
-# names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
-# return(clinPathAssess(test.pData,x)) 
-# }
+results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
+ as.numeric(mb.vsd.novel[i,]) -> x
+ names(x) <- colnames(mb.vsd.novel)
+ names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
+ return(clinPathAssess(test.pData,x)) 
+ }
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 
-results.master <- foreach(i = 1:10)%dopar%{
-  as.numeric(mb.vsd[i,]) -> x
-  names(x) <- colnames(mb.vsd)
-  names(x) <- gsub("T","",names(mb.vsd)) 
-  return(clinPathAssess(test.pData,x))
-}
+# results.master <- foreach(i = 1:10)%dopar%{
+#  as.numeric(mb.vsd[i,]) -> x
+#  names(x) <- colnames(mb.vsd)
+#  names(x) <- gsub("T","",names(mb.vsd)) 
+#  return(clinPathAssess(test.pData,x))
+# }
 
 
 ##############################################################################
@@ -172,9 +172,9 @@ results.master <- foreach(i = 1:10)%dopar%{
 ### unhash the relevant name for the output 
 
 # names(results.master) <- row.names(mb.vsd)
-# names(results.master) <- row.names(mb.vsd.novel)
+ names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
-  names(results.master) <- row.names(mb.vsd)[1:10]
+# names(results.master) <- row.names(mb.vsd)[1:10]
 
 toc()
 
@@ -184,10 +184,10 @@ toc()
 ### update name according to input file
 
 
-saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
-#saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
-# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
 
 ### then reload this when examining the results
 
@@ -198,12 +198,12 @@ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/
 
 ### Annotate with known gene sets
 
-annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
+# annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
-# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
+annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.10.051017.csv")
-# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
+# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
+write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
 
 ###############################################################################
 
