@@ -79,7 +79,7 @@ RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on th
 
 mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
 
-# mb.vsd <- read.delim(RNA.data)
+mb.vsd <- read.delim(RNA.data)
 
 ##############################################################################
 
@@ -89,12 +89,12 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### set file for pdf output
-pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
-#pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
+# pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
+pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
 
 ### set file for log output
-log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
-#log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
+# log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
+log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
 ### run up to here if wish to interrogate clinPathAssess function, by directly nominating input variables within clinical_data_functions_master.R
 ################################################################################
@@ -134,6 +134,7 @@ tic()
 ### unhash here when trouble shooting
 
 # i=17
+#  i = 12109  ### seem to remember the previous error was around this number
 # as.numeric(mb.vsd.novel[i,]) -> x
 # names(x) <- colnames(mb.vsd.novel)
 # names(x) <- gsub("T","",names(mb.vsd.novel))
@@ -158,6 +159,7 @@ results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
  }
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+### this is for the main expression dataset
 
 # results.master <- foreach(i = 1:10)%dopar%{
 #  as.numeric(mb.vsd[i,]) -> x
@@ -166,7 +168,14 @@ results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
 #  return(clinPathAssess(test.pData,x))
 # }
 
+# results.master <- foreach(i = 12100:12150)%dopar%{      ### previously tried 12000 - 12050 and ran successfully
+# as.numeric(mb.vsd.novel[i,]) -> x
+#  names(x) <- colnames(mb.vsd.novel)
+#  names(x) <- gsub("T","",names(mb.vsd.novel)) 
+#  return(clinPathAssess(test.pData,x))
+# }
 
+ 
 ##############################################################################
 
 ### unhash the relevant name for the output 
