@@ -5,9 +5,10 @@
 
 ### file input
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds") 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds") ### has cox Z score
-
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds") 
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds") ### has cox Z score
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.12100.12150.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")  ### currently error as file has error
 
 ### read in functions file
 
@@ -34,6 +35,8 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 ###
 
 extracted.km.OS.pval <- lapply(results.master, function(x){return(x[[1]][[3]][[1]])}) 
+
+
 km.OS.p.extract.assembled <- do.call(rbind, extracted.km.OS.pval)
 adjusted.p.km.OS <-p.adjust(km.OS.p.extract.assembled, method = "BH") 
 OS.pvalue.all <- cbind(km.OS.p.extract.assembled, adjusted.p.km.OS)
@@ -237,10 +240,11 @@ write.csv(significant.cox.PFS.cat.all, file = "/home/nmm199/R/MB_RNAseq/Clinical
 ##########################################################################################################################
 
 ### cox PFS for continuous variable, overall category
+### errors 9/10/17, under revision
 
 extract.coxpval.contin<- function (x){
-  return(ifelse(length(x[[4]])< 3, NA,
-                ifelse(length(x[[4]][[4]])<6, NA, 
+  return(ifelse(length(x[[4]])< 4, NA,  ### changed from < 3 (9/10/17), check i=25
+                ifelse(length(x[[4]][[4]])<1, NA, ### changed from < 6  (9/10/17), still does not work
                        ifelse(length(x[[4]][[4]][[1]])<1, NA,
                               x[[4]][[4]][[1]]))))
 }
@@ -249,9 +253,11 @@ extract.coxpval.contin<- function (x){
 cox.PFS.cont.pval.all <- lapply(results.master, extract.coxpval.contin)
 
 ### cox Z score for continuous  biomarker
+### has errors 9/10/17
+### error message Error in x[[4]][[4]] : subscript out of bounds, corrected by altering x[[4]]<4 instead of x[[4]]<3  9/10/17
 
 extract.PFS.cont.cox.Zscore <- function(x){
-  return(ifelse(length(x[[4]])<3, NA,
+  return(ifelse(length(x[[4]])<4, NA,    ### changed from < 3 (9/10/17)
                 ifelse(length(x[[4]][[4]])<6, NA, 
                        ifelse(length(x[[4]][[4]][[5]])<1, NA,
                               x[[4]][[3]][[5]]))))
@@ -260,9 +266,10 @@ extract.PFS.cont.cox.Zscore <- function(x){
 cox.PFS.cont.Zscore.all <- lapply(results.master, extract.PFS.cont.cox.Zscore) ### where biomarker is continuous variable
 
 ### cox PFS HR, contin
+ 
 
 extract.cox.PFS.cont.HR <- function(x){
-  ifelse(length(x[[4]])<3, NA,
+  ifelse(length(x[[4]])<4, NA,  ### 9/10/17 update:  was < 3, works for all values 4, 5, 6
          ifelse(length(x[[4]][[4]])<6, NA, 
                 ifelse(length(x[[4]][[4]][[2]])<1, NA,
                        x[[4]][[4]][[2]])))
@@ -272,9 +279,10 @@ cox.PFS.cont.HR.all <- lapply (results.master, extract.cox.PFS.cont.HR)
 
 ### cox PFS L95CI
 
+
 extract.cox.cont.L95CI.HR <- function(x){
-  ifelse(length(x[[4]])<3, NA,  ### get error message if make this < 2
-         ifelse(length(x[[4]][[4]])<6, NA,  ### original script has <4 for this parameter, updated. ### 12109 is where the error is occurring
+  ifelse(length(x[[4]])<4, NA,  ### 9/10/17 update:  was < 3, works for all values 4, 5, 6
+         ifelse(length(x[[4]][[4]])<6, NA,  ### original script has <4 for this parameter, updated 5/10/17. ### 12109 is where the error is occurring
                 ifelse(length(x[[4]][[4]][[3]])<1, NA,
                        x[[4]][[4]][[3]])))
 }
@@ -284,8 +292,9 @@ cox.L95CI.PFS.cont.HR.all <- lapply (results.master, extract.cox.cont.L95CI.HR)
 
 ### cox PFS U95CI
 
+
 extract.function.cont <- function(x){
-  return(ifelse(length(x[[4]]) < 3, NA,
+  return(ifelse(length(x[[4]]) < 4, NA,  ### 9/10/17 update:  was < 3, works 
                 ifelse(length(x[[4]][[4]])<6, NA, ### changed from <4, to < 6. May need to alter for other RDS input file
                        ifelse(length(x[[4]][[4]][[4]])<1, NA, ### updated
                               x[[4]][[4]][[4]]))))
@@ -1173,3 +1182,87 @@ logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pv
 # significant.cox.OS.all <- cox.OS.all.df[which(cox.OS.all.df[, 2]<0.05),]
 
 # write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.all.csv")
+
+
+
+
+
+
+###########################
+
+### graphical depiction of p values against adjusted p values, may wish to add in abline
+### may wish to alter graphics later
+
+histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS.all)
+
+# library(density)
+plot(ecdf(adjusted.p.km.EFS.all))
+plot(density(adjusted.p.km.EFS.all))
+hist(km.EFS.p.extract.assembled.all)
+lines(density(km.EFS.p.extract.assembled.all), col = "red")
+
+cox.PFS.cat.G3G4.df
+
+
+head(cox.PFS.cat.G3G4.df)
+
+hist(cox.PFS.cat.G3G4.df[,1])
+hist(cox.PFS.cat.G3G4.df[,2])
+
+cox.PFS.cat.G3G4.df[,1] -> x
+"Cox PFS categorical G3/G4" -> test.name
+breaks = 100
+
+plotHist <- function(x, test.name, breaks = 100, xlab = "p-value", cutoff = 0.05, text.pos = 0.9){
+  hist.res <- hist(x, breaks = breaks, plot = F)
+  max(hist.res$counts) -> temp.height
+  length(which(x<0.05)) -> temp.no.sig
+  
+  if(length(cutoff)==1){
+  ifelse(hist.res$breaks<cutoff,"red", "grey") -> hist.cols
+  }else{
+    ifelse(hist.res$breaks<cutoff[1]|hist.res$breaks>cutoff[2],"red", "grey") -> hist.cols
+  }
+  
+    hist(x, breaks = breaks,  xlab = xlab, main = paste("Histogram of", test.name), col = hist.cols)
+    
+    if(length(cutoff)==1){
+      abline(v= cutoff, lty = 2 , col = "red")
+      text(text.pos, temp.height-(temp.height*0.1), paste("Number Genes p <", cutoff, "=", temp.no.sig), pos = 2)
+    }else{
+      abline(v= cutoff, lty = 2 , col = "red")
+      text(text.pos, temp.height-(temp.height*0.1), paste("Number Genes p <", cutoff[1],"or p >", cutoff[2],"=", temp.no.sig), pos = 2)
+    }
+}
+
+cox.PFS.cat.G3G4.df[,3] -> x
+
+plotEcdf <- function(x, y = NULL, test.name, xlab = "z-score", cutoff=c(-2,2)){
+  cdf.x <- ecdf(x)
+  plot(ecdf(x), xlab = xlab, main = paste("cumulative density plot of", test.name), col = "red")
+  abline(h = 0.5, v = 0)
+  abline(v = cutoff, lty = 2)
+  min(x, na.rm = T) -> min.x
+  temp.no.dn.x <- length(which(x<cutoff[1]))
+  max(x, na.rm = T) -> max.x
+  temp.no.up.x <- length(which(x>cutoff[2]))
+  text(min.x-(0.1*min.x), 0.9, paste("Number Genes z <", cutoff[1],temp.no.dn.x), pos = 4)
+  text(max.x-(0.1*max.x), 0.2, paste("Number Genes z >", cutoff[2],temp.no.up.x), pos = 2)
+  if(!is.null(y)){
+    cdf.y <- ecdf(y)
+  }  
+  
+}
+
+
+
+plotHist(cox.PFS.cat.G3G4.df[,1], "Cox PFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+plotHist(cox.PFS.cat.G3G4.df[,3], "Cox PFS categorical G3/G4", breaks = 100, xlab = "Z-score", cutoff = c(-2, 2))
+
+
+
+plot(ecdf(cox.PFS.cat.G3G4.df[,3]))
+plot(density(x, na.rm = "T"))
+hist(km.EFS.p.extract.assembled.all)
+lines(density(km.EFS.p.extract.assembled.all), col = "red")
