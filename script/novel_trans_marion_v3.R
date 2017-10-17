@@ -48,7 +48,12 @@ unique(tcons.refgene.gtf$transcript_id) -> tcons.refgene.remove
 c(tcons.linc.remove,tcons.refgene.remove) -> tcons.all.remove
 ### 1/5/17 confirm with Dan: think this means that those that are being removed are removed into filt.novel.gtf and that novel.gtf contains only novel transcripts now
 novel.gtf[-which(novel.gtf$transcript_id%in%tcons.all.remove),] -> filt.novel.gtf
+
 ################################################################################################
+### this section below deals with assigning levels to each transcript and then determining sequence strings, which are then saved as separate files that are run against the PFAM moieties ()
+### need to run the section below that contains "levs" and "nonrandom.novel.gtf" even if already have PFAM file that is generated using the RNA files contained in /home/R/MB_RNAseq/RNA_classes/working_files/split_fasta
+
+###############################################################################################
 
 ### assign levels to each transcript (isoform)
 levels(as.factor(novel.gtf$transcript_id)) -> levs
@@ -66,17 +71,11 @@ random.gtf <- grep(pattern = "*random", novel.gtf)
 
 ### can treat gtf like a dataframe, by removing lines that are indicated by the random.gtf file
 nonrandom.novel.gtf <- novel.gtf[-random.gtf,]
-  
-### check with novel gtf file should be used below (nonrandom.novel.gtf or novel.gtf, original file uses novel.gtf) 29/8/17
-#seqs <- foreach(i = levs)%dopar%{
- # novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
- # temp.seqs <- getSeq(Hsapiens, temp.grange)
- # unlist(temp.seqs) -> temp.seqs
- # return(temp.seqs)
-#}
+
+
 
 seqs <- foreach(i = levs)%dopar%{
-  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange ### used to be novel.gtf, now replaced with nonrandom.novel.gtf 29/8/17
   temp.seqs <- getSeq(Hsapiens, temp.grange)
   unlist(temp.seqs) -> temp.seqs
   return(temp.seqs)
@@ -86,6 +85,9 @@ seqs <- foreach(i = levs)%dopar%{
 seqs.set <- DNAStringSet(seqs) 
 names(seqs.set) <- levs
 
+
+########################################
+### if you already have the PFAM data against the sequence strings, then do not run this section below (line 93 -130)
 
 ### write out various versions of the sequence strings
 # old script: writeXStringSet(seqs.set, file="./temp.seqs.fasta", format = "fasta", width=80)
@@ -114,6 +116,9 @@ writeXStringSet(seqs.set[splits[[i]]], file=paste0("/home/nmm199/R/MB_RNAseq/RNA
 #writeXStringSet(seqs.set[1:10], file="./temp.seqs.10.fasta", format = "fasta", width=80) 
 
 
+##################################################################################
+##################################################################################
+
 #### NOW GO AND PERFORM PFAM SEARCH ON SERVER ###
 ### tips: make sure use script created within atom to ensure runs currently on server using screen session. see macbook   Desktop/Bioinformatics/CPAT/PFAM/pfamscan.sh
 ### have created PFAM file now (5/10/17) via using FMS cluster. See files on macbook for further information (under Desktop/Bioinformatics/CPAT/PFAM). 
@@ -123,17 +128,26 @@ writeXStringSet(seqs.set[splits[[i]]], file=paste0("/home/nmm199/R/MB_RNAseq/RNA
 ### pfam_scan.pl -translate orf -cpu 10 –fasta home/nmm199/R/MB_RNAseq/RNA classes/working files/temp.seqs.100.fasta -dir ./dat -outfile /home/nmm199/R/MB_RNAseq/RNA classes/working files/outfile.pfam
 
 
+##################################################################################
+##################################################################################
+
 ### read back in pfam results
 #pfam <- read.table(file="/home/dan/pfam/pfam.res.10.txt", header = TRUE)   ### this is not needed 30/8/17
 pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/all.seqs.fasta.no.head.res", header = TRUE) ### filename updated 5/10/17
 colnames(pfam) <- c("seq_id", "alignment_start", "alignment_end", "envelope_start", "envelope_end", "hmm__acc", "hmm_name", "type", "hmm_start", "hmmend", "hmmlength", "bitscore", "E-value", "significance", "clan", "strand", "nt_start", "nt_end")
 
+
+##################################################################################
 #### RUN CPAT ON MAC ###
 
 ### note on file input: export current FASTA files from R studio on Macbook into Macbook downloads, and then move to folder /Users/Marion/Desktop/Bioinformatics/CPAT on macbook. 
 ### then run terminal on Macbook
 ### see shell script (cpat.sh) files on Atom on macbook
-### then reexport files from Macbook onto R studio
+### then reexport files from Macbook onto R studio and read back into script below
+
+
+##################################################################################
+### read back in CPAT results
 
 cpat.results <- read.delim(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.results.txt")   
 
@@ -163,11 +177,6 @@ phast.cons.files[-grep("gl",phast.cons.files)] -> phast.cons.files
 ### script below imports big wig files, takes overnight, run over several cores
 phast.cons<- mclapply(phast.cons.files, function(i){return(import(i, format="bw"))}, mc.cores = 32)
 
-### import big wig files, code superceded as of 8/5/17
-# phast.cons <- foreach(i = phast.cons.files)%do%{
-#  return(import(i, format="bw"))
-# }
-
 ### sub and gsub perform replacement of the first and all matches respectively.
 gsub(".phastCons46way.bigWig","",basename(phast.cons.files)) -> names(phast.cons)
 
@@ -181,10 +190,12 @@ phast.cons.scores <- foreach(i = 1:length(phast.cons))%do%{
 }
 names(phast.cons) -> names(phast.cons.scores)
 
-### if workflow interrupted, note that phast.cons takes overnight to generate, phast.cons.scores takes less than an hour. option to save and reload
-# saveRDS(phast.cons, "/home/nmm199/R/MB_Data/results/phast.cons.rds")
-# save(phast.cons.scores, file = "/home/nmm199/R/MB_Data/results/phast.cons.scores.Rdata")
-# load("/home/nmm199/R/MB_Data/phast.cons.scores.Rdata")
+### phast.cons takes a few hours with 32 cores
+
+# saveRDS(phast.cons, "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/May_2017/phast.cons.rds") ### previous file
+# saveRDS(phast.cons, "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds") ### takes a while to save as RDS object
+# load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/May_2017/phast.cons.rds")
+# load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds")
 
 ###  5/5/17 phast.window script below is obsolete
 
@@ -249,11 +260,9 @@ save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/pha
 # gc()
 
 ### 2nd stage of script on server up until here 5/10/17#####################
+### error generated 5/10/17 unable to generate phast.windows object
 
 
-
-
-#### 3/5/17 check you do not need phast.cons from here, remove large memory footprint of phast.cons object. cannot undo rm()
 ### call gc() after a large object has been removed, as this may prompt R to return memory to the operating system
 rm(phast.cons)
 gc()
