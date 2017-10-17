@@ -261,9 +261,10 @@ cox.OS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, 18)
 ##################
 
 ### significant dataframes & annotation
-### can work on this more later
+### can work on this more later for SHH, SHH.old if needed
 
 sig.cox.OS.cat.all <- cox.OS.cat.all.df[which(cox.OS.cat.all.df[, 2]<0.05),]
+
 try(annot.sig.cox.OS.cat.all <- annotate.HTseq.IDs(rownames(sig.cox.OS.cat.all)), silent = T)
 # write.csv(annot.sig.cox.OS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/annot.sig.cox.OS.cat.allgroups.csv")
 
@@ -287,49 +288,45 @@ write.csv(sig.cox.OS.cont.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.
 
 ###
 
+sig.cox.OS.cat.SHH <- cox.OS.cat.SHH.df[which(cox.OS.cat.SHH.df[, 2]<0.05),] ### no results
 
+sig.cox.OS.cont.SHH.df <- cox.OS.cont.SHH.df[which(cox.OS.cont.SHH.df[, 2]<0.05), ]
+
+sig.cox.OS.cat.SHH.old <- cox.OS.cat.SHH.old.df[which(cox.OS.cat.SHH.old.df[, 2]<0.05),]
+
+sig.cox.OS.cont.SHH.old.df <- cox.OS.cont.SHH.old.df [which(cox.OS.cont.SHH.old.df[,2]<0.05),]
 
 ########################################################################
-### checking dimensions in each dataframe
-
-# nrow(sig.cox.OS.cat.all)
-# nrow(sig.cox.OS.cont.all)
-# nrow (sig.cox.OS.cat.G3G4)
-# nrow(sig.cox.OS.cont.G3G4)
-
-
-#########################################################################
 
 ### Cox EFS for all - these are all categorical expression data
 
-try(cox.EFS.pval.all <- lapply(results.master, function(x){return(x[[4]][[1]][[1]])}), silent = T)
-try (cox.EFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[1]][[5]])}), silent = T)
-try(cox.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[2]])}), silent = T)
-try(cox.U95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[4]])}), silent = T)  
-try(cox.L95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[3]])}), silent = T)
 
-try(cox.EFS.all.df <- cox.dataframe(pval = cox.EFS.pval.all, Zscore = cox.EFS.Zscore.all, HR = cox.EFS.HR.all, L95CI = cox.L95CI.EFS.HR.all, U95CI = cox.U95CI.EFS.HR.all), silent = T)
-try(colnames(cox.EFS.all.df) <- c("cox.EFS.pval.all", "cox.EFS.adj.pval.all", "cox.EFS.Zscore.all", "cox.EFS.HR.all", "cox.U95CI.EFS.HR.all", "cox.L95CI.EFS.HR.all"), silent = T)
+cox.EFS.cat.all.df <- extract.cox.OS (results.master, 1)
 
-try(significant.cox.EFS.all <- cox.EFS.all.df[which(cox.EFS.all.df[, 2]<0.05),], silent = T)
-try(write.csv(significant.cox.EFS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.EFS.all.csv"), silent =T)
+cox.EFS.cat.G3G4.df <- extract.cox.OS (results.master, 2)
 
-### cox EFS for G3G4
+# cox.EFS.cat.G3G4.v2.df <- extract.cox.SHH.old (results.master, 2) ### this is to compare the output when subsetting is increased to x[[4]]<17
 
-try(cox.EFS.pval.G3G4  <- lapply(results.master, function(x){return(x[[4]][[2]][[1]])}), silent = T)
-try(cox.EFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[5]])}), silent = T)
-try(cox.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[2]])}), silent = T)
-try(cox.U95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[4]])}), silent = T)  
-try(cox.L95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[3]])}), silent = T)
 
-try(cox.EFS.G3G4.df <- cox.dataframe(pval = cox.EFS.pval.G3G4, Zscore = cox.EFS.Zscore.G3G4, HR = cox.EFS.HR.G3G4, L95CI = cox.L95CI.EFS.HR.G3G4, U95CI = cox.U95CI.EFS.HR.G3G4), silent = T)
-try(colnames(cox.EFS.G3G4.df) <- c("cox.EFS.pval.G3G4", "cox.EFS.adj.pval.G3G4", "cox.EFS.Zscore.G3G4", "cox.EFS.HR.G3G4", "cox.U95CI.EFS.HR.G3G4", "cox.L95CI.EFS.HR.G3G4"), silent = T)
+sig.cox.EFS.cat.all <- cox.EFS.cat.all.df[which(cox.EFS.cat.all.df[, 2]<0.05),]
 
-try(significant.cox.EFS.G3G4 <- cox.EFS.G3G4.df[which(cox.EFS.G3G4.df[, 2]<0.05),], silent = T)
-try(write.csv(significant.cox.EFS.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.EFS.G3G4.csv"), silent = T)
+sig.cox.EFS.cat.G3G4 <- cox.EFS.cat.G3G4.df[which(cox.EFS.cat.G3G4.df[,2]<0.05), ]
 
-########################################################################
+# sig.cox.EFS.cat.G3G4.v2 <- cox.EFS.cat.G3G4.v2.df[which(cox.EFS.cat.G3G4.v2.df[, 2]<0.05), ] 
 
+### explore difference from sig.cox.EFS.cat.G3G4, I wonder if it is related to the significant cox dataframe creation
+### seems to be that the more accurate subsetting, the more relevant targets are found within the dataset i.e x[[4]]< 6 for a more complete dataset is better than generic x[[4]]<17
+### there are fewer candidates found when have more liberal NA rule e.g for x[[4]]<17 (liberal, fewer candidates, less NAs) compared to x[[4]]<6 (strict)
+### other difference is the adjusted p value (perhaps with fewer candidates, there is less correction)
+
+
+try(write.csv(sig.cox.EFS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/sig.cox.EFS.all.csv"), silent =T)
+
+
+try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/sig.cox.EFS.G3G4.csv"), silent = T)
+
+
+#################################################################################################
 #################################################################################################
 
 ### extract logistic regression p value 
@@ -365,15 +362,6 @@ logreg.relapse.adj.pval <- p.adjust(logreg.relapse.pval, method = "BH")
 logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pval)
 
 
-### could create a foreach loop
-
-#logreg.allresults <- foreach (i = 1:length(results.master[[i]]$reg.log.list)$dopar% {
- # logreg.pval <- lapply(results.master, function(x){return(x$reg.log.list[[i]][[1]])})
- # logreg.adj.pval <- p.adjust(logreg.pval, method = "BH")
- # logreg.combined.pval <- cbind (logreg.pval, logreg.adj.pval)
- # return(logreg.combined.pval)
-## }
-# )
 
 ######################################################################
 
@@ -420,7 +408,9 @@ extracted.dataframes <- list(cox.PFS.cat.all.df,
                              cox.OS.cat.SHH.df,
                              cox.OS.cont.SHH.df,
                              cox.OS.cat.SHH.old.df,
-                             cox.OS.cont.SHH.old.df
+                             cox.OS.cont.SHH.old.df,
+                             cox.EFS.cat.all.df,
+                             cox.EFS.cat.G3G4.df 
                              )
 # return (extracted.dataframes)
 

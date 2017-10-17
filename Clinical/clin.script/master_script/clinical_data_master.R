@@ -256,6 +256,16 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 
 ### compare to a randomised dataframe
 
+
+### script for the server 17/10/17:
+
 library(NMF)
+RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
+
+mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
+
+mb.vsd <- read.delim(RNA.data)
+
 mb.vsd.random <- randomize(mb.vsd)
-### then run through the clinPathAssess function
+
+### then run through the clinPathAssess function ### up to here 17/10/17

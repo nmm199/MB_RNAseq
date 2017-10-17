@@ -716,4 +716,28 @@ cox.PFS.Zscore.cat.G3G4 <- lapply (results.master, extract.Zscore.PFS.cat.G3G4)
  
  
  
- ###
+ ####################################################
+ ### cox EFS for categorical, all patients (in survival cohort)
+ 
+ try(cox.EFS.pval.all <- lapply(results.master, function(x){return(x[[4]][[1]][[1]])}), silent = T)
+ try (cox.EFS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[1]][[5]])}), silent = T)
+ try(cox.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[2]])}), silent = T)
+ try(cox.U95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[4]])}), silent = T)  
+ try(cox.L95CI.EFS.HR.all <- lapply(results.master, function(x){return(x[[4]][[1]][[3]])}), silent = T)
+ 
+ try(cox.EFS.all.df <- cox.dataframe(pval = cox.EFS.pval.all, Zscore = cox.EFS.Zscore.all, HR = cox.EFS.HR.all, L95CI = cox.L95CI.EFS.HR.all, U95CI = cox.U95CI.EFS.HR.all), silent = T)
+ try(colnames(cox.EFS.all.df) <- c("cox.EFS.pval.all", "cox.EFS.adj.pval.all", "cox.EFS.Zscore.all", "cox.EFS.HR.all", "cox.U95CI.EFS.HR.all", "cox.L95CI.EFS.HR.all"), silent = T)
+ 
+ 
+ 
+ ### cox EFS for G3G4
+ 
+ try(cox.EFS.pval.G3G4  <- lapply(results.master, function(x){return(x[[4]][[2]][[1]])}), silent = T)
+ try(cox.EFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[5]])}), silent = T)
+ try(cox.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[2]])}), silent = T)
+ try(cox.U95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[4]])}), silent = T)  
+ try(cox.L95CI.EFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[2]][[3]])}), silent = T)
+ 
+ try(cox.EFS.G3G4.df <- cox.dataframe(pval = cox.EFS.pval.G3G4, Zscore = cox.EFS.Zscore.G3G4, HR = cox.EFS.HR.G3G4, L95CI = cox.L95CI.EFS.HR.G3G4, U95CI = cox.U95CI.EFS.HR.G3G4), silent = T)
+ try(colnames(cox.EFS.G3G4.df) <- c("cox.EFS.pval.G3G4", "cox.EFS.adj.pval.G3G4", "cox.EFS.Zscore.G3G4", "cox.EFS.HR.G3G4", "cox.U95CI.EFS.HR.G3G4", "cox.L95CI.EFS.HR.G3G4"), silent = T)
+ 
