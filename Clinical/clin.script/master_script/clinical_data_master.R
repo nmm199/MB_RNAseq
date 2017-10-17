@@ -82,6 +82,8 @@ mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"
 
 mb.vsd <- read.delim(RNA.data)
 
+# mb.vsd.random <- randomise (mb.vsd) ### generate this first then run the clinPathAssess function on this.
+
 ##############################################################################
 
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
@@ -142,12 +144,21 @@ tic()
 
 ### unhash when running the complete transcript set
 
-results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
  as.numeric(mb.vsd[i,]) -> x
  names(x) <- colnames(mb.vsd)
  names(x) <- gsub("T","",names(mb.vsd))
  return(clinPathAssess(test.pData,x)) 
  }
+
+### unhash when running the randomised dataset 17/10/17 ### on server
+results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
+  as.numeric(mb.vsd.random [i,]) -> x
+  names(x) <- colnames(mb.vsd.random)
+  names(x) <- gsub("T","",names(mb.vsd.random))
+  return(clinPathAssess(test.pData,x)) 
+}
+
 
 ### unhash when running the novel transcript set
 
@@ -158,15 +169,16 @@ results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
 # return(clinPathAssess(test.pData,x)) 
 # }
 
+
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 ### this is for the main expression dataset
-
-# results.master <- foreach(i = 1:25)%dopar%{
-# as.numeric(mb.vsd[i,]) -> x
-# names(x) <- colnames(mb.vsd)
-#  names(x) <- gsub("T","",names(mb.vsd)) 
-# return(clinPathAssess(test.pData,x))
-# }
+i = 1
+ results.master <- foreach(i = 1:25)%dopar%{
+ as.numeric(mb.vsd.random[i,]) -> x
+ names(x) <- colnames(mb.vsd.random)
+ names(x) <- gsub("T","",names(mb.vsd.random)) 
+ return(clinPathAssess(test.pData,x))
+ }
 
 # results.master <- foreach(i = 12200:12250)%dopar%{      ### previously tried 12000 - 12050, 12100-12150 and ran successfully. #  i = 12109  ###  previous error was around this number
  # as.numeric(mb.vsd.novel[i,]) -> x
@@ -180,21 +192,26 @@ results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
 
 ### unhash the relevant name for the output 
 
- names(results.master) <- row.names(mb.vsd)
+# names(results.master) <- row.names(mb.vsd)
+ names (results.master) <- row.names(mb.vsd.random)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
 # names(results.master) <- row.names(mb.vsd)[1:10]
 
 toc()
 
+### run up to here for the clinPathAssess function
+
+###############################################################################
 ###############################################################################
 ### save RDS
 
 ### update name according to input file
-
+### 17/10/17 note: once this runs for the randomised file, then can save RDS
 
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
- saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.rds")
+saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.random.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
 
 ### then reload this when examining the results
@@ -213,6 +230,7 @@ toc()
 write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
 
+###############################################################################
 ###############################################################################
 
 guiltByAssociation <-function(data, associated.gene, cores = 10){
@@ -253,7 +271,7 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 
 
 #####################################################################
-
+#####################################################################
 ### compare to a randomised dataframe
 
 
@@ -269,3 +287,6 @@ mb.vsd <- read.delim(RNA.data)
 mb.vsd.random <- randomize(mb.vsd)
 
 ### then run through the clinPathAssess function ### up to here 17/10/17
+
+
+#####################################################################
