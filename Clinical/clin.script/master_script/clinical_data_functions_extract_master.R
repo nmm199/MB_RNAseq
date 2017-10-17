@@ -49,7 +49,7 @@ extract.cox.pval<- function (x, subset.index){
 
 
 extract.cox.pval.SHH.old <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 10, NA, ###  works with length < 3 and < 4 above for PFS for all groups, change it to 10 for it to work for G3G4 PFS 11/10/17
+  return(ifelse(length(x[[4]])< 17, NA, ###  used to be 10. Change to <15, then < 17. works with length < 3 and < 4 above for PFS for all groups, change it to 10 for it to work for G3G4 PFS 11/10/17
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
                               x[[4]][[subset.index]][[1]]))))
@@ -66,7 +66,7 @@ extract.cox.Zscore <- function(x, subset.index){
 
 
 extract.cox.Zscore.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<10, NA,
+  return (ifelse(length(x[[4]])<17, NA,
                  ifelse(length(x[[4]][[subset.index]])<6, NA,
                         ifelse(length(x[[4]][[subset.index]][[5]])<1, NA, 
                                x[[4]][[subset.index]][[5]]))))
@@ -83,7 +83,7 @@ extract.cox.HR <- function(x, subset.index){
 
 
 extract.cox.HR.SHH.old <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 10, NA, 
+  return(ifelse(length(x[[4]])< 17, NA, 
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[2]])<1, NA,
                               x[[4]][[subset.index]][[2]]))))
@@ -99,7 +99,7 @@ extract.cox.L95CI.HR <- function(x, subset.index){
 
 
 extract.cox.L95CI.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<10, NA,
+  return (ifelse(length(x[[4]])<17, NA,
                  ifelse(length(x[[4]][[subset.index]])<6, NA,
                         ifelse(length(x[[4]][[subset.index]][[3]])<1, NA, 
                                x[[4]][[subset.index]][[3]]))))
@@ -114,7 +114,7 @@ extract.cox.U95CI.HR <- function(x, subset.index){
 
 
 extract.cox.U95CI.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<10, NA,
+  return (ifelse(length(x[[4]])<17, NA,
                  ifelse(length(x[[4]][[subset.index]])<6, NA,
                         ifelse(length(x[[4]][[subset.index]][[4]])<1, NA, 
                                x[[4]][[subset.index]][[4]]))))
@@ -123,7 +123,7 @@ extract.cox.U95CI.SHH.old <- function(x, subset.index){
 
 
 
-
+######################################################################
 
 extract.cox <- function(results.master, subset.index){
   cox.dataframe(pval = lapply(results.master, extract.cox.pval, subset.index = subset.index),
@@ -147,9 +147,17 @@ extract.cox.SHH.old <- function (results.master, subset.index){
  }
  
  
+
+
+
+
+
+######################################################################
+
+
  extract.cox.OS <- function(results.master, subset.index){
  cox.dataframe (pval = lapply(results.master, extract.cox.OS.pval, subset.index = subset.index), 
-               Zscore = lapply (results.master, extract.cox.Zscore, subset.index = subset.index),
+               Zscore = lapply (results.master, extract.cox.OS.Zscore, subset.index = subset.index),
                HR = lapply(results.master, extract.cox.OS.HR,subset.index = subset.index ),
                L95CI = lapply (results.master, extract.cox.OS.L95CI, subset.index = subset.index),
                U95CI = lapply(results.master, extract.cox.OS.U95CI,subset.index = subset.index )
@@ -158,10 +166,13 @@ extract.cox.SHH.old <- function (results.master, subset.index){
 
 
 ########################################
+
 ### creating cox OS function with subsets < 5, < 6, <1
+### 17/10/17:have had to increase the subsetting for subsequent cox OS dataframes
+### currently (> 11 worked for extract.cox.OS to work for cox.OS.cat, then  > 12 needed for cox.OS.cont, then  x[[4]]>13 (increasing each time)needed for cox.OS.cat.G3G4, then > 14 needed for cox.OS.cont.G3G4, now up to 
 
 extract.cox.OS.pval <-  function (x, subset.index){
-  return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 6 for OS
+  return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 11 for OS, then changed to 12 for cox.cont.OS
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
                               x[[4]][[subset.index]][[1]]))))
@@ -169,7 +180,7 @@ extract.cox.OS.pval <-  function (x, subset.index){
 
 
 extract.cox.OS.HR <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it 6 for OS
+  return(ifelse(length(x[[4]])< 14, NA, ###  see comment for extract.cox.OS.pval, which applies to all extract cox OS functions below
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[2]])<1, NA,
                               x[[4]][[subset.index]][[2]]))))
@@ -177,7 +188,7 @@ extract.cox.OS.HR <- function (x, subset.index){
 
 
 extract.cox.OS.Zscore <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, changd to 11
+  return(ifelse(length(x[[4]])< 14, NA,
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[5]])<1, NA,
                               x[[4]][[subset.index]][[5]]))))
@@ -187,7 +198,7 @@ extract.cox.OS.Zscore <- function (x, subset.index){
 
 
 extract.cox.OS.L95CI<- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, changd to 11
+  return(ifelse(length(x[[4]])< 14, NA, 
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[3]])<1, NA,
                               x[[4]][[subset.index]][[3]]))))
@@ -195,7 +206,7 @@ extract.cox.OS.L95CI<- function (x, subset.index){
 
 
 extract.cox.OS.U95CI <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, changd to 11
+  return(ifelse(length(x[[4]])< 14, NA, 
                 ifelse(length(x[[4]][[subset.index]])<6, NA, 
                        ifelse(length(x[[4]][[subset.index]][[4]])<1, NA,
                               x[[4]][[subset.index]][[4]]))))

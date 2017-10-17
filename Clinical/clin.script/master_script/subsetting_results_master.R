@@ -468,4 +468,252 @@ cox.PFS.Zscore.cat.G3G4 <- lapply (results.master, extract.Zscore.PFS.cat.G3G4)
  
  
  
+ ##################################
  
+ ### p value
+ 
+ extract.coxpval.OS.cat.all<- function (x){
+   return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 12 on11/10/17
+                 ifelse(length(x[[4]][[11]])<6, NA, 
+                        ifelse(length(x[[4]][[11]][[1]])<1, NA,
+                               x[[4]][[11]][[1]]))))
+ }
+ 
+ cox.OS.pval.cat.all <- lapply(results.master, extract.coxpval.OS.cat.all)
+ 
+ ### HR
+ 
+ extract.HR.OS.cat.all<- function (x){
+   return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[11]])<6, NA, 
+                        ifelse(length(x[[4]][[11]][[2]])<1, NA,
+                               x[[4]][[11]][[2]]))))
+ }
+ 
+ cox.OS.HR.cat.all <- lapply(results.master, extract.HR.OS.cat.all)
+ 
+ ### Z score
+ 
+ extract.Zscore.OS.cat.all<- function (x){
+   return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[11]])<6, NA, 
+                        ifelse(length(x[[4]][[11]][[5]])<1, NA,
+                               x[[4]][[11]][[5]]))))
+ }
+ 
+ cox.OS.Zscore.cat.all <- lapply(results.master, extract.Zscore.OS.cat.all)
+ 
+ ### HR 95 CI
+ 
+ extract.L95CI.OS.cat.all<- function (x){
+   return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[11]])<6, NA, 
+                        ifelse(length(x[[4]][[11]][[3]])<1, NA,
+                               x[[4]][[11]][[3]]))))
+ }
+ 
+ 
+ extract.U95CI.OS.cat.all<- function (x){
+   return(ifelse(length(x[[4]])< 11, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[11]])<6, NA, 
+                        ifelse(length(x[[4]][[11]][[4]])<1, NA,
+                               x[[4]][[11]][[4]]))))
+ }
+ 
+ cox.L95CI.OS.HR.cat.all<- lapply(results.master, extract.L95CI.OS.cat.all)
+ cox.U95CI.OS.HR.cat.all<- lapply(results.master, extract.U95CI.OS.cat.all)
+ 
+ ### cox OS dataframe
+ 
+ cox.OS.cat.all.df <- cox.dataframe(pval = cox.OS.pval.cat.all , Zscore = cox.OS.Zscore.cat.all, HR = cox.OS.HR.cat.all, L95CI = cox.L95CI.OS.HR.cat.all, U95CI = cox.U95CI.OS.HR.cat.all)
+ colnames(cox.OS.cat.all.df) <- c("cox.OS.pval.cat.all", "cox.OS.adj.pval.cat.all", "cox.OS.Zscore.cat.all", "cox.OS.HR.cat.all","cox.L95CI.OS.HR.cat.all", "cox.U95CI.OS.HR.cat.all")
+ 
+ 
+ ########################################
+ 
+ ### cox OS for all groups, continuous variable
+ 
+ ### p value
+ 
+ extract.coxpval.OS.cont.all<- function (x){
+   return(ifelse(length(x[[4]])< 12, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[12]])<6, NA, 
+                        ifelse(length(x[[4]][[12]][[1]])<1, NA,
+                               x[[4]][[12]][[1]]))))
+ }
+ 
+ cox.OS.pval.cont.all <- lapply(results.master, extract.coxpval.OS.cont.all)
+ 
+ 
+ ### HR
+ 
+ extract.HR.OS.cont.all<- function (x){
+   return(ifelse(length(x[[4]])< 12, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[12]])<6, NA, 
+                        ifelse(length(x[[4]][[12]][[2]])<1, NA,
+                               x[[4]][[12]][[2]]))))
+ }
+ 
+ cox.OS.HR.cont.all <- lapply(results.master, extract.HR.OS.cont.all)
+ 
+ ### Z score
+ 
+ extract.Zscore.OS.cont.all<- function (x){
+   return(ifelse(length(x[[4]])< 12, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[12]])<6, NA, 
+                        ifelse(length(x[[4]][[12]][[5]])<1, NA,
+                               x[[4]][[12]][[5]]))))
+ }
+ 
+ cox.OS.Zscore.cont.all <- lapply(results.master, extract.Zscore.OS.cont.all)
+ 
+ ### HR 95 CI
+ 
+ extract.L95CI.OS.cont.all<- function (x){
+   return(ifelse(length(x[[4]])< 12, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[12]])<6, NA, 
+                        ifelse(length(x[[4]][[12]][[3]])<1, NA,
+                               x[[4]][[12]][[3]]))))
+ }
+ 
+ cox.L95CI.OS.HR.cont.all<- lapply(results.master, extract.L95CI.OS.cont.all)
+ 
+ 
+ extract.U95CI.OS.cont.all<- function (x){
+   return(ifelse(length(x[[4]])< 12, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[12]])<6, NA, 
+                        ifelse(length(x[[4]][[12]][[4]])<1, NA,
+                               x[[4]][[12]][[4]]))))
+ }
+ 
+ cox.U95CI.OS.HR.cont.all<- lapply(results.master, extract.U95CI.OS.cont.all)
+ 
+ ###########################################
+ 
+ ### cox OS dataframe
+ 
+ cox.OS.all.cont.df <- cox.dataframe(pval = cox.OS.pval.cont.all, Zscore = cox.OS.Zscore.cont.all, HR = cox.OS.HR.cont.all, L95CI = cox.L95CI.OS.HR.cont.all, U95CI = cox.U95CI.OS.HR.cont.all)
+ colnames(cox.OS.all.cont.df) <- c("cox.OS.pval.cont.all", "cox.OS.adj.pval.cont.all", "cox.OS.Zscore.cont.all", "cox.OS.HR.cont.all","cox.L95CI.OS.HR.cont.all", "cox.U95CI.OS.HR.cont.all")
+ 
+ 
+ ###
+ 
+ ### Cox OS for G3G4, categorical 
+ 
+ extract.coxpval.OS.cat.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 13, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[13]])<6, NA, 
+                        ifelse(length(x[[4]][[13]][[1]])<1, NA,
+                               x[[4]][[13]][[1]]))))
+ }
+ 
+ cox.OS.pval.cat.G3G4 <- lapply(results.master, extract.coxpval.OS.cat.G3G4)
+ 
+ ### HR 
+ extract.HR.OS.cat.G3G4 <- function (x){
+   return(ifelse(length(x[[4]])< 13, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[13]])<6, NA, 
+                        ifelse(length(x[[4]][[13]][[2]])<1, NA,
+                               x[[4]][[13]][[2]]))))
+ }
+ 
+ cox.OS.HR.cat.G3G4 <- lapply(results.master, extract.HR.OS.cat.G3G4)
+ 
+ ### Z score
+ 
+ extract.Zscore.OS.cat.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 13, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[13]])<6, NA, 
+                        ifelse(length(x[[4]][[13]][[5]])<1, NA,
+                               x[[4]][[13]][[5]]))))
+ }
+ 
+ cox.OS.Zscore.cat.G3G4 <- lapply(results.master, extract.Zscore.OS.cat.G3G4)
+ 
+ ### 95 CI
+ 
+ extract.L95CI.OS.cat.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 13, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[13]])<6, NA, 
+                        ifelse(length(x[[4]][[13]][[3]])<1, NA,
+                               x[[4]][[13]][[3]]))))
+ }
+ 
+ cox.L95CI.OS.HR.cat.G3G4 <- lapply(results.master, extract.L95CI.OS.cat.G3G4)
+ 
+ extract.U95CI.OS.cat.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 13, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[13]])<6, NA, 
+                        ifelse(length(x[[4]][[13]][[4]])<1, NA,
+                               x[[4]][[13]][[4]]))))
+ }
+ 
+ cox.U95CI.OS.HR.cat.G3G4 <- lapply(results.master, extract.U95CI.OS.cat.G3G4)
+ 
+ 
+ ### cox dataframe for OS G3G4
+ cox.OS.cat.G3G4.df <- cox.dataframe(pval = cox.OS.pval.cat.G3G4, Zscore = cox.OS.Zscore.cat.G3G4, HR = cox.OS.HR.cat.G3G4, L95CI = cox.L95CI.OS.HR.cat.G3G4, U95CI = cox.U95CI.OS.HR.cat.G3G4)
+ colnames(cox.OS.cat.G3G4.df) <- c("cox.OS.pval.cat.G3G4", "cox.OS.adj.pval.cat.G3G4", "cox.OS.Zscore.cat.G3G4", "cox.OS.HR.cat.G3G4","cox.L95CI.OS.HR.cat.G3G4", "cox.U95CI.OS.HR.cat.G3G4")
+ 
+ ################################
+ 
+ ### Cox OS for G3G4, continuous
+ 
+ extract.coxpval.OS.cont.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[14]])<6, NA, 
+                        ifelse(length(x[[4]][[14]][[1]])<1, NA,
+                               x[[4]][[14]][[1]]))))
+ }
+ 
+ cox.OS.pval.cont.G3G4 <- lapply(results.master, extract.coxpval.OS.cont.G3G4)
+ 
+ ### HR 
+ extract.HR.OS.cont.G3G4 <- function (x){
+   return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[14]])<6, NA, 
+                        ifelse(length(x[[4]][[14]][[2]])<1, NA,
+                               x[[4]][[14]][[2]]))))
+ }
+ 
+ cox.OS.HR.cont.G3G4 <- lapply(results.master, extract.HR.OS.cont.G3G4)
+ 
+ ### Z score
+ 
+ extract.Zscore.OS.cont.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[14]])<6, NA, 
+                        ifelse(length(x[[4]][[14]][[5]])<1, NA,
+                               x[[4]][[14]][[5]]))))
+ }
+ 
+ cox.OS.Zscore.cont.G3G4 <- lapply(results.master, extract.Zscore.OS.cont.G3G4)
+ 
+ ### 95 CI
+ 
+ extract.L95CI.OS.cont.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[14]])<6, NA, 
+                        ifelse(length(x[[4]][[14]][[3]])<1, NA,
+                               x[[4]][[14]][[3]]))))
+ }
+ 
+ cox.L95CI.OS.HR.cont.G3G4 <- lapply(results.master, extract.L95CI.OS.cont.G3G4)
+ 
+ extract.U95CI.OS.cont.G3G4<- function (x){
+   return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 5 or 6 for it to work for G3G4 PFS
+                 ifelse(length(x[[4]][[14]])<6, NA, 
+                        ifelse(length(x[[4]][[14]][[4]])<1, NA,
+                               x[[4]][[14]][[4]]))))
+ }
+ 
+ cox.U95CI.OS.HR.cont.G3G4 <- lapply(results.master, extract.U95CI.OS.cont.G3G4)
+ 
+ 
+ ### cox dataframe for OS G3G4
+ cox.OS.cont.G3G4.df <- cox.dataframe(pval = cox.OS.pval.cont.G3G4, Zscore = cox.OS.Zscore.cont.G3G4, HR = cox.OS.HR.cont.G3G4, L95CI = cox.L95CI.OS.HR.cont.G3G4, U95CI = cox.U95CI.OS.HR.cont.G3G4)
+ colnames(cox.OS.cont.G3G4.df) <- c("cox.OS.pval.cont.G3G4", "cox.OS.adj.pval.cont.G3G4", "cox.OS.Zscore.cont.G3G4", "cox.OS.HR.cont.G3G4","cox.L95CI.OS.HR.cont.G3G4", "cox.U95CI.OS.HR.cont.G3G4")
+ 
+ 
+ 
+ ###
