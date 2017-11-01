@@ -36,7 +36,7 @@
 ### Libraries to be used
 # install.packages('gplots')
 # install.packages('survival')
-
+library(NMF)
 
 ### Functions used
 
@@ -82,7 +82,8 @@ mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"
 
 mb.vsd <- read.delim(RNA.data)
 
-# mb.vsd.random <- randomise (mb.vsd) ### generate this first then run the clinPathAssess function on this.
+mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
+
 
 ##############################################################################
 
@@ -145,19 +146,20 @@ tic()
 ### unhash when running the complete transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
- as.numeric(mb.vsd[i,]) -> x
- names(x) <- colnames(mb.vsd)
- names(x) <- gsub("T","",names(mb.vsd))
- return(clinPathAssess(test.pData,x)) 
- }
+# as.numeric(mb.vsd[i,]) -> x
+# names(x) <- colnames(mb.vsd)
+# names(x) <- gsub("T","",colnames(mb.vsd))
+# return(clinPathAssess(test.pData,x)) 
+# }
 
-### unhash when running the randomised dataset 17/10/17 ### on server
+### unhash when running the randomised dataset 1/11/17 ### on server
 results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
   as.numeric(mb.vsd.random [i,]) -> x
   names(x) <- colnames(mb.vsd.random)
-  names(x) <- gsub("T","",names(mb.vsd.random))
+  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd) as error may have been related to the object being matrix not dataframe
   return(clinPathAssess(test.pData,x)) 
 }
+
 
 
 ### unhash when running the novel transcript set
@@ -172,13 +174,13 @@ results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 ### this is for the main expression dataset
-i = 1
- results.master <- foreach(i = 1:25)%dopar%{
- as.numeric(mb.vsd.random[i,]) -> x
- names(x) <- colnames(mb.vsd.random)
- names(x) <- gsub("T","",names(mb.vsd.random)) 
- return(clinPathAssess(test.pData,x))
- }
+# i = 1
+# results.master <- foreach(i = 1:25)%dopar%{
+# as.numeric(mb.vsd.random[i,]) -> x
+# names(x) <- colnames(mb.vsd.random)
+# names(x) <- gsub("T","",names(mb.vsd.random)) 
+# return(clinPathAssess(test.pData,x))
+# }
 
 # results.master <- foreach(i = 12200:12250)%dopar%{      ### previously tried 12000 - 12050, 12100-12150 and ran successfully. #  i = 12109  ###  previous error was around this number
  # as.numeric(mb.vsd.novel[i,]) -> x
@@ -223,12 +225,15 @@ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/r
 
 ### Annotate with known gene sets
 
- annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
+# annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
+annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
+
+# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
+write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.random.csv")
 
 ###############################################################################
 ###############################################################################
@@ -272,21 +277,5 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 
 #####################################################################
 #####################################################################
-### compare to a randomised dataframe
 
 
-### script for the server 17/10/17:
-
-library(NMF)
-RNA.data <- "/home/dan/mygit/rna_seq_mb/paper/MB.vsd.txt" ### run it first on this 070917, then update to the novel vsd and the foreach loop if it is working on the single goi
-
-mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt") ### novel transcripts, updated 060917
-
-mb.vsd <- read.delim(RNA.data)
-
-mb.vsd.random <- randomize(mb.vsd)
-
-### then run through the clinPathAssess function ### up to here 17/10/17
-
-
-#####################################################################
