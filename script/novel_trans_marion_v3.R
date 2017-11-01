@@ -25,7 +25,7 @@ library(scatterplot3d)
 registerDoParallel(cores = 10)
 ### load in description of all novel transcripts
 #novel.gtf.old <- import("/media/microarray/output_cufflinks/cuffmerge/merged_asm/unknown.merged.gtf", format ="gtf")
-novel.gtf <- import ("/home/dan/novel.mb.merged.gtf", form = "gtf") ### this is the updated file August 2018
+novel.gtf <- import ("/home/dan/novel.mb.merged.gtf", form = "gtf") ### this is the updated file August 2017
 
 
 ### you can subset like a matrix e.g.
@@ -72,9 +72,10 @@ random.gtf <- grep(pattern = "*random", novel.gtf)
 ### can treat gtf like a dataframe, by removing lines that are indicated by the random.gtf file
 nonrandom.novel.gtf <- novel.gtf[-random.gtf,]
 
+########
+levs.nonrandom <- levels(as.factor(nonrandom.novel.gtf$transcript_id))  ### have now replaced everything that was levs with levs.nonrandom 1/11/17
 
-
-seqs <- foreach(i = levs)%dopar%{
+seqs <- foreach(i = levs.nonrandom)%dopar%{
   nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange ### used to be novel.gtf, now replaced with nonrandom.novel.gtf 29/8/17
   temp.seqs <- getSeq(Hsapiens, temp.grange)
   unlist(temp.seqs) -> temp.seqs
@@ -83,7 +84,7 @@ seqs <- foreach(i = levs)%dopar%{
 
 ### make a DNAStringSet
 seqs.set <- DNAStringSet(seqs) 
-names(seqs.set) <- levs
+names(seqs.set) <- levs.nonrandom
 
 
 ########################################
@@ -227,14 +228,14 @@ f <- function(n){
 
 ptm <- proc.time()
 library(utils)
-pb <- txtProgressBar(min = 1, max = length(levs), style=3)
+pb <- txtProgressBar(min = 1, max = length(levs.nonrandom), style=3)
 registerDoParallel(cores = 6)
 
 ### calculate maximum phast score within 200bp rolling window, script takes a few hours
 
-phast.window <- foreach(i = 1:length(levs), .combine=c)%dopar%{
+phast.window <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
   setTxtProgressBar(pb, i)
-  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange ### changed from novel.gtf to nonrandom.novel.gtf 5/10/17
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange ### changed from novel.gtf to nonrandom.novel.gtf 5/10/17
   as.character(seqnames(temp.grange))[1] -> chromosome
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
     return(start(temp.grange)[j]:end(temp.grange)[j])
@@ -251,8 +252,35 @@ phast.window <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 
 close(pb)
 proc.time() - ptm
-names(phast.window) <- levs
+names(phast.window) <- levs.nonrandom
+
+
+############ error solving, task failed at 5527, NA/NaN argument
+
+# phast.window <- foreach(i = 5526:5528, .combine=c)%dopar%{
+ # setTxtProgressBar(pb, i)
+ # nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange ### changed from novel.gtf to nonrandom.novel.gtf 5/10/17
+ # as.character(seqnames(temp.grange))[1] -> chromosome
+ # temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
+ #   return(start(temp.grange)[j]:end(temp.grange)[j])
+ # }
+  
+ # phast.cons.scores[[chromosome]][temp.index] -> temp.score
+ # TS <- zoo(c(temp.score))
+ # if(length(TS)>200){
+ #   return(max(rollapply(TS, width = 200, FUN = mean, align = "left", na.rm = TRUE)))
+ # }else{
+ #   return(NA)
+ # }
+#}
+
+# close(pb)
+# proc.time() - ptm
+# names(phast.window) <- levs.nonrandom
+################################
 #### save phast window scores
+### up to here 17/10/17
+
 save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.window.Rdata")
 
 ### remove large memory object
@@ -266,6 +294,7 @@ save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/pha
 ### call gc() after a large object has been removed, as this may prompt R to return memory to the operating system
 rm(phast.cons)
 gc()
+
 
 ##################################################################################################
 ### list all bigwig phyloP scores
