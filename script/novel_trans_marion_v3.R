@@ -327,7 +327,7 @@ gc()
 #### return fraction of conserved bases score greater than 2
 ptm <- proc.time()
 registerDoParallel(cores = 6)
-phyloP.fraction <- foreach(i = levs, .combine=c)%dopar%{
+phyloP.fraction <- foreach(i = levs.nonrandom, .combine=c)%dopar%{   ### have changed to levs.nonrandom from levs (2/11/17)
   nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==i,] -> temp.grange  ### changed to nonrandom.novel.gft from novel.gtf 5/10/17
   as.character(seqnames(temp.grange))[1] -> chromosome
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
@@ -338,7 +338,7 @@ phyloP.fraction <- foreach(i = levs, .combine=c)%dopar%{
 }
 proc.time() - ptm
 
-names(phyloP.fraction) <- levs
+names(phyloP.fraction) <- levs.nonrandom
 saveRDS(phyloP.fraction, file="/home/nmm199/R/MB_Data/phyloP.fraction.rds")
 rm(phyloP.scores)
 gc()
@@ -372,8 +372,8 @@ registerDoParallel(cores = 6)
 
 ### check length of transcripts
 ### use nonrandom.novel.gtf file instead of novel.gtf for the below script, therefore changed below 5/10/17
-length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange ### changed here 5/10/17
+length.transcript <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange ### changed here 5/10/17
   temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
     return(start(temp.grange)[j]:end(temp.grange)[j])
   }
@@ -381,14 +381,14 @@ length.transcript <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 }
 
 ### calculate number of exons
-no.ex <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange  ### changed here 5/10/17
+no.ex <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange  ### changed here 5/10/17
   return(length(temp.grange$exon_number))
 }
 
 ### return name of gene for each transcript
-gene.id <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs[i],] -> temp.grange
+gene.id <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
+  nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange
   return(temp.grange$gene_id[1])
 }
 
@@ -397,14 +397,14 @@ gene.id <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 trinotate.annot <- read.delim(file="/home/dan/mygit/rna_seq_mb/trinotate_annotation_report.tab") ### this is where you update the name of the PFAM results file to use 30/8/17
 
 ### check if it has a pfam entry
-any.pfam <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  trinotate.annot[trinotate.annot$transcript_id==levs[i],] -> temp.trin
+any.pfam <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
+  trinotate.annot[trinotate.annot$transcript_id==levs.nonrandom[i],] -> temp.trin
   return(any(temp.trin$Pfam!="."))
 }
 
 ### return which pfam it is
-specific.pfam <- foreach(i = 1:length(levs), .combine=c)%dopar%{
-  trinotate.annot[trinotate.annot$transcript_id==levs[i],] -> temp.trin
+specific.pfam <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
+  trinotate.annot[trinotate.annot$transcript_id==levs.nonrandom[i],] -> temp.trin
   return(paste(temp.trin$Pfam, collapse = ";"))
 }
 
@@ -414,7 +414,7 @@ specific.pfam <- foreach(i = 1:length(levs), .combine=c)%dopar%{
 (phyloP.fraction>0.0947) -> conservation.index
 (phast.window>0.9986) -> uce.index
 cpat.results$coding_prob>0.5242 -> cpat.index
-levs%in%ALL.specific.novel.isoforms
+levs.nonrandom%in%ALL.specific.novel.isoforms
 
 
 #### put all into one dataframe
@@ -430,9 +430,9 @@ conservation.scores <- data.frame(length.transcript = length.transcript,
                                   no.ex.index = no.ex.index,
                                   any.pfam = any.pfam,
                                   gene.id = gene.id,
-                                  subgroup.spec = levs%in%ALL.specific.novel.isoforms,
+                                  subgroup.spec = levs.nonrandom%in%ALL.specific.novel.isoforms,
                                   specific.pfam = specific.pfam,
-                                  subgroup.isoforms = isoform.groups[levs],
+                                  subgroup.isoforms = isoform.groups[levs.nonrandom],
                                   subgroup.genes = gene.groups[gene.id]
 )
 
