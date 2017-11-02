@@ -156,7 +156,7 @@ tic()
 results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
   as.numeric(mb.vsd.random [i,]) -> x
   names(x) <- colnames(mb.vsd.random)
-  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd) as error may have been related to the object being matrix not dataframe
+  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd.random) as error may have been related to the object being matrix not dataframe
   return(clinPathAssess(test.pData,x)) 
 }
 
@@ -232,8 +232,8 @@ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/r
 annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
 
 # write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
-# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv")
-write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.random.csv")
+# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv") ### this is the novel transcripts
+write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.random.csv")
 
 ###############################################################################
 ###############################################################################
