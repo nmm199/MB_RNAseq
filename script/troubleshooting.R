@@ -23,3 +23,19 @@ head(novel.gtf, 15655) ### this shows what the file looks like from beginning of
 #  return(clinPathAssess(test.pData,x)) 
 # }
 # }  #### prints the error message to screen
+
+
+### 9/11/17 when determining where the error lies for a script
+
+library(foreach)
+extract.multivar.cox <- function(results.master, subset.index){
+  cox.dataframe (pval <- unlist(foreach(i = 1:length(results.master))%do%{return(extract.multivar.cox.pval(results.master[[i]], subset.index = subset.index))}),
+                 Zscore <- unlist(foreach(i = 1:length(results.master))%do%{return(extract.multivar.cox.Zscore(results.master[[i]], subset.index = subset.index))})      , 
+                 Zscore = lapply(results.master, extract.multivar.cox.Zscore, subset.index = subset.index),
+                 HR = lapply(results.master, extract.multivar.cox.HR,subset.index = subset.index ),
+                 L95CI = lapply(results.master, extract.multivar.cox.L95CI, subset.index = subset.index),
+                 U95CI = lapply(results.master, extract.multivar.cox.U95CI, subset.index = subset.index )
+  )               
+}
+
+### can use unlist and foreach, %do% (or %dopar%)

@@ -239,8 +239,6 @@ write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinic
 ########################################################################################
 
 ### Cox OS overall for categorical variable
-### Then work on EFS then work on km survival
-
 
 cox.OS.cat.all.df <- extract.cox.OS (results.master, 11) 
 
@@ -322,9 +320,7 @@ sig.cox.EFS.cat.G3G4 <- cox.EFS.cat.G3G4.df[which(cox.EFS.cat.G3G4.df[,2]<0.05),
 
 try(write.csv(sig.cox.EFS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/sig.cox.EFS.all.csv"), silent =T)
 
-
 try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/sig.cox.EFS.G3G4.csv"), silent = T)
-
 
 #################################################################################################
 #################################################################################################
@@ -421,7 +417,210 @@ extracted.dataframes <- list(cox.PFS.cat.all.df,
 
 #########
 ### examples based on previous dataframes
+##########################################
+########################################
 
+### 9/11/17: focusing on multivariate cox, using example from univariate cox
+
+extract.multivar.cox.pval <-  function (x, subset.index){
+  return(ifelse(length(x[[5]])< 1, NA, ### was 3
+                ifelse(length(x[[5]][[subset.index]])< 6, NA,  ### was < 6
+                       ifelse(length(x[[5]][[subset.index]][[1]])<1, NA,
+                              x[[5]][[subset.index]][[1]]))))
+}
+
+
+extract.multivar.cox.HR <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 1, NA, 
+                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
+                              x[[5]][[subset.index]][[2]]))))
+}
+
+
+
+  
+extract.multivar.cox.Zscore <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 1, NA,
+                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
+                              x[[5]][[subset.index]][[5]]))))
+}
+
+
+
+extract.multivar.cox.L95CI<- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 1, NA, 
+                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
+                              x[[5]][[subset.index]][[3]]))))
+}
+
+
+extract.multivar.cox.U95CI <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 1, NA, 
+                ifelse(length(x[[5]][[subset.index]])<6, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
+                              x[[5]][[subset.index]][[4]]))))
+}
+
+
+##################
+####
+
+extract.multivar.cox <- function(results.master, subset.index){
+  cox.dataframe (pval = lapply(results.master, extract.multivar.cox.pval, subset.index = subset.index), 
+                 Zscore = lapply(results.master, extract.multivar.cox.Zscore, subset.index = subset.index), 
+                 HR = lapply(results.master, extract.multivar.cox.HR,subset.index = subset.index ),
+                 L95CI = lapply(results.master, extract.multivar.cox.L95CI, subset.index = subset.index),
+                 U95CI = lapply(results.master, extract.multivar.cox.U95CI, subset.index = subset.index )
+  )               
+}
+
+
+
+
+####
+
+multivar.cox.OS.combined.cat.df <- extract.multivar.cox(results.master, 1)  ### work out why adjusted p value is not working
+
+multivar.cox.OS.combined.cont.df <- extract.multivar.cox(results.master,2) 
+
+multivar.cox.OS.lancetG3G4.cat.df <- extract.multivar.cox(results.master, 3) 
+
+multivar.cox.OS.lancetG3G4.cont.df <- extract.multivar.cox(results.master, 4)
+
+multivar.cox.OS.PNET5.cat.df <- extract.multivar.cox(results.master, 5)
+
+multivar.cox.OS.PNET5.cont.df <- extract.multivar.cox(results.master, 6)
+
+multivar.cox.OS.SHHold.cat.df <- extract.multivar.cox(results.master, 7)
+
+multivar.cox.OS.SHHold.cont.df <- extract.multivar.cox(results.master, 8)
+
+multivar.cox.PFS.combined.cat.df <- extract.multivar.cox.PFS(results.master, 9) 
+
+multivar.cox.PFS.combined.cont.df <- extract.multivar.cox.PFS (results.master, 10)  ### subsetting worked with x[[5]]<10
+
+multivar.cox.PFS.lancetG3G4.cat.df <- extract.multivar.cox.PFS (results.master, 11) ### had to increase subset to x[[5]]< 12
+
+multivar.cox.PFS.lancetG3G4.cont.df <- extract.multivar.cox.PFS(results.master, 12) ### worked with x[[5]]<12
+
+multivar.cox.PFS.PNET5.cat.df <- extract.multivar.cox.PFS (results.master, 13) 
+########################################
+
+
+
+
+  
+  extract.multivar.cox.PFS <- function(results.master, subset.index){
+    cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.pval, subset.index = subset.index),
+                  Zscore = lapply(results.master, extract.multivar.cox.PFS.Zscore, subset.index = subset.index),
+                  HR = lapply(results.master, extract.multivar.cox.PFS.HR , subset.index = subset.index),
+                  L95CI = lapply (results.master, extract.multivar.cox.PFS.L95CI, subset.index = subset.index),
+                  U95CI = lapply(results.master, extract.multivar.cox.PFS.U95CI, subset.index = subset.index)
+    )
+  }
+
+  
+extract.multivar.cox.PFS.pval <- function(x, subset.index){
+  return (ifelse(length(x[[5]])<12, NA, 
+                 ifelse(length(x[[5]][[subset.index]])<3, NA, 
+                        ifelse(length(x[[5]][[subset.index]][[1]])<1, NA, 
+                               x[[5]][[subset.index]][[2]]))))
+}
+
+
+extract.multivar.cox.PFS.HR <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 12, NA, ### was 3
+                ifelse(length(x[[5]][[subset.index]])<3, NA, ### was 6
+                       ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
+                              x[[5]][[subset.index]][[2]]))))
+}
+
+extract.multivar.cox.PFS.L95CI <-  function (x, subset.index){
+  return(ifelse(length(x[[5]])< 12, NA, ### was 3
+                ifelse(length(x[[5]][[subset.index]])<3, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
+                              x[[5]][[subset.index]][[3]]))))
+}
+
+extract.multivar.cox.PFS.U95CI <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 12, NA, ### was 3
+                ifelse(length(x[[5]][[subset.index]])<3, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
+                              x[[5]][[subset.index]][[4]]))))
+}
+  
+  
+extract.multivar.cox.PFS.Zscore <- function (x, subset.index){
+  return(ifelse(length(x[[5]])< 12, NA, ### was 3
+                ifelse(length(x[[5]][[subset.index]])<6, NA, 
+                       ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
+                              x[[5]][[subset.index]][[5]]))))
+}
+  
+  
+###
+
+### working space, to integrate into main file once completed 9/11/17
+
+# multivar.cox.OS.comb.cat.pval <- lapply(results.master,(function(x){return(x[[5]][[1]][[1]])})) ### created 9/11/17 and works
+
+### errors with cox.OS.combined.cont therefore run each separately to make it work then incorporate into wider function above. for troubleshooting, can cut and paste into the formulae below
+
+extract.multivar.cox.PFS.comb.cat.pval <- function(x){
+  return (ifelse(length(x[[5]])<10, NA, 
+                  ifelse(length(x[[5]][[9]])<3, NA, 
+                        ifelse(length(x[[5]][[9]][[1]])<1, NA, 
+                                x[[5]][[9]][[2]]))))
+}
+
+extract.multivar.cox.PFS.comb.cat.HR<- function (x){
+return(ifelse(length(x[[5]])< 10, NA, ### was 3
+              ifelse(length(x[[5]][[9]])<3, NA, ### was 6
+                     ifelse(length(x[[5]][[9]][[2]])<1, NA,
+                          x[[5]][[9]][[2]]))))
+ }
+
+extract.multivar.cox.PFS.comb.cat.L95CI <- function (x){
+  return(ifelse(length(x[[5]])< 10, NA, ### was 3
+                ifelse(length(x[[5]][[9]])<3, NA, 
+                       ifelse(length(x[[5]][[9]][[3]])<1, NA,
+                              x[[5]][[9]][[3]]))))
+}
+
+extract.multivar.cox.PFS.comb.cat.U95CI <- function (x){
+  return(ifelse(length(x[[5]])< 10, NA, ### was 3
+                ifelse(length(x[[5]][[9]])<3, NA, 
+                       ifelse(length(x[[5]][[9]][[4]])<1, NA,
+                              x[[5]][[2]][[4]]))))
+}
+
+extract.multivar.cox.PFS.comb.cat.Zscore <- function (x){
+  return(ifelse(length(x[[5]])< 10, NA, ### was 3
+                ifelse(length(x[[5]][[9]])<6, NA, 
+                       ifelse(length(x[[5]][[9]][[5]])<1, NA,
+                              x[[5]][[9]][[5]]))))
+}
+
+multivar.cox.PFS.comb.cat.Zscore <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.Zscore) ### this works
+
+multivar.cox.PFS.comb.cat.pval <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.pval)
+multivar.cox.PFS.comb.cat.HR <- lapply(results.master, extract.multivar.cox.PFS.comb.cat.HR)
+multivar.cox.PFS.comb.cat.L95CI <- lapply(results.master, extract.multivar.cox.PFS.comb.cat.L95CI)
+multivar.cox.PFS.comb.cat.U95CI <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.U95CI)
+
+# multivar.cox.OS.comb.cat.pval <- lapply(results.master, extract.multivar.cox.pval) ### this works
+
+
+
+### then work on cox PFS multivar for all 8 combinations
+
+
+#######
+
+# cox.PFS.cat.pval.all.test <- lapply(results.master, extract.coxpval.test)
 # cox.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[1]])})
 # cox.PFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[5]])})
 # cox.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[2]])})
@@ -528,3 +727,6 @@ plot(ecdf(cox.PFS.cat.G3G4.df[,3]))
 plot(density(x, na.rm = "T"))
 hist(km.EFS.p.extract.assembled.all)
 lines(density(km.EFS.p.extract.assembled.all), col = "red")
+
+
+
