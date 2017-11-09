@@ -306,13 +306,13 @@ phyloP.files[-grep("hap",phyloP.files)] -> phyloP.files
 
 library(foreach)
 ### read in bigwig files
-phyloP.cons <- foreach(i = phyloP.files)%do%{
+phyloP.cons <- foreach(i = phyloP.files)%dopar%{  ### updated to %dopar%  November 9 2017
   return(import(i, format="bw"))
 }
 gsub(".phyloP46way.bigWig","",basename(phyloP.files)) -> names(phyloP.cons)
 
 ### turn bigwig into vectors
-phyloP.scores <- foreach(i = 1:length(phyloP.cons))%do%{
+phyloP.scores <- foreach(i = 1:length(phyloP.cons))%do%{  
   start(phyloP.cons[[i]]) -> temp.starts
   rep(NA, max(temp.starts)) -> temp.vector
   temp.vector[temp.starts] <- phyloP.cons[[i]]$score
@@ -324,6 +324,7 @@ names(phyloP.cons) -> names(phyloP.scores)
 rm(phyloP.cons)
 gc()
 
+### if running this script from lines 301, will need to regenerate lines 28-87, as require levs.nonrandom, nonrandom.novel.gtf
 #### return fraction of conserved bases score greater than 2
 ptm <- proc.time()
 registerDoParallel(cores = 6)
@@ -339,11 +340,11 @@ phyloP.fraction <- foreach(i = levs.nonrandom, .combine=c)%dopar%{   ### have ch
 proc.time() - ptm
 
 names(phyloP.fraction) <- levs.nonrandom
-saveRDS(phyloP.fraction, file="/home/nmm199/R/MB_Data/phyloP.fraction.rds")
+saveRDS(phyloP.fraction, file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phyloP.fraction.Rdata")
 rm(phyloP.scores)
 gc()
 
-### run here on NICR compsvr from where PFAM file is loaded in, up until here line 303, 5/10/17
+
 
 ####################################################
 ### may need to make changes from here 5/10/17
@@ -353,8 +354,8 @@ gc()
 
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.isoforms.Rdata")
-load(file = "/home/nmm199/R/MB_Data/phyloP.fraction.Rdata")
-load(file = "/home/nmm199/R/MB_Data/phast.window.Rdata")
+load(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phyloP.fraction.Rdata")
+load(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.window.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/filtered.gene_exp.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/filtered.gene_isoforms.Rdata")
 
@@ -366,7 +367,9 @@ rep(c("GRP3","GRP4","SHH","WNT"), unlist(lapply(filtered.isoforms_exp[[1]],lengt
 names(gene.groups) <- ALL.specific.novel
 names(isoform.groups) <- ALL.specific.novel.isoforms
 
-read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results
+# read.delim(file="/home/nmm199/R/MB_Data/temp.seqs.results.txt") -> cpat.results ### older file version pre 9/11/17
+
+cpat.results <- read.delim(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.results.txt")  
 
 registerDoParallel(cores = 6)
 
@@ -385,6 +388,8 @@ no.ex <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
   nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange  ### changed here 5/10/17
   return(length(temp.grange$exon_number))
 }
+
+### has worked up to here 9/11/17
 
 ### return name of gene for each transcript
 gene.id <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
@@ -421,12 +426,12 @@ levs.nonrandom%in%ALL.specific.novel.isoforms
 conservation.scores <- data.frame(length.transcript = length.transcript,
                                   phyloP.fraction =  phyloP.fraction,
                                   phast.window=phast.window,
-                                  cpat.prob = cpat.results$coding_prob,
+                                  # cpat.prob = cpat.results$coding_prob,
                                   no.ex = no.ex,
                                   length.transcript.index  = length.transcript.index,
                                   conservation.index = conservation.index,
                                   uce.index = uce.index,
-                                  cpat.index = cpat.index,
+                                  # cpat.index = cpat.index,
                                   no.ex.index = no.ex.index,
                                   any.pfam = any.pfam,
                                   gene.id = gene.id,
@@ -435,6 +440,12 @@ conservation.scores <- data.frame(length.transcript = length.transcript,
                                   subgroup.isoforms = isoform.groups[levs.nonrandom],
                                   subgroup.genes = gene.groups[gene.id]
 )
+
+
+saveRDS(conservation.scores, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/conservation.scores.Rdata")
+
+### running up to here 9/11/17, in screen session, however have generated error in creation of the dataframe as the CPAT results have 5947 entries whereas the other variables have 36071 entries
+
 
 ### remove overlaps with refgene/LINCRNAs
 conservation.scores[-which(rownames(conservation.scores)%in%tcons.all.remove),] -> conservation.scores.remove
@@ -472,7 +483,8 @@ c(total.multi.iso,total.multi.gen)
 c(total.single.iso,total.single.gen )
 
 
-### Coding Potential CPAT
+### Coding Potential CPAT ###will need to determine CPAT entries validity 9/11/17
+
 conservation.scores.remove.length.no.ex[which(conservation.scores.remove.length.no.ex$cpat.index),] -> cpat.table
 nrow(cpat.table) -> total.cpat.iso
 length(unique(cpat.table$gene.id)) -> total.cpat.gen
