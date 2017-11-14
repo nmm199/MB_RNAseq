@@ -93,7 +93,9 @@ names(seqs.set) <- levs.nonrandom
 ### write out various versions of the sequence strings
 # old script: writeXStringSet(seqs.set, file="./temp.seqs.fasta", format = "fasta", width=80)
 writeXStringSet(seqs.set, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.fasta", format = "fasta", width=80)
-writeXStringSet(seqs.set[ex.no>1], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.ex.no.fasta", format = "fasta", width=80)
+writeXStringSet(seqs.set[ex.no>1], file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.ex.no.fasta", format = "fasta", width=80) 
+### note that ex.no here is created using the levs file (i.e without randoms removed)
+### ex.no is regenerated later on , as "no.ex" using levs.nonrandom, line 383
 
 #dir.create("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/split_fasta")
 1:length(seqs.set) -> d
@@ -141,10 +143,10 @@ colnames(pfam) <- c("seq_id", "alignment_start", "alignment_end", "envelope_star
 ##################################################################################
 #### RUN CPAT ON MAC ###
 
-### note on file input: export current FASTA files from R studio on Macbook into Macbook downloads, and then move to folder /Users/Marion/Desktop/Bioinformatics/CPAT on macbook. 
+### note on file input: export current FASTA file (temp.seqs.fasta) from R studio on Macbook into Macbook downloads, and then move to folder /Users/Marion/Desktop/Bioinformatics/CPAT on macbook. 
 ### then run terminal on Macbook
 ### see shell script (cpat.sh) files on Atom on macbook
-### then reexport files from Macbook onto R studio and read back into script below
+### then reexport files from Macbook onto R studio and read back into script below (currently exported temp.seqs.results.txt from Nov 14 2017 run)
 
 
 ##################################################################################
@@ -198,18 +200,7 @@ names(phast.cons) -> names(phast.cons.scores)
 # load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/May_2017/phast.cons.rds")
 # load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds")
 
-###  5/5/17 phast.window script below is obsolete
-
-# registerDoParallel(cores = 2)
-# phast.window <- foreach(i = levs[1:2], .combine=c)%dopar%{
-# novel.gtf[novel.gtf$transcript_id==i,] -> temp.grange
-# as.character(seqnames(temp.grange))[1] -> chromosome
-# subsetByOverlaps(phast.cons[[chromosome]],temp.grange) -> temp.phast.cons
-# findOverlaps(phast.cons[[chromosome]],temp.grange)
-# temp.phast.cons$score ->temp.score
-# TS <- zoo(c(temp.score))
-# return(max(rollapply(TS, width = 200, FUN = mean, align = "left")))
-# }
+###  5/5/17 phast.window script obsolete, thus deleted
 
 #### function to make a progress bar compatible with parallel processing
 
@@ -279,17 +270,12 @@ names(phast.window) <- levs.nonrandom
 # names(phast.window) <- levs.nonrandom
 ################################
 #### save phast window scores
-### up to here 17/10/17
 
 save(phast.window,file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.window.Rdata")
 
 ### remove large memory object
 # rm(phast.cons.scores)
 # gc()
-
-### 2nd stage of script on server up until here 5/10/17#####################
-### error generated 5/10/17 unable to generate phast.windows object
-
 
 ### call gc() after a large object has been removed, as this may prompt R to return memory to the operating system
 rm(phast.cons)
@@ -347,18 +333,18 @@ gc()
 
 
 ####################################################
-### may need to make changes from here 5/10/17
-
 ### loading in all of the data, note PhyloP data from home/nmm199/R
-### Dan needs to look for these files 31/8/17
 
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.isoforms.Rdata")
-load(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phyloP.fraction.Rdata")
+phyloP.fraction <- readRDS(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phyloP.fraction.Rdata")
 load(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.window.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/filtered.gene_exp.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/filtered.gene_isoforms.Rdata")
 
+
+
+### if running script from line 345, loading in generated data, need to run lines 28-87, as require levs.nonrandom, nonrandom.novel.gtf below
 
 #### asign the specific group to genes and isoforms
 rep(c("GRP3","GRP4","SHH","WNT"), unlist(lapply(filtered.gene_exp[[1]],length))) -> gene.groups
@@ -371,7 +357,7 @@ names(isoform.groups) <- ALL.specific.novel.isoforms
 
 cpat.results <- read.delim(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.results.txt")  
 
-registerDoParallel(cores = 6)
+registerDoParallel(cores = 16) ### was 6
 
 ### check length of transcripts
 ### use nonrandom.novel.gtf file instead of novel.gtf for the below script, therefore changed below 5/10/17
@@ -389,7 +375,6 @@ no.ex <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
   return(length(temp.grange$exon_number))
 }
 
-### has worked up to here 9/11/17
 
 ### return name of gene for each transcript
 gene.id <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
@@ -419,19 +404,19 @@ specific.pfam <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
 (phyloP.fraction>0.0947) -> conservation.index
 (phast.window>0.9986) -> uce.index
 cpat.results$coding_prob>0.5242 -> cpat.index
-levs.nonrandom%in%ALL.specific.novel.isoforms
+# levs.nonrandom%in%ALL.specific.novel.isoforms ### relevance?
 
 
 #### put all into one dataframe
 conservation.scores <- data.frame(length.transcript = length.transcript,
                                   phyloP.fraction =  phyloP.fraction,
                                   phast.window=phast.window,
-                                  # cpat.prob = cpat.results$coding_prob,
+                                  cpat.prob = cpat.results$coding_prob,
                                   no.ex = no.ex,
                                   length.transcript.index  = length.transcript.index,
                                   conservation.index = conservation.index,
                                   uce.index = uce.index,
-                                  # cpat.index = cpat.index,
+                                  cpat.index = cpat.index,
                                   no.ex.index = no.ex.index,
                                   any.pfam = any.pfam,
                                   gene.id = gene.id,
@@ -442,10 +427,9 @@ conservation.scores <- data.frame(length.transcript = length.transcript,
 )
 
 
-saveRDS(conservation.scores, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/conservation.scores.Rdata")
+save (conservation.scores, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/conservation.scores.Rdata") ### if using saveRDS, use with .rds
 
-### running up to here 9/11/17, in screen session, however have generated error in creation of the dataframe as the CPAT results have 5947 entries whereas the other variables have 36071 entries
-
+### CPAT results updated so that dataframe now works, with 36071 transcripts in dataframe. 
 
 ### remove overlaps with refgene/LINCRNAs
 conservation.scores[-which(rownames(conservation.scores)%in%tcons.all.remove),] -> conservation.scores.remove
@@ -460,7 +444,7 @@ subgroup.specific.cons[order(subgroup.specific.cons$subgroup.isoforms),c(-14,-16
 
 nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id%in%rownames(subgroup.specific.cons),] ### changed 5/10/17
 
-nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id=="TCONS_01254472",]
+# nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id=="TCONS_01254472",]
 
 ### only transcripts greater than 250bp
 conservation.scores.remove[conservation.scores.remove$length.transcript.index,] -> conservation.scores.remove.length
@@ -483,7 +467,7 @@ c(total.multi.iso,total.multi.gen)
 c(total.single.iso,total.single.gen )
 
 
-### Coding Potential CPAT ###will need to determine CPAT entries validity 9/11/17
+### Coding Potential CPAT ### CPAT file updated 14/11/17, note that TCONS names are generated from cuffdiff-level, and thus same TCONS will be used in PFAM and CPAT files.
 
 conservation.scores.remove.length.no.ex[which(conservation.scores.remove.length.no.ex$cpat.index),] -> cpat.table
 nrow(cpat.table) -> total.cpat.iso
@@ -507,16 +491,16 @@ total.multi.gen - total.tucp.gen -> total.linc.gen
 c(total.linc.iso,total.linc.gen)
 
 ### subgroup specific TUCP
-dir.create("/home/nmm199/R/MB_Data/results/subgroup.tucp")
+# dir.create("/home/nmm199/R/MB_RNAseq/RNA_classes/subgroup.tucp")
 tucp.table[which(tucp.table$subgroup.spec),] -> subgroup.tucp.table
-write.table(subgroup.tucp.table, file = "/home/nmm199/R/MB_Data/results/subgroup.tucp/subgroup.tucp.table.txt", sep = "\t")
+write.table(subgroup.tucp.table, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/subgroup.tucp/subgroup.tucp.table.txt", sep = "\t")
 nrow(subgroup.tucp.table) -> total.subgroup.tucp.iso
 length(unique(subgroup.tucp.table$gene.id)) -> total.subgroup.tucp.gen
 c(total.subgroup.tucp.iso,total.subgroup.tucp.gen)
 ### subgroup specific LINC ***** OUTPUT THIS ONE FOR JANET ****
 linc.table[which(linc.table$subgroup.spec),] -> subgroup.linc.table
-dir.create("/home/nmm199/R/MB_Data/results/subgroup.linc")
-write.table(subgroup.linc.table, file = "/home/nmm199/R/MB_Data/results/subgroup.linc/subgroup.linc.table.txt", sep = "\t")
+# dir.create("/home/nmm199/R/MB_RNAseq/RNA_classes/subgroup.linc")
+write.table(subgroup.linc.table, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/subgroup.linc/subgroup.linc.table.txt", sep = "\t")
 nrow(subgroup.linc.table) -> total.subgroup.linc.iso
 length(unique(subgroup.linc.table$gene.id)) -> total.subgroup.linc.gen
 c(total.subgroup.linc.iso,total.subgroup.linc.gen)
@@ -555,6 +539,8 @@ c(total.cons.linc.iso,total.cons.linc.gen)
 
 ### put it all together in a table and output
 
+dir.create("/home/nmm199/R/MB_RNAseq/RNA_classes/results")
+
 nrow(conservation.scores.remove.length.no.ex)
 
 rbind(
@@ -576,7 +562,7 @@ rbind(
 ) -> subgroup.counts
 rownames(subgroup.counts)<- c("cpat", "cons","UCE","pfam","subgroup")
 
-write.table(cbind(total.counts, subgroup.counts), file = "/home/nmm199/R/MB_Data/results/counts.table.novel.trans.txt", sep = "\t")
+write.table(cbind(total.counts, subgroup.counts), file = "/home/nmm199/R/MB_RNAseq/RNA_classes/results/counts.table.novel.trans.txt", sep = "\t")
 
 ###########################################################################
 ### output as venn diagram
@@ -589,7 +575,7 @@ table(conservation.scores.remove.length.no.ex[,c(7,8,9,11,13)])
 library(gplots)
 library('VennDiagram')
 
-pdf(file = "/home/nmm199/R/MB_Data/results/venn.diagram.novel.trans.pdf")
+pdf(file = "/home/nmm199/R/MB_RNAseq/RNA_classes/results/venn.diagram.novel.trans.pdf")
 v.table<-venn( list("conserved" = rownames(conservation.scores.remove.length.no.ex[conservation.scores.remove.length.no.ex[,7]==TRUE,]),
                     "UCE" = rownames(conservation.scores.remove.length.no.ex[which(conservation.scores.remove.length.no.ex[,8]==TRUE),]),
                     "CPAT" = rownames(conservation.scores.remove.length.no.ex[conservation.scores.remove.length.no.ex[,9]==TRUE,]),
@@ -601,25 +587,24 @@ str(v.table)
 print(v.table)
 
 
-### upload clinical data
-# library(readxl)
-# database <- read_excel("~/R/Data/database.xlsx")
-# View(database)
-# head(database)
+########################################################################
+### there may be errors with the CPAT file not aligning with the previously generated PFAM file etc, therefore to view fasta file:
+### Nov 14 2017
 
+library("Biostrings")
+temp.seqs = readDNAStringSet("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.fasta")
 
+### other options that did not work:
+# install.packages("seqinr", repos="http://R-Forge.R-project.org")
+# read.fasta(file = system.file("sequences/ct.fasta.gz", package = "seqinr"), 
+   #         seqtype = c("DNA", "AA"), as.string = FALSE, forceDNAtolower = TRUE,
+   #         set.attributes = TRUE, legacy.mode = TRUE, seqonly = FALSE, strip.desc = FALSE,
+    #        bfa = FALSE, sizeof.longlong = .Machine$sizeof.longlong,
+     #       endian = .Platform$endian, apply.mask = TRUE)
 
-### installing packages for survival analysis
-### choose mirror e.g Cambridge
-# install.packages('survival')
-# install.packages ('pwr')
-# install.packages ('powerSurvEpi')
-library(survival)
-library(pwr)
-library(powerSurvEpi)
+# temp.seqs <- read.fasta(file = system.file ("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/temp.seqs.fasta", package = "seqinr"), 
+ #         seqtype = c("DNA", "AA"), as.string = FALSE, forceDNAtolower = TRUE, 
+ #         set.attributes = TRUE)
 
-### example for calculating power relative to exposure/control, survival and clinical trials
-# powerCT.default(nE=, nC=, pE=, pC=, RR=, alpha=0.05) 
-### where E=experimental group, C=control group, pE= probability of event in the experimental group, RR is relative risk
-### if calculating ratios between E:C group, where k=ratio E:C, m= total number of expected events over both groups
-# powerCT.default0(k=, m=, RR=, alpha=)
+###
+
