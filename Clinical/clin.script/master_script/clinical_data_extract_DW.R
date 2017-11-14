@@ -346,15 +346,18 @@ return (logreg.allresults.df)
 
 logreg.LCA.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA)})
 logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])})
-logreg.LCA.df <- do.call(rbind, logreg.LCA.pval) ### possibly do not need this
-logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH")
-logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.df, logreg.LCA.adj.pval)
+logreg.LCA.df <- do.call(rbind, logreg.LCA.pval) ### need this, otherwise, there is an error 
+logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH") ### why does this appear with double rows
+# logreg.LCA.adj.pval <- p.adjust(logreg.LCA.pval, method = "BH") ### Error in p.adjust(logreg.LCA.pval, method = "BH") : (list) object cannot be coerced to type 'double'
+logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.adj.pval)
 
 
 
 logreg.relapse.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse)})
 logreg.relapse.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse[[1]])})
-logreg.relapse.adj.pval <- p.adjust(logreg.relapse.pval, method = "BH")
+# logreg.relapse.adj.pval <- p.adjust(logreg.relapse.pval, method = "BH") ### error, (list) object cannot be coerced to type 'double'
+logreg.relapse.df <- do.call(rbind, logreg.relapse.pval)
+logreg.relapse.adj.pval <- p.adjust(logreg.relapse.df, method = "BH")
 logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pval)
 
 
@@ -387,28 +390,6 @@ logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pv
 
 #############################################################################
 
-############################################################################
-### function to return files:
-extracted.dataframes <- list(cox.PFS.cat.all.df, 
-                             cox.PFS.cont.all.df,
-                             cox.PFS.cat.G3G4.df,
-                             cox.PFS.cont.G3G4.df,
-                             cox.PFS.cat.SHH.df,
-                             cox.PFS.cont.SHH.df,
-                             cox.PFS.cat.SHH.old.df,
-                             cox.PFS.cont.SHH.old.df,
-                             cox.OS.cat.all.df,
-                             cox.OS.cont.all.df,
-                             cox.OS.cat.G3G4.df,
-                             cox.OS.cont.G3G4.df,
-                             cox.OS.cat.SHH.df,
-                             cox.OS.cont.SHH.df,
-                             cox.OS.cat.SHH.old.df,
-                             cox.OS.cont.SHH.old.df,
-                             cox.EFS.cat.all.df,
-                             cox.EFS.cat.G3G4.df 
-                             )
-# return (extracted.dataframes)
 
 #########
 ### examples based on previous dataframes
@@ -450,7 +431,31 @@ multivar.cox.PFS.SHHold.cat.df <- extract.multivar.cox.PFS.SHH (results.master, 
 
 multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox.PFS.SHH (results.master, 16) ### worked with x[[5]]<16
 
-########################################
+############################################################################
+############################################################################
+
+### function to return files:
+extracted.dataframes <- list(cox.PFS.cat.all.df, 
+                             cox.PFS.cont.all.df,
+                             cox.PFS.cat.G3G4.df,
+                             cox.PFS.cont.G3G4.df,
+                             cox.PFS.cat.SHH.df,
+                             cox.PFS.cont.SHH.df,
+                             cox.PFS.cat.SHH.old.df,
+                             cox.PFS.cont.SHH.old.df,
+                             cox.OS.cat.all.df,
+                             cox.OS.cont.all.df,
+                             cox.OS.cat.G3G4.df,
+                             cox.OS.cont.G3G4.df,
+                             cox.OS.cat.SHH.df,
+                             cox.OS.cont.SHH.df,
+                             cox.OS.cat.SHH.old.df,
+                             cox.OS.cont.SHH.old.df,
+                             cox.EFS.cat.all.df,
+                             cox.EFS.cat.G3G4.df 
+)
+# return (extracted.dataframes)
+###########################################
 
 ### schema when integrating new subsetting into a function
 ### 1. determine relevant formulae e. extract.cox.OS, cox.dataframe

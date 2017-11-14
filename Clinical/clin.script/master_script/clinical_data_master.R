@@ -82,7 +82,7 @@ mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"
 
 mb.vsd <- read.delim(RNA.data)
 
-mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
+# mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
 
 
 ##############################################################################
@@ -161,7 +161,6 @@ results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
 }
 
 
-
 ### unhash when running the novel transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
@@ -226,7 +225,6 @@ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/r
 ### Annotate with known gene sets
 
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
-
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
 annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
@@ -278,4 +276,25 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 #####################################################################
 #####################################################################
 
+### earlier commands for clinical data
+# library(readxl)
+# database <- read_excel("~/R/Data/database.xlsx")
+# View(database)
+# head(database)
+
+
+### installing packages for survival analysis
+### choose mirror e.g Cambridge
+# install.packages('survival')
+# install.packages ('pwr')
+# install.packages ('powerSurvEpi')
+library(survival)
+library(pwr)
+library(powerSurvEpi)
+
+### example for calculating power relative to exposure/control, survival and clinical trials
+# powerCT.default(nE=, nC=, pE=, pC=, RR=, alpha=0.05) 
+### where E=experimental group, C=control group, pE= probability of event in the experimental group, RR is relative risk
+### if calculating ratios between E:C group, where k=ratio E:C, m= total number of expected events over both groups
+# powerCT.default0(k=, m=, RR=, alpha=)
 

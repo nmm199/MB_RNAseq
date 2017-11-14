@@ -161,6 +161,7 @@ extract.cox.SHH.old <- function (results.master, subset.index){
  }
 
 
+
 ########################################
 
 ### creating cox OS function with subsets < 5, < 6, <1
@@ -255,6 +256,9 @@ extract.multivar.cox.U95CI <- function (x, subset.index){
                               x[[5]][[subset.index]][[4]]))))
 }
 
+
+# results.master = results.master
+# subset.index = 1
 
 extract.multivar.cox <- function(results.master, subset.index){
   cox.dataframe (pval = lapply(results.master, extract.multivar.cox.pval, subset.index = subset.index), 

@@ -275,20 +275,21 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 
 ### input variables according to a classic cox regression model Surv(time,event)~ marker, data
 
-# time <- matched.test.incl.pData$PFS
-# event <- relapse.bin.incl
-# marker <- "ENSG00000008196"   ### TFAP2B
+time <- matched.test.incl.pData$PFS
+event <- relapse.bin.incl
+marker <- "ENSG00000008196"   ### TFAP2B
+# marker <- "ENSG00000249859"
 
 ### Factors A to I to include in the multivariate cox regression
-# FacA <- matched.test.incl.pData$LCA
-# FacB <- matched.test.incl.pData$MYCMYCN.cat ### changed to MYCMYCN.cat rather than individual MYC.cat and MYCN.cat as per DW 4/10/17
-# FacC <- matched.test.incl.pData$mstatus
-# FacD <- matched.test.incl.pData$resection
-# FacE <- matched.test.incl.pData$q13loss
-# FAcF <- matched.test.incl.pData$TP53.cat
-# FacG <- matched.test.incl.pData$sex
-# FacH <- matched.test.incl.pData$meth7
-# data <- matched.test.incl.pData
+FacA <- matched.test.incl.pData$LCA
+FacB <- matched.test.incl.pData$MYCMYCN.cat ### changed to MYCMYCN.cat rather than individual MYC.cat and MYCN.cat as per DW 4/10/17
+FacC <- matched.test.incl.pData$mstatus
+FacD <- matched.test.incl.pData$resection
+ FacE <- matched.test.incl.pData$q13loss
+ FacF <- matched.test.incl.pData$TP53.cat
+ FacG <- matched.test.incl.pData$sex
+ FacH <- matched.test.incl.pData$meth7
+ data <- matched.test.incl.pData
 
 cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
   if(is.null(strata)){
@@ -675,17 +676,19 @@ clinPathAssess <- function(test.pData,
      # log.file = NULL
   
   ### MM stipulating inputs 140917
-  ### goi <- "ENSG00000008196.12_1"
-
+  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below. 
+  ### if then interrogate functions, will need to generate matched.test.pData
+  
+  # goi <- "ENSG00000008196.12_1"
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
-  #  goi.vsd <- as.numeric(mb.vsd[goi,]) 
+    goi.vsd <- as.numeric(mb.vsd[goi,]) 
   ### the output would be a vector with a continuous variable, names equal NMB numbers
-  #  names(goi.vsd) <- gsub("T","",names(mb.vsd))
-  #  test.pData = test.pData
-  #  pdf.file = NULL
-  #  log.file = NULL
+   names(goi.vsd) <- gsub("T","",names(mb.vsd))
+   test.pData = test.pData
+    pdf.file = NULL
+    log.file = NULL
   ### 
   
   #############################################
