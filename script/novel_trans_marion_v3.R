@@ -589,6 +589,7 @@ print(v.table)
 
 ########################################################################
 ### there may be errors with the CPAT file not aligning with the previously generated PFAM file etc, therefore to view fasta file:
+### shows the the beginning and end of the CPAT file aligns with the temp.seqs.fasta file
 ### Nov 14 2017
 
 library("Biostrings")
