@@ -139,6 +139,7 @@ writeXStringSet(seqs.set[splits[[i]]], file=paste0("/home/nmm199/R/MB_RNAseq/RNA
 pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/all.seqs.fasta.no.head.res", header = TRUE) ### filename updated 5/10/17
 colnames(pfam) <- c("seq_id", "alignment_start", "alignment_end", "envelope_start", "envelope_end", "hmm__acc", "hmm_name", "type", "hmm_start", "hmmend", "hmmlength", "bitscore", "E-value", "significance", "clan", "strand", "nt_start", "nt_end")
 
+### use this PFAM file later
 
 ##################################################################################
 #### RUN CPAT ON MAC ###
@@ -195,12 +196,9 @@ names(phast.cons) -> names(phast.cons.scores)
 
 ### phast.cons takes a few hours with 32 cores
 
-# saveRDS(phast.cons, "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/May_2017/phast.cons.rds") ### previous file
-# saveRDS(phast.cons, "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds") ### takes a while to save as RDS object
+# saveRDS(phast.cons, "/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds") ### takes a while to save as RDS object ### not done 21/11/17
 # load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/May_2017/phast.cons.rds")
 # load("/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/phast.cons.rds")
-
-###  5/5/17 phast.window script obsolete, thus deleted
 
 #### function to make a progress bar compatible with parallel processing
 
@@ -246,28 +244,8 @@ proc.time() - ptm
 names(phast.window) <- levs.nonrandom
 
 
-############ error solving, task failed at 5527, NA/NaN argument
+############ error solving, task failed at 5527 (thererfore interrogated phast.window <- foreach(i= 5526:5528, .combine = c)%dopar%  ### etc) ### NA/NaN argument
 
-# phast.window <- foreach(i = 5526:5528, .combine=c)%dopar%{
- # setTxtProgressBar(pb, i)
- # nonrandom.novel.gtf[nonrandom.novel.gtf$transcript_id==levs.nonrandom[i],] -> temp.grange ### changed from novel.gtf to nonrandom.novel.gtf 5/10/17
- # as.character(seqnames(temp.grange))[1] -> chromosome
- # temp.index <- foreach(j = 1:length(temp.grange), .combine=c)%do%{
- #   return(start(temp.grange)[j]:end(temp.grange)[j])
- # }
-  
- # phast.cons.scores[[chromosome]][temp.index] -> temp.score
- # TS <- zoo(c(temp.score))
- # if(length(TS)>200){
- #   return(max(rollapply(TS, width = 200, FUN = mean, align = "left", na.rm = TRUE)))
- # }else{
- #   return(NA)
- # }
-#}
-
-# close(pb)
-# proc.time() - ptm
-# names(phast.window) <- levs.nonrandom
 ################################
 #### save phast window scores
 
@@ -334,6 +312,7 @@ gc()
 
 ####################################################
 ### loading in all of the data, note PhyloP data from home/nmm199/R
+### dan to update these files as of 21/11/17 and to send me definition for subgroup specific
 
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.Rdata")
 load(file = "/home/dan/mygit/rna_seq_mb/ALL.specific.novel.isoforms.Rdata")
@@ -382,20 +361,25 @@ gene.id <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
   return(temp.grange$gene_id[1])
 }
 
-### load Matt's Trinotate annotation (note default home folder for dan is home/dan/mygit/rna_seq_mb/)
-### check: do I need this section  5/10/17 
-trinotate.annot <- read.delim(file="/home/dan/mygit/rna_seq_mb/trinotate_annotation_report.tab") ### this is where you update the name of the PFAM results file to use 30/8/17
+### load in my PFAM file 21/11/17
 
-### check if it has a pfam entry
+### trinotate file from Matt is now superfluous
+
+pfam <- read.table(file="/home/nmm199/R/MB_RNAseq/RNA_classes/working_files/all.seqs.fasta.no.head.res", header = TRUE) ### filename updated 5/10/17
+colnames(pfam) <- c("seq_id", "alignment_start", "alignment_end", "envelope_start", "envelope_end", "hmm__acc", "hmm_name", "type", "hmm_start", "hmmend", "hmmlength", "bitscore", "E-value", "significance", "clan", "strand", "nt_start", "nt_end")
+     
+gsub("\\..*", '', pfam$seq_id) -> transcript_id
+cbind(transcript_id, pfam) -> pfam
+
 any.pfam <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
-  trinotate.annot[trinotate.annot$transcript_id==levs.nonrandom[i],] -> temp.trin
-  return(any(temp.trin$Pfam!="."))
+  pfam[pfam$transcript_id==levs.nonrandom[i],] -> temp.trin
+  if(nrow(temp.trin)==0){return(FALSE)}else{return(TRUE)}
 }
 
 ### return which pfam it is
 specific.pfam <- foreach(i = 1:length(levs.nonrandom), .combine=c)%dopar%{
-  trinotate.annot[trinotate.annot$transcript_id==levs.nonrandom[i],] -> temp.trin
-  return(paste(temp.trin$Pfam, collapse = ";"))
+  pfam[pfam$transcript_id==levs.nonrandom[i],] -> temp.trin
+  if(nrow(temp.trin)==0){return(NA)}else{return(paste(temp.trin$hmm_name, collapse = ";"))}
 }
 
 ### makes some logical vectors describing whether pass cutoff
@@ -434,11 +418,13 @@ save (conservation.scores, file = "/home/nmm199/R/MB_RNAseq/RNA_classes/working_
 ### remove overlaps with refgene/LINCRNAs
 conservation.scores[-which(rownames(conservation.scores)%in%tcons.all.remove),] -> conservation.scores.remove
 
+#### number of novel isoforms total
 dim(conservation.scores.remove)
+#### number of genes within these isoforms
 length(unique(conservation.scores.remove$gene.id))
 
+##### issue here too few subgroup specific.....
 conservation.scores.remove[conservation.scores.remove$subgroup.spec&(conservation.scores.remove$cpat.index|conservation.scores.remove$any.pfam),] -> subgroup.specific.cons
-
 subgroup.specific.cons[order(subgroup.specific.cons$subgroup.isoforms),c(-14,-16)]
 
 
