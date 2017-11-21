@@ -341,8 +341,66 @@ colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval","logreg.HR",
 return (logreg.allresults.df)
 }
 
+# extract.logistic <- function (results.master, subset.index){
+  # log.reg.dataframe (pval = lapply(results.master, extract.log.pval, subset.index = subset.index), 
+    #                 OR = lapply(results.master, extract.log.OR, subset.index = subset.index) , 
+     #                L95CI = lapply(results.master, extract.log.L95CI, subset.index = subset.index), 
+      #               U95CI = lapply(results.master, extract.log.U95CI, subset.index = subset.index)
+#  )
+# } 
 
+
+### develop functions for each of p value, OR, L95CI, U95CI
+extract.log.pval <- function (x, subset.index){
+  return(x[[3]][[subset.index]][[1]]) ### trialled x$reg.log.list$subset.index$LR.pval
+ }
+
+### see if this returns the p value for log.reg.LCA
+
+# logreg.LCA.extract.pval <- extract.log.pval(results.master, 3)
+
+logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])}) ### or could be x$reg.log.list$log.reg.LCA$LR.pval
+logreg.LCA.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$LR.OR.val)})
+logreg.LCA.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$lower.95CI)})
+logreg.LCA.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$upper.95CI)})
+
+# logreg.extract.pval <- lapply(results.master, function(x, subset.index){return(x$reg.log.list$subset.index$LR.pval)})
+
+Log.reg.LCA.results <- log.reg.dataframe (pval = logreg.LCA.pval, OR = logreg.LCA.OR, L95CI = logreg.LCA.L95CI, U95CI = logreg.LCA.U95CI)
+
+
+extract.log.OR
+extract.log.L95CI
+extract.log.U95CI
+
+### develop the dataframe for each of the separate variables LCA, mstatus, relapse, resection, 
+log.reg.LCA.pval <- 
+  
+  
+  #### example
+  
+ # extract.cox <- function(results.master, subset.index){
+ #   cox.dataframe(pval = lapply(results.master, extract.cox.pval, subset.index = subset.index),
+ #                 Zscore = lapply(results.master, extract.cox.Zscore, subset.index = subset.index),
+ #                 HR = lapply(results.master, extract.cox.HR, subset.index = subset.index),
+ #                 L95CI = lapply (results.master, extract.cox.L95CI.HR, subset.index = subset.index),
+ #                 U95CI = lapply(results.master, extract.cox.U95CI.HR, subset.index = subset.index)
+ #   )
+ # }
+
+# cox.OS.cat.all.df <- extract.cox.OS (results.master, 11) 
+
+# extract.cox.OS.pval <-  function (x, subset.index){
+#  return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 11 for OS, then changed to 12 for cox.cont.OS
+         #       ifelse(length(x[[4]][[subset.index]])<6, NA, 
+          #             ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
+                     #         x[[4]][[subset.index]][[1]]))))
+# }
+
+###
+  
 ### potentially just return p values and adjusted p values for each logistic regression category currently
+
 
 logreg.LCA.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA)})
 logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])})
@@ -352,6 +410,13 @@ logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH") ### why does this 
 logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.adj.pval)
 
 
+# logreg.LCA.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA)})
+# logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])})
+# logreg.LCA.df <- do.call(rbind, logreg.LCA.pval) ### need this, otherwise, there is an error 
+# logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH") ### why does this appear with double rows
+## logreg.LCA.adj.pval <- p.adjust(logreg.LCA.pval, method = "BH") ### Error in p.adjust(logreg.LCA.pval, method = "BH") : (list) object cannot be coerced to type 'double'
+# logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.adj.pval)
+
 
 logreg.relapse.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse)})
 logreg.relapse.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse[[1]])})
@@ -359,8 +424,6 @@ logreg.relapse.pval <- lapply(results.master, function(x){return(x$reg.log.list$
 logreg.relapse.df <- do.call(rbind, logreg.relapse.pval)
 logreg.relapse.adj.pval <- p.adjust(logreg.relapse.df, method = "BH")
 logreg.relapse.combined.pval <- cbind(logreg.relapse.pval, logreg.relapse.adj.pval)
-
-
 
 ######################################################################
 
