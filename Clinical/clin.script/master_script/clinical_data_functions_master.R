@@ -277,7 +277,7 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 
 # time <- matched.test.incl.pData$PFS
 # event <- relapse.bin.incl
-# marker = matched.goi.vsd.cat.incl ### must use this and not an individual ENSG identity number. 
+# marker = matched.goi.vsd.cat.incl ### must use this and not an individual ENSG identity number. (### specify ENSG within clinPathAssess function first)
 
 ### Factors A to I to include in the multivariate cox regression
 # FacA <- matched.test.incl.pData$LCA
@@ -290,27 +290,6 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 # FacH <- matched.test.incl.pData$meth7.cat
 # data <- matched.test.incl.pData
 
-### delete once this is confirmed as superfluous
-
-# cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
- # if(is.null(strata)){
- #   cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB + FacC + FacD + FacE + FacF + FacG + FacH, data=data)
- # }else {
- #   cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD + FacE + FacF + FacG + FacH, data=data)
- # }  
-### Error in model.frame.default(formula = Surv(time, event) ~ marker + FacA + ...variable lengths differ (found for 'marker') 14/11/17, marker needs to be matched.goi.vsd.cat.incl or similar
-
- # cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
- # cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
-#  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
- # cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
-#  cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
-#  cox.n <-summary(cox.temp)$n
-# cox.nevent <-summary(cox.temp)$nevent
- # summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
-#  return (summary.cox)
-# }
- 
 ###################################
 ### updated function below 14/11/17
 
@@ -339,7 +318,7 @@ cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, Fa
 
 # FacA <- matched.test.incl.pData$LCA
 # FacB <- matched.test.incl.pData$MYCMYCN.cat ### keep this in algorithm because of flow diagram includes MYC.cat
-### FacC <- matched.test.incl.pData$MYCN.cat
+### FacC <- matched.test.incl.pData$MYCN.cat ### do not include this 
 # FacC <- matched.test.incl.pData$mstatus
 # FacD <- matched.test.incl.pData$resection
 # FacE <- matched.test.incl.pData$TP53.cat ### included in PNET5 algorithm update, updated 5/10/17
@@ -349,6 +328,7 @@ cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, Fa
 # time <- matched.test.incl.pData$PFS
 # event <- relapse.bin.incl
 # marker <- matched.goi.vsd.cat.incl
+
 ### age is not included as we are including only age 3-16 years (and age < 3 years is listed in PNET5)
 ### included factors :
 ### LCA, mstatus, MYC or MYCN amplification (MYCMYCN.cat as d/w DW), R+, sex, methylation subgroup (n=4, rather than WNT vs non WNT). TP53 not included, will be broadly stratified in SHH
@@ -361,9 +341,9 @@ cox.multivar.surv.PNET5_7 <- function (time, event, marker, FacA, FacB, FacC, Fa
   }else {
     cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE + FacF + FacG, data=data)
   }
-  cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients ### ocntinue to update from here 21/11/17 
-  cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
-  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
+  cox.p.val <- summary(cox.temp)$coefficients[1,5] ### updated 21/11/17. 
+  cox.HR <- summary(cox.temp)$coefficients[1,2] ### updated 21/11/17. 
+  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### multivariate, access 1st row results
   cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
   cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
   cox.n <-summary(cox.temp)$n
@@ -390,8 +370,10 @@ cox.multivar.surv.Schwalbe_4 <- function (time, event, marker, FacA, FacB, FacC,
   }else {
     cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD, data=data)
   }
-  cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
-  cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
+  # cox.p.val <- summary(cox.temp)$logtest[3] ### p value can also be called within cox.temp$coefficients
+  cox.p.val <- summary(cox.temp)$coefficients[1,5] ### updated 21/11/17
+  # cox.HR <- summary(cox.temp)$conf.int[1] ### called within cox.temp$coefficients
+  cox.HR <- summary(cox.temp)$coefficients[1,2] ### updated 21/11/17
   cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
   cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
   cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
