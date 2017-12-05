@@ -32,126 +32,43 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 ##########################################################################
 
 ### Extracted dataframes
-### this section is to be updated as of Oct 11 2017
 
-###
-function(results.master){
+### KM Survival overall
+### see extraction functions for KM
 
-### OS p value for G3G4
-  cbind(
-extracted.km.OS.pval = extractKM(results.master, 3),
-extracted.km.OS.pval.G3G4 = extractKM(results.master, 4)
-)
+######################
+### OS p values
+km.OS.all.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.all")
+km.OS.G3G4.results <- extract.km.OS.pval (results.master, name = "surv.km.OS.G3G4")
+km.OS.SHH.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH") ### this is an example to put into the clinical_data_extract_DW.R file
+km.OS.SHH.old.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH.old") 
 
-######
+### EFS p values
+km.EFS.all.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.all")
+km.EFS.G3G4.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.G3G4")
 
-### put all the functions you want to run here
-
-
-###
-extracted.results.list <-list(
-  extracted.km.OS.pval=extracted.km.OS.pval,
-  extracted.km.OS.pval.G3G4=extracted.km.OS.pval.G3G4
-)
-return(extracted.results.list)
-}
-
-results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH")
-
-extract.km.OS.pval <- function(results.master, name){
-  extracted.km.OS.pval.SHH <- lapply(results.master, function(x){return(x[["surv.p.values.list"]][[name]][["OS.p.val"]])}) 
-  km.OS.p.extract.assembled.SHH <- do.call(rbind, extracted.km.OS.pval.SHH)
-  adjusted.p.km.OS.SHH <-p.adjust(km.OS.p.extract.assembled.SHH, method = "BH") 
-  OS.pvalue.SHH <- cbind(km.OS.p.extract.assembled.SHH, adjusted.p.km.OS.SHH)
-  colnames(OS.pvalue.SHH) <- c("OS.p.value.SHH", "OS.adjusted.pval.SHH")
-  return(OS.pvalue.SHH)
-} 
-
-x$surv.p.values.list$surv.km.OS.SHH$OS.p.val
-### OS p value for SHH
-
-extracted.km.OS.pval.SHH <- lapply(results.master, function(x){return(x[[1]][[5]][[1]])}) 
-km.OS.p.extract.assembled.SHH <- do.call(rbind, extracted.km.OS.pval.SHH)
-adjusted.p.km.OS.SHH <-p.adjust(km.OS.p.extract.assembled.SHH, method = "BH") 
-OS.pvalue.SHH <- cbind(km.OS.p.extract.assembled.SHH, adjusted.p.km.OS.SHH)
-colnames(OS.pvalue.SHH) <- c("OS.p.value.SHH", "OS.adjusted.pval.SHH")
-
-### OS p value for SHH.old
-extracted.km.OS.pval.SHH.old <- lapply(results.master, function(x){return(x[[1]][[6]][[1]])}) 
-km.OS.p.extract.assembled.SHH.old <- do.call(rbind, extracted.km.OS.pval.SHH.old)
-adjusted.p.km.OS.SHH.old <-p.adjust(km.OS.p.extract.assembled.SHH.old, method = "BH") 
-OS.pvalue.SHH.old <- cbind(km.OS.p.extract.assembled.SHH.old, adjusted.p.km.OS.SHH.old)
-colnames(OS.pvalue.SHH.old) <- c("OS.p.value.SHH.old", "OS.adjusted.pval.SHH.old")
-
-### EFS p value for overall group
-
-extracted.km.EFS.pval.all <- lapply(results.master, function(x){return(x[[1]][[1]][[1]])})  ### note that pulls out same as x[[1]][[1]][[1]] but able to combine dataframes and do p adjust on this element
-km.EFS.p.extract.assembled.all <- do.call(rbind, extracted.km.EFS.pval.all)
-adjusted.p.km.EFS.all <-p.adjust(km.EFS.p.extract.assembled.all, method = "BH") 
-EFS.pvalue.all.combined <- cbind(km.EFS.p.extract.assembled.all, adjusted.p.km.EFS.all)
-colnames(EFS.pvalue.all.combined) <- c("EFS.p.value.all", "EFS.adjusted.pval.all")
-
-### EFS p value for G3G4
-
-extracted.km.EFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[1]][[2]][[1]])}) 
-km.EFS.p.extract.assembled.G3G4 <- do.call(rbind, extracted.km.EFS.pval.G3G4)
-adjusted.p.km.EFS.G3G4 <-p.adjust(km.EFS.p.extract.assembled.G3G4, method = "BH") 
-EFS.pvalue.G3G4.combined <- cbind(km.EFS.p.extract.assembled.G3G4, adjusted.p.km.EFS.G3G4)
-colnames(EFS.pvalue.G3G4.combined) <- c("EFS.p.value.G3G4", "EFS.adjusted.pval.G3G4")
-
-### PFS p value for overall 
-extracted.km.PFS.pval.all <- lapply(results.master, function(x){return(x[[1]][[7]][[1]])}) ### changed now that SHH and SHH.old analysis have been added
-km.PFS.p.extract.assembled.all <- do.call(rbind, extracted.km.PFS.pval.all)
-adjusted.p.km.PFS.all <-p.adjust(km.PFS.p.extract.assembled.all, method = "BH") 
-PFS.pvalue.all.combined <- cbind(km.PFS.p.extract.assembled.all, adjusted.p.km.PFS.all)
-colnames(PFS.pvalue.all.combined) <- c("PFS.p.value.all", "PFS.adjusted.pval.all")
-
-### PFS p value for G3G4
-extracted.km.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[1]][[8]][[1]])})  ### changed as above
-km.PFS.p.extract.assembled.G3G4 <- do.call(rbind, extracted.km.PFS.pval.G3G4)
-adjusted.p.km.PFS.G3G4 <-p.adjust(km.PFS.p.extract.assembled.G3G4, method = "BH") 
-PFS.pvalue.G3G4.combined <- cbind(km.PFS.p.extract.assembled.G3G4, adjusted.p.km.PFS.G3G4)
-colnames(PFS.pvalue.G3G4.combined) <- c("PFS.p.value.G3G4", "PFS.adjusted.pval.G3G4")
-
-### PFS p value for SHH
-extracted.km.PFS.p.val.SHH <- lapply(results.master, function(x){return(x[[1]][[9]][[1]])})
-km.PFS.p.extract.assembled.SHH <- do.call(rbind, extracted.km.PFS.p.val.SHH)
-adjusted.p.km.PFS.SHH <- p.adjust(km.PFS.p.extract.assembled.SHH, method = "BH")
-PFS.pvalue.SHH.combined <- cbind(km.PFS.p.extract.assembled.SHH, adjusted.p.km.PFS.SHH)
-colnames(PFS.pvalue.SHH.combined)<- c("PFS.p.value.SHH", "PFS.adjusted.pval.SHH")
-
-### PFS p value for SHH_child
-extracted.km.PFS.p.val.SHH.old <- lapply(results.master, function(x){return(x[[1]][[10]][[1]])})
-km.PFS.p.extract.assembled.SHH.old <- do.call(rbind, extracted.km.PFS.p.val.SHH.old)
-adjusted.p.km.PFS.SHH.old <- p.adjust(km.PFS.p.extract.assembled.SHH.old, method = "BH")
-PFS.pvalue.SHH.combined.old <- cbind(km.PFS.p.extract.assembled.SHH.old, adjusted.p.km.PFS.SHH.old)
-colnames(PFS.pvalue.SHH.combined.old)<- c("PFS.p.value.SHH.old", "PFS.adjusted.pval.SHH.old")
+### PFS p values
+km.PFS.all.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.all")
+km.PFS.G3G4.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.G3G4")
+km.PFS.SHH.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH")
+km.PFS.SHH.old.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH.old")
 
 
-### combined dataframe with OS, PFS, EFS results for overall and G3G4, unadjusted and adjusted p values
+### significant dataframes for adjusted p values
 
-OS.pvalues.bothgroups <- cbind(OS.pvalue.all, OS.pvalue.G3G4,  OS.pvalue.SHH, OS.pvalue.SHH.old)
-EFS.pvalues.bothgroups <- cbind(EFS.pvalue.all.combined, EFS.pvalue.G3G4.combined)
-PFS.pvalues.bothgroups <- cbind(PFS.pvalue.all.combined, PFS.pvalue.G3G4.combined, PFS.pvalue.SHH.combined, PFS.pvalue.SHH.combined.old )
+significant.km.EFS.all <- km.EFS.all.results[which(km.EFS.all.results[, 2]<0.05),]
+significant.km.EFS.G3G4 <- km.EFS.G3G4.results [which(km.EFS.G3G4.results[, 2]<0.05),]
 
-all.survival.p.bothgroups <- cbind(OS.pvalues.bothgroups, EFS.pvalues.bothgroups, PFS.pvalues.bothgroups)
+significant.km.OS.all <- km.OS.all.results [which (km.OS.all.results[,2] <0.05),]
+significant.km.OS.G3G4 <- km.OS.G3G4.results[which(km.OS.G3G4.results [, 2]<0.05), ]
+significant.km.OS.SHH <- km.OS.SHH.results [which(km.OS.SHH.results [, 2]<0.05), ]
+significant.km.OS.SHH.old <- km.OS.SHH.old.results[which(km.OS.SHH.old.results[, 2]<0.05),]
 
-### extract those goi with p<0.05 in adjusted p values for survival
+significant.km.PFS.all <- km.PFS.all.results[which(km.PFS.all.results[, 2]<0.05),]              ### 4/12/17 nrow = 452 (for mb.vsd)
+significant.km.PFS.G3G4 <- km.PFS.G3G4.results[which(km.PFS.G3G4.results[, 2]<0.05),]           ### 4/12/17 nrow = 379 (for mb.vsd)
+significant.km.PFS.SHH <- km.PFS.SHH.results[which(km.PFS.SHH.results[, 2]<0.05),]              ### 4/12/17 nrow = 223 (for mb.vsd)
+significant.km.PFS.SHH.old <- km.PFS.SHH.old.results[which(km.PFS.SHH.old.results[, 2]<0.05),]  ### 4/12/17 nrow = 570 (for mb.vsd)
 
-significant.p.EFS.all <- EFS.pvalue.all.combined[which(EFS.pvalue.all.combined[, 2]<0.05),]
-significant.p.EFS.G3G4 <- EFS.pvalue.G3G4.combined[which(EFS.pvalue.all.combined[, 2]<0.05),]
-significant.p.OS.all <- OS.pvalue.all[which(OS.pvalue.all[, 2]<0.05), ]
-significant.p.OS.G3G4 <- OS.pvalue.G3G4[which(OS.pvalue.G3G4 [, 2]<0.05), ]
-significant.p.OS.SHH <- OS.pvalue.SHH[which(OS.pvalue.SHH[, 2]<0.05), ]
-significant.p.OS.SHH.old <- OS.pvalue.SHH.old[which(OS.pvalue.SHH.old[, 2]<0.05),]
-significant.p.PFS.all <- PFS.pvalue.all.combined[which(PFS.pvalue.all.combined[, 2]<0.05),]
-significant.p.PFS.G3G4 <- PFS.pvalue.G3G4.combined[which(PFS.pvalue.G3G4.combined[, 2]<0.05),]
-significant.p.PFS.SHH <- PFS.pvalue.SHH.combined[which(PFS.pvalue.SHH.combined[, 2]<0.05),]
-significant.p.PFS.SHH.old <- PFS.pvalue.SHH.combined.old[which(PFS.pvalue.SHH.combined.old[, 2]<0.05),]
-
-
-
-### need to update up until here 11/10/17
 
 ##########################################################################################################################
 ##########################################################################################################################
@@ -176,7 +93,6 @@ cox.PFS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, 9)
 cox.PFS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, 10) 
 
 
-### DW suggests to create list of outputs, rather than significant dataframes
 ### then to filter the lists by a defined threshold e.g adjusted p<0.05
 
 ### create significant dataframes  
@@ -338,25 +254,17 @@ try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/c
 
 ### using log.reg.dataframe function (moved to clinical_data_functions_master.R after completed hardcoding)
 
-log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
-logreg.pval.assembled <- do.call(rbind, pval) ### check if recurrent error here when more than one input goi
-logreg.adj.pval <- p.adjust(logreg.pval.assembled, method = "BH")
-logreg.OR.assembled <- do.call(rbind, OR)
-logreg.L95CI.assembled <- do.call(rbind, L95CI)
-logreg.U95CI.assembled <- do.call(rbind, U95CI)
-logreg.allresults.df <- cbind(logreg.pval.assembled, logreg.adj.pval, logreg.OR.assembled, logreg.L95CI.assembled, logreg.U95CI.assembled)
-colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval","logreg.OR", "logreg.OR.L95CI", "logreg.OR.U95CI" )
-return (logreg.allresults.df)
-}
 
 ### 28/11/17 decision to hardcode the logistic regression for larger expression dataset
-### develop the dataframe for each of the separate variables LCA, mstatus, relapse, resection
 
+###
 logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$LR.pval)})  ### x$reg.log.list$log.reg.LCA[[1]]
 logreg.LCA.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$LR.OR.val)})
 logreg.LCA.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$lower.95CI)})
 logreg.LCA.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$upper.95CI)})
 extract.logreg.LCA.df <- log.reg.dataframe(pval = logreg.LCA.pval, OR = logreg.LCA.OR, L95CI = logreg.LCA.L95CI, U95CI= logreg.LCA.U95CI)
+
+###
 
 logreg.relapse.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse$LR.pval)})
 logreg.relapse.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse$LR.OR.val)})
@@ -364,25 +272,113 @@ logreg.relapse.L95CI <- lapply(results.master, function(x){return(x$reg.log.list
 logreg.relapse.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.relapse$upper.95CI)})
 extract.logreg.relapse.df <- log.reg.dataframe(pval = logreg.relapse.pval, OR = logreg.relapse.OR, L95CI = logreg.relapse.L95CI, U95CI = logreg.relapse.U95CI)  
 
+###
 logreg.mstatus.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.mstatus$LR.pval)}) 
 logreg.mstatus.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.mstatus$LR.OR.val)}) 
 logreg.mstatus.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.mstatus$lower.95CI)}) 
 logreg.mstatus.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.mstatus$upper.95CI)})
 extract.logreg.mstatus.df <- log.reg.dataframe(pval = logreg.mstatus.pval, OR = logreg.mstatus.OR, L95CI = logreg.mstatus.L95CI, U95CI = logreg.mstatus.U95CI)
 
-logreg.age.cat
-logreg.meth
-logreg.meth7
-logreg.MYC
-logreg.MYCN
-logreg.MYCMYCN
-logreg.resection
-logreg.sex
-logreg.TERT
-logreg.TP53
+###
+logreg.age.cat.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.age.cat$LR.pval)}) 
+logreg.age.cat.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.age.cat$LR.OR.val)}) 
+logreg.age.cat.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.age.cat$lower.95CI)}) 
+logreg.age.cat.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.age.cat$upper.95CI)})
+extract.logreg.age.cat.df <- log.reg.dataframe(pval = logreg.age.cat.pval , OR = logreg.age.cat.OR , L95CI = logreg.age.cat.L95CI, U95CI = logreg.age.cat.U95CI)
 
+###
+logreg.meth.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth$LR.pval)}) 
+logreg.meth.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth$LR.OR.val)}) 
+logreg.meth.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth$lower.95CI)}) 
+logreg.meth.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth$upper.95CI)})
+extract.logreg.meth.df <- log.reg.dataframe(pval = logreg.meth.pval , OR = logreg.meth.OR , L95CI = logreg.meth.L95CI, U95CI = logreg.meth.U95CI)
+
+###
+
+logreg.meth7.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth7$LR.pval)}) 
+logreg.meth7.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth7$LR.OR.val)}) 
+logreg.meth7.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth7$lower.95CI)}) 
+logreg.meth7.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.meth7$upper.95CI)})
+extract.logreg.meth7.df <- log.reg.dataframe(pval = logreg.meth7.pval , OR = logreg.meth7.OR , L95CI = logreg.meth7.L95CI, U95CI = logreg.meth7.U95CI)
+
+
+###
+
+logreg.MYC.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYC$LR.pval)}) 
+logreg.MYC.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYC$LR.OR.val)}) 
+logreg.MYC.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYC$lower.95CI)}) 
+logreg.MYC.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYC$upper.95CI)})
+extract.logreg.MYC.df <- log.reg.dataframe(pval = logreg.MYC.pval , OR = logreg.MYC.OR , L95CI = logreg.MYC.L95CI, U95CI = logreg.MYC.U95CI)
+
+
+###
+
+logreg.MYCN.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCN$LR.pval)}) 
+logreg.MYCN.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCN$LR.OR.val)}) 
+logreg.MYCN.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCN$lower.95CI)}) 
+logreg.MYCN.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCN$upper.95CI)})
+extract.logreg.MYCN.df <- log.reg.dataframe(pval = logreg.MYCN.pval , OR = logreg.MYCN.OR , L95CI = logreg.MYCN.L95CI, U95CI = logreg.MYCN.U95CI)
+
+###
+logreg.MYCMYCN.pval <-lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCMYCN$LR.pval)}) 
+logreg.MYCMYCN.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCMYCN$LR.OR.val)}) 
+logreg.MYCMYCN.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCMYCN$lower.95CI)}) 
+logreg.MYCMYCN.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.MYCMYCN$upper.95CI)})
+extract.logreg.MYCMYCN.df <- log.reg.dataframe(pval = logreg.MYCMYCN.pval , OR = logreg.MYCMYCN.OR , L95CI = logreg.MYCMYCN.L95CI, U95CI = logreg.MYCMYCN.U95CI)
+
+###
+
+logreg.resection.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.resection$LR.pval)})
+logreg.resection.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.resection$LR.OR.val)})
+logreg.resection.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.resection$lower.95CI)})
+logreg.resection.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.resection$upper.95CI)})
+extract.logreg.resection.df <- log.reg.dataframe(pval = logreg.resection.pval, OR = logreg.resection.OR, L95CI = logreg.resection.L95CI, U95CI = logreg.resection.U95CI) 
+
+###
+logreg.sex.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.sex$LR.pval)})
+logreg.sex.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.sex$LR.OR.val)})
+logreg.sex.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.sex$lower.95CI)})
+logreg.sex.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.sex$upper.95CI)})
+extract.logreg.sex.df <- log.reg.dataframe(pval = logreg.sex.pval, OR = logreg.sex.OR, L95CI = logreg.sex.L95CI, U95CI = logreg.sex.U95CI) 
+
+###
+
+logreg.TERT.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TERT$LR.pval)})
+logreg.TERT.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TERT$LR.OR.val)})
+logreg.TERT.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TERT$lower.95CI)})
+logreg.TERT.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TERT$upper.95CI)})
+extract.logreg.TERT.df <- log.reg.dataframe(pval = logreg.TERT.pval, OR = logreg.TERT.OR, L95CI = logreg.TERT.L95CI, U95CI = logreg.TERT.U95CI) 
+
+
+###
+
+logreg.TP53.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TP53$LR.pval)})
+logreg.TP53.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TP53$LR.OR.val)})
+logreg.TP53.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TP53$lower.95CI)})
+logreg.TP53.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.TP53$upper.95CI)})
+extract.logreg.TP53.df <- log.reg.dataframe(pval = logreg.TP53.pval, OR = logreg.TP53.OR, L95CI = logreg.TP53.L95CI, U95CI = logreg.TP53.U95CI) 
+
+
+
+
+# name = "log.reg.LCA" 
+### if have time to make this into a function, the extracted.logreg.allresults line returned an error due to differing lengths of the log reg dataframe and the 5 columns in the log.reg.dataframe functoin that includes adjusted p value
+
+# extract.log.reg <- function(results.master, name){
+#  extracted.logreg.pval <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["LR.p.val"]])}) 
+# extracted.logreg.OR <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["LR.OR.val"]])})
+#  extracted.logreg.L95CI <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["lower.95CI"]])})
+#  extracted.logreg.U95CI <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["upper.95CI"]])})
+#  extracted.logreg.allresults <- log.reg.dataframe(pval = extracted.logreg.pval, OR = extracted.logreg.OR, L95CI = extracted.logreg.L95CI, U95CI= extracted.logreg.U95CI)
+#  return(extracted.logreg.allresults)
+# }
+
+# logreg.LCA.results <- extract.log.reg(results.master, name = "log.reg.LCA")
+
+######################################################################
 
 ### get "extract.logreg...."
+# logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg"))) 
 
 ######################################################################
 
@@ -397,43 +393,50 @@ logreg.TP53
 
 #results <- extract.km.OS.pval.SHH(results.master)
 
-name <- "list.age.cat.infant"
-
-extract.chi.all(results.master, "list.age.cat.infant")
+# name <- "list.age.cat.infant"
+# extract.chi.all(results.master, "list.age.cat.infant")
 
 extract.chi.all <- function(results.master, name){
   extracted.chi.all.pval <- lapply(results.master, function(x){return(x[["chi.sq.list"]][[name]][["p.value"]])}) 
-  extracted.chi.all.pval.assembled <- do.call(rbind, extracted.km.OS.pval.SHH)
+  extracted.chi.all.pval.assembled <- do.call(rbind, extracted.chi.all.pval)
   adjusted.p.chi.all <-p.adjust(extracted.chi.all.pval.assembled, method = "BH") 
   chi.pvalue <- cbind(extracted.chi.all.pval.assembled, adjusted.p.chi.all)
   colnames(chi.pvalue) <- c("chi.p.value", "adjusted.pval")
   return(chi.pvalue)
 } 
 
+chi.age.cat.infant.result <- extract.chi.all(results.master, name = "list.age.cat.infant")
+chi.CSI.result <- extract.chi.all(results.master, name = "list.CSI")
+chi.LCA.result <- extract.chi.all(results.master, name = "list.LCA")
+chi.meth4.result <-extract.chi.all(results.master, name = "list.meth.4")
+chi.meth7.result <- extract.chi.all(results.master, name = "list.meth.7")
+chi.mstatus.result <- extract.chi.all(results.master, name = "list.mstatus")
+chi.MYC.result <- extract.chi.all(results.master, name = "list.MYC")
+chi.MYCMYCN.result <- extract.chi.all(results.master, name = "list.MYCMYCN")
+chi.MYCN.result <- extract.chi.all(results.master, name = "list.MYCN")
+chi.q13loss.result <- extract.chi.all(results.master, name = "list.q13loss")
+chi.relapse.result <- extract.chi.all(results.master, name = "list.relapse")
+chi.resection.result <- extract.chi.all(results.master, name = "list.resection")
+chi.RTX.result <- extract.chi.all(results.master, name = "list.RTX")
+chi.sex.result <- extract.chi.all(results.master, name = "list.sex")
+chi.TERT.result <- extract.chi.all(results.master, name = "list.TERT")
+chi.TP53.result <- extract.chi.all(results.master, name = "list.TP53")
+
+
+### later if wish to extract the chi squared statistic, will need to rerun results.master with the updated naming for the chi squared function 4/12/17
+
+### extract adj p <0.05 for relapse, mstatus, MYC, MYCN, MYCMYCN
+
+significant.chi.relapse <- chi.relapse.result[which(chi.relapse.result[,2]<0.05), ]  ### n=4388 4/12/17 for mb.vsd
+significant.chi.mstatus <- chi.mstatus.result[which(chi.mstatus.result[,2]<0.05), ]  ### n=3875, 4/12/17 for mb.vsd
+significant.chi.MYC <- chi.MYC.result [which(chi.MYC.result[,2]<0.05), ]            ### n=4640, 4/12/17 for mb.vsd
+significant.chi.MYCN <- chi.MYCN.result[which(chi.MYCN.result[,2]<0.05),]
+significant.chi.MYCMYCN <- chi.MYCMYCN.result[which(chi.MYCMYCN.result[,2]<0.05), ]  ### n=214 4/12/17 for mb.vsd
 
 
 ########################################################################
 
-### examples for how to then extract lists you are interested in
-
-#lapply(results.master, function(x){return(x[[3]][[2]])}) -> extracted.results
-
-#do.call(rbind, extracted.results) -> compiled.results
-
-#p.adjust(compiled.results[,1], method = "BH") -> adjusted.p.values
-
-#hist(adjusted.p.values)
-
-
-
-#############################################################################
-
-
-#########
-### examples based on previous dataframes
-##########################################
 ### 9/11/17: focusing on multivariate cox, using example from univariate cox
-##################
 
 ####
 
@@ -492,6 +495,8 @@ extracted.dataframes <- list(cox.PFS.cat.all.df,
                              cox.EFS.cat.all.df,
                              cox.EFS.cat.G3G4.df 
 )
+
+### for ease can list all of the dataframes up above to assist with understanding the outputs 4/12/17
 # return (extracted.dataframes)
 ###########################################
 
