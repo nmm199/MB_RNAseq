@@ -40,12 +40,12 @@ chi.sq <- function(x,y){
   chi.test.temp.stat <- try(c(stat=chi.test.temp$statistic, p.value=chi.test.temp$p.value), silent = T) ### added 26/9/17
   chi.test.temp.res <- try(chi.test.temp$residuals, silent = T)                                         ### added 26/9/17
   try(aheatmap(chi.test.temp$residuals, Rowv=NA, Colv = NA), silent = T)
-  list.temp <- list  (p.value= chi.test.temp$p.value,                                                   ### subset chi.test.temp$p.value may not exist
-                      chi.test.temp.stat, 
-                      table.temp, ## does not work if put in variable x or y, here
-                      table.temp.perc,
-                      chi.test.temp,
-                      chi.test.temp.res
+  list.temp <- list  (p.value = chi.test.temp$p.value,                                                   ### subset chi.test.temp$p.value may not exist
+                      chi.test = chi.test.temp.stat, 
+                      table.temp = table.temp, ## does not work if put in variable x or y, here
+                      table.temp.perc = table.temp.perc,
+                      chi.test.temp = chi.test.temp,
+                      chi.test.temp.res = chi.test.temp.res
   )
   
   return(list.temp)
@@ -685,11 +685,12 @@ clinPathAssess <- function(test.pData,
   ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below. 
   ### if then interrogate functions, will need to generate matched.test.pData
   
-  # goi <- "ENSG00000008196.12_1"
+  # goi <- "ENSG00000008196.12_1" ### TFAP2B
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
-    goi.vsd <- as.numeric(mb.vsd[goi,]) 
+  # goi.vsd <- as.numeric(mb.vsd[goi,])  ### make sure this is unhashed when running the clinPathAssess function
+  
   ### the output would be a vector with a continuous variable, names equal NMB numbers
    names(goi.vsd) <- gsub("T","",names(mb.vsd))
    test.pData = test.pData
@@ -1310,7 +1311,7 @@ clinPathAssess <- function(test.pData,
 
 
 ##########################################################
-
+##########################################################
 
 #### Function called cox.dataframe
 
@@ -1363,3 +1364,17 @@ annotate.HTseq.IDs<-function(HTseq.IDs){
 #ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
 #listAttributes(ensembl) ### if wish to add further components to the annotate function that exist within the ensembl database. Adds computing power/time
 
+########################################################################################
+
+### Function called log.reg.dataframe
+
+log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
+  logreg.pval.assembled <- do.call(rbind, pval) ### check if recurrent error here when more than one input goi
+  logreg.adj.pval <- p.adjust(logreg.pval.assembled, method = "BH")
+  logreg.OR.assembled <- do.call(rbind, OR)
+  logreg.L95CI.assembled <- do.call(rbind, L95CI)
+  logreg.U95CI.assembled <- do.call(rbind, U95CI)
+  logreg.allresults.df <- cbind(logreg.pval.assembled, logreg.adj.pval, logreg.OR.assembled, logreg.L95CI.assembled, logreg.U95CI.assembled)
+  colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval","logreg.OR", "logreg.OR.L95CI", "logreg.OR.U95CI" )
+  return (logreg.allresults.df)
+}

@@ -145,12 +145,13 @@ tic()
 
 ### unhash when running the complete transcript set
 
- results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
- as.numeric(mb.vsd[i,]) -> x
- names(x) <- colnames(mb.vsd)
- names(x) <- gsub("T","",colnames(mb.vsd))
- return(clinPathAssess(test.pData,x)) 
- }
+# results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
+### results.master <- foreach(i = 1:5)%dopar%{
+# as.numeric(mb.vsd[i,]) -> x
+# names(x) <- colnames(mb.vsd)
+# names(x) <- gsub("T","",colnames(mb.vsd))
+# return(clinPathAssess(test.pData,x)) 
+# }
 
 ### unhash when running the randomised dataset 1/11/17 ### on server
 # results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
@@ -163,12 +164,12 @@ tic()
 
 ### unhash when running the novel transcript set
 
-# results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
-# as.numeric(mb.vsd.novel[i,]) -> x
-# names(x) <- colnames(mb.vsd.novel)
-# names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
-# return(clinPathAssess(test.pData,x)) 
-# }
+ results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
+ as.numeric(mb.vsd.novel[i,]) -> x
+ names(x) <- colnames(mb.vsd.novel)
+ names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
+ return(clinPathAssess(test.pData,x)) 
+ }
 
 
 ### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
@@ -193,9 +194,9 @@ tic()
 
 ### unhash the relevant name for the output 
 
- names(results.master) <- row.names(mb.vsd)
-#  names (results.master) <- row.names(mb.vsd.random)
-# names(results.master) <- row.names(mb.vsd.novel)
+# names(results.master) <- row.names(mb.vsd)
+# names (results.master) <- row.names(mb.vsd.random)
+ names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
 # names(results.master) <- row.names(mb.vsd)[1:10]
 
@@ -211,9 +212,9 @@ toc()
 ### 17/10/17 note: once this runs for the randomised file, then can save RDS
 
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
- saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.rds")
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.random.rds")
-# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")
+ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.rds")
 
 ### then reload this when examining the results
 
@@ -224,13 +225,14 @@ toc()
 ### Annotate with known gene sets
 
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
-# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
+ annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
+# annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
 
-# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.allgenes.csv")
-# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.annot.novel.csv") ### this is the novel transcripts
-write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.csv")
+
+# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.allgenes.csv")
+ write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.csv") ### this is the novel transcripts
+# write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.csv")
 
 ###############################################################################
 ###############################################################################
