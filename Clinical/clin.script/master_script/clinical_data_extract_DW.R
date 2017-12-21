@@ -16,7 +16,7 @@ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.result
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_extract_master.R")
 
-### file output 
+ ### file output 
 
 ### dataframes with p value, adjusted p value
 ### all.survival.p.bothgroups: includes OS, EFS and PFS for overall group and G3G4 
@@ -157,8 +157,8 @@ write.csv(annot.sig.cox.PFS.cat.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/
 # write.csv(annot.sig.cox.PFS.cont.SHH, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.PFS.cont.SHH.csv")
 # write.csv (annot.sig.cox.PFS.cat.SHH, file = ""/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.PFS.cat.SHH.csv")
 
-write.csv (annot.sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/annot.sig.cox.PFS.cont.SHH.old.csv")
-write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/annot.sig.cox.PFS.cat.SHH.old.csv")
+try(write.csv (annot.sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/annot.sig.cox.PFS.cont.SHH.old.csv"), silent = T)
+try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/annot.sig.cox.PFS.cat.SHH.old.csv"), silent = T)
 
 ########################################################################################
 ########################################################################################
@@ -252,12 +252,8 @@ try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/c
 
 ### extract logistic regression p value 
 
-### using log.reg.dataframe function (moved to clinical_data_functions_master.R after completed hardcoding)
+### decision made to hard code as difficulty generating function, in hindsight could replace with "reg.log.list" like in chi square function (extract.chi.all, name = "....")
 
-
-### 28/11/17 decision to hardcode the logistic regression for larger expression dataset
-
-###
 logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$LR.pval)})  ### x$reg.log.list$log.reg.LCA[[1]]
 logreg.LCA.OR <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$LR.OR.val)})
 logreg.LCA.L95CI <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA$lower.95CI)})
@@ -359,30 +355,15 @@ logreg.TP53.U95CI <- lapply(results.master, function(x){return(x$reg.log.list$lo
 extract.logreg.TP53.df <- log.reg.dataframe(pval = logreg.TP53.pval, OR = logreg.TP53.OR, L95CI = logreg.TP53.L95CI, U95CI = logreg.TP53.U95CI) 
 
 
-
-
-# name = "log.reg.LCA" 
-### if have time to make this into a function, the extracted.logreg.allresults line returned an error due to differing lengths of the log reg dataframe and the 5 columns in the log.reg.dataframe functoin that includes adjusted p value
-
-# extract.log.reg <- function(results.master, name){
-#  extracted.logreg.pval <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["LR.p.val"]])}) 
-# extracted.logreg.OR <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["LR.OR.val"]])})
-#  extracted.logreg.L95CI <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["lower.95CI"]])})
-#  extracted.logreg.U95CI <- lapply(results.master, function(x){return(x[["reg.log.list"]][[name]][["upper.95CI"]])})
-#  extracted.logreg.allresults <- log.reg.dataframe(pval = extracted.logreg.pval, OR = extracted.logreg.OR, L95CI = extracted.logreg.L95CI, U95CI= extracted.logreg.U95CI)
-#  return(extracted.logreg.allresults)
-# }
-
-# logreg.LCA.results <- extract.log.reg(results.master, name = "log.reg.LCA")
-
 ######################################################################
-
+### if wish to make a list of all the logistic regression results 
 ### get "extract.logreg...."
+
 # logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg"))) 
 
 ######################################################################
 
-### creating log reg list for all variables
+### creating log reg list for all significant variables
 
 #significant.logreg.df.all <- logreg.allresults.df[which(cox.allresults.df[, 2]<0.05)]
 
@@ -396,14 +377,6 @@ extract.logreg.TP53.df <- log.reg.dataframe(pval = logreg.TP53.pval, OR = logreg
 # name <- "list.age.cat.infant"
 # extract.chi.all(results.master, "list.age.cat.infant")
 
-extract.chi.all <- function(results.master, name){
-  extracted.chi.all.pval <- lapply(results.master, function(x){return(x[["chi.sq.list"]][[name]][["p.value"]])}) 
-  extracted.chi.all.pval.assembled <- do.call(rbind, extracted.chi.all.pval)
-  adjusted.p.chi.all <-p.adjust(extracted.chi.all.pval.assembled, method = "BH") 
-  chi.pvalue <- cbind(extracted.chi.all.pval.assembled, adjusted.p.chi.all)
-  colnames(chi.pvalue) <- c("chi.p.value", "adjusted.pval")
-  return(chi.pvalue)
-} 
 
 chi.age.cat.infant.result <- extract.chi.all(results.master, name = "list.age.cat.infant")
 chi.CSI.result <- extract.chi.all(results.master, name = "list.CSI")
@@ -436,11 +409,10 @@ significant.chi.MYCMYCN <- chi.MYCMYCN.result[which(chi.MYCMYCN.result[,2]<0.05)
 
 ########################################################################
 
-### 9/11/17: focusing on multivariate cox, using example from univariate cox
+###  multivariate cox, looking for transcripts that are significant beyond either the current PNET5, the Lancet oncology paper (Schwalbe et al 2017) or a combined model taking both models together
 
-####
 
-multivar.cox.OS.combined.cat.df <- extract.multivar.cox(results.master, 1)  ### updated so that p value is for biomarker not overall modell p val 21/11/17
+multivar.cox.OS.combined.cat.df <- extract.multivar.cox(results.master, 1)  ### updated so that p value is for biomarker not overall model p val 21/11/17
 
 multivar.cox.OS.combined.cont.df <- extract.multivar.cox(results.master,2) 
 
@@ -471,6 +443,37 @@ multivar.cox.PFS.PNET5.cont.df <- extract.multivar.cox.PFS(results.master, 14) #
 multivar.cox.PFS.SHHold.cat.df <- extract.multivar.cox.PFS.SHH (results.master, 15) ### worked with x[[5]]<15 
 
 multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox.PFS.SHH (results.master, 16) ### worked with x[[5]]<16
+
+
+
+
+### generating significant dataframes for the multivariate cox modelling, ie transcripts that perform about and beyond current clinical risk models
+
+significant.multivar.cox.OS.combined.cat <- multivar.cox.OS.combined.cat.df [which(multivar.cox.OS.combined.cat.df[,2]<0.05), ]
+
+significant.multivar.cox.OS.combined.cont <- multivar.cox.OS.combined.cont.df [which(multivar.cox.OS.combined.cont.df[,2]<0.05), ]
+
+significant.multivar.cox.OS.lancetG3G4.cat <- multivar.cox.OS.lancetG3G4.cat.df[which(multivar.cox.OS.lancetG3G4.cat.df[,2]<0.05),]
+
+significant.multivar.cox.OS.lancetG3G4.cont <- multivar.cox.OS.lancetG3G4.cont.df[which(multivar.cox.OS.lancetG3G4.cont.df[,2]<0.05),]
+
+significant.multivar.cox.OS.PNET5.cat <- multivar.cox.OS.PNET5.cat.df[which(multivar.cox.OS.PNET5.cat.df[,2]<0.05),]  ### n=43
+
+significant.multivar.cox.OS.PNET5.cont <- multivar.cox.OS.PNET5.cont.df[which(multivar.cox.OS.PNET5.cont.df[,2]<0.05),] ### n=30
+
+significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(multivar.cox.OS.SHHold.cat.df[,2]<0.05), ]
+
+significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),]
+
+
+### up to here 19/12/17# ### need to continue with significant dataframes for multicox PFS then create significant df for logisit regression
+
+
+
+### significant.chi.MYCMYCN <- chi.MYCMYCN.result[which(chi.MYCMYCN.result[,2]<0.05), ]  ### example code
+
+
+### then annotate these significant transcripts
 
 ############################################################################
 ############################################################################
@@ -505,128 +508,9 @@ extracted.dataframes <- list(cox.PFS.cat.all.df,
 ### 2. can use hardcoding first to determine the cut off subset required e.g x[[5]]<15, see example for extract.multivar.cox.PFS.comb.cat.pval below
 ### 3. then create function using x, subset.index; and keep this function within the current file to tweak until all subset indices are working, or generate new functions as required
 ### 4. then move new function into main "clinical_data_functions_extract_master.R" file
+### 5. OR can name the index, such as $p.val rather than [[subset.index]] described as a number
   
 ########################################
-
-# multivar.cox.OS.comb.cat.pval <- lapply(results.master,(function(x){return(x[[5]][[1]][[1]])})) ### created 9/11/17 and works
-
-# extract.multivar.cox.PFS.comb.cat.pval <- function(x){
-  #return (ifelse(length(x[[5]])<10, NA, 
-   #               ifelse(length(x[[5]][[9]])<3, NA, 
-    #                    ifelse(length(x[[5]][[9]][[1]])<1, NA, 
-     #                           x[[5]][[9]][[2]]))))
-# }
-
-#extract.multivar.cox.PFS.comb.cat.HR<- function (x){
-#return(ifelse(length(x[[5]])< 10, NA, ### was 3
- #             ifelse(length(x[[5]][[9]])<3, NA, ### was 6
-  #                   ifelse(length(x[[5]][[9]][[2]])<1, NA,
-   #                       x[[5]][[9]][[2]]))))
-# }
-
-# extract.multivar.cox.PFS.comb.cat.L95CI <- function (x){
-#  return(ifelse(length(x[[5]])< 10, NA, ### was 3
- #               ifelse(length(x[[5]][[9]])<3, NA, 
-  #                     ifelse(length(x[[5]][[9]][[3]])<1, NA,
-   #                           x[[5]][[9]][[3]]))))
-# }
-
-# extract.multivar.cox.PFS.comb.cat.U95CI <- function (x){
-#  return(ifelse(length(x[[5]])< 10, NA, ### was 3
-    #           ifelse(length(x[[5]][[9]])<3, NA, 
-         #              ifelse(length(x[[5]][[9]][[4]])<1, NA,
-      #                        x[[5]][[2]][[4]]))))
-# }
-
-# extract.multivar.cox.PFS.comb.cat.Zscore <- function (x){
- # return(ifelse(length(x[[5]])< 10, NA, ### was 3
-           #      ifelse(length(x[[5]][[9]])<6, NA, 
-                 #      ifelse(length(x[[5]][[9]][[5]])<1, NA,
-                   #           x[[5]][[9]][[5]]))))
-# }
-
-# multivar.cox.PFS.comb.cat.Zscore <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.Zscore) ### this works
-
-# multivar.cox.PFS.comb.cat.pval <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.pval)
-# multivar.cox.PFS.comb.cat.HR <- lapply(results.master, extract.multivar.cox.PFS.comb.cat.HR)
-# multivar.cox.PFS.comb.cat.L95CI <- lapply(results.master, extract.multivar.cox.PFS.comb.cat.L95CI)
-# multivar.cox.PFS.comb.cat.U95CI <- lapply (results.master, extract.multivar.cox.PFS.comb.cat.U95CI)
-# multivar.cox.OS.comb.cat.pval <- lapply(results.master, extract.multivar.cox.pval) ### this works
-
-
-
-#########################################################
-#########################################################
-
-### script that worked previously for the novel transcript file that has now been superceded 28/9/17
-#######
-
-# cox.PFS.cat.pval.all.test <- lapply(results.master, extract.coxpval.test)
-# cox.PFS.pval.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[1]])})
-# cox.PFS.Zscore.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[5]])})
-# cox.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[2]])})
-# cox.U95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[4]])})
-# cox.L95CI.PFS.HR.G3G4 <- lapply(results.master, function(x){return(x[[4]][[4]][[3]])})
-
-#########
-### older script for COX OS all
-
-# cox.OS.pval.all <- lapply(results.master, extract.coxpval.OS.all)
-# cox.OS.pval.all <- lapply (results.master, function(x){return(x[[4]][[5]][[1]])})
-# cox.OS.Zscore.all <- lapply(results.master, function(x){return(x[[4]][[5]][[5]])})
-# cox.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[2]])})
-# cox.U95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[4]])})
-# cox.L95CI.OS.HR.all <- lapply(results.master, function(x){return(x[[4]][[5]][[3]])})
-
-# cox.OS.all.df <- cox.dataframe(pval = cox.OS.pval.all, Zscore = cox.OS.Zscore.all, HR = cox.OS.HR.all, L95CI = cox.L95CI.OS.HR.all, U95CI = cox.U95CI.OS.HR.all)
-# colnames(cox.OS.all.df) <- c("cox.OS.pval.all", "cox.OS.adj.pval.all", "cox.OS.Zscore.all", "cox.OS.HR.all","cox.L95CI.OS.HR.all", "cox.U95CI.OS.HR.all")
-
-# significant.cox.OS.all <- cox.OS.all.df[which(cox.OS.all.df[, 2]<0.05),]
-
-# write.csv(significant.cox.OS.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/significant.cox.OS.all.csv")
-
-
-##########################
-### script that has been tried for logistic regression function, before decision to hardcode 28/11/17
-# extract.logistic <- function (results.master, subset.index){
-# log.reg.dataframe (pval = lapply(results.master, extract.log.pval, subset.index = subset.index), 
-#                 OR = lapply(results.master, extract.log.OR, subset.index = subset.index) , 
-#                L95CI = lapply(results.master, extract.log.L95CI, subset.index = subset.index), 
-#               U95CI = lapply(results.master, extract.log.U95CI, subset.index = subset.index)
-#  )
-# } 
-
-
-### develop functions for each of p value, OR, L95CI, U95CI
-# extract.log.pval <- function (x, subset.index){
-# return(x[[3]][[subset.index]][[1]]) ### trialled x$reg.log.list$subset.index$LR.pval
-# }
-
-### see if this returns the p value for log.reg.LCA ### error
-
-# logreg.LCA.extract.pval <- extract.log.pval(results.master, 3) ### error
-
-# test <- "log.reg.LCA"
-
-# function(results.master, test){
-# which(names(x$reg.log.list)==test) -> test.no
-# logreg.pval <- lapply(results.master, function(x){return(x$reg.log.list[test.no][[1]])}) ### or could be x$reg.log.list$log.reg.LCA$LR.pval
-# logreg.OR <- lapply(results.master, function(x){return(x$reg.log.list[test.no][[3]])})
-# logreg.L95CI <- lapply(results.master, function(x){return(x$reg.log.list[test.no][[4]])})
-# logreg.U95CI <- lapply(results.master, function(x){return(x$reg.log.list[test.no][[5]])})
-# return(log.reg.dataframe(pval = logreg.pval, OR = logreg.OR, L95CI = logreg.L95CI, U95CI = logreg.U95CI))
-# }
-
-############################
-### previous script that worked for logreg LCA, then updated 28/11/17
-
-# logreg.LCA.list <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA)})
-# logreg.LCA.pval <- lapply(results.master, function(x){return(x$reg.log.list$log.reg.LCA[[1]])})
-# logreg.LCA.adj.pval <- p.adjust(logreg.LCA.pval, method = "BH") ### Error in p.adjust(logreg.LCA.pval, method = "BH") : (list) object cannot be coerced to type 'double'
-# logreg.LCA.df <- do.call(rbind, logreg.LCA.pval) ### need this, otherwise, there is an error 
-# logreg.LCA.adj.pval <- p.adjust(logreg.LCA.df, method = "BH")
-# logreg.LCA.combined.pval<- cbind (logreg.LCA.pval, logreg.LCA.adj.pval)
-
 
 #########################################################
 #########################################################

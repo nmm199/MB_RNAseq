@@ -413,6 +413,19 @@ log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
 
 
 
+##############################################
+### function for extracting chi squared results
+### this will work for all variables that have been run in chi squared test
+
+extract.chi.all <- function(results.master, name){
+  extracted.chi.all.pval <- lapply(results.master, function(x){return(x[["chi.sq.list"]][[name]][["p.value"]])}) 
+  extracted.chi.all.pval.assembled <- do.call(rbind, extracted.chi.all.pval)
+  adjusted.p.chi.all <-p.adjust(extracted.chi.all.pval.assembled, method = "BH") 
+  chi.pvalue <- cbind(extracted.chi.all.pval.assembled, adjusted.p.chi.all)
+  colnames(chi.pvalue) <- c("chi.p.value", "adjusted.pval")
+  return(chi.pvalue)
+} 
+
 
 ##############################################
 
@@ -428,7 +441,7 @@ log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
 
 ###################
 ###################
-### superceded function as of 4/12/17
+### superceded function as of 4/12/17 as returns subset out of bounds error
 
 # extractKM <- function(results.master, subset.index){
 #  pval <- lapply(results.master, function(x){return(x[[1]][[subset.index]][[1]])}) 
