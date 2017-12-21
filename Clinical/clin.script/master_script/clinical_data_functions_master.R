@@ -15,6 +15,25 @@ library(survival)
 ### Author: Dr Marion Mateos
 ### Date: July 14 2017 - September 20 2017
 
+### names of functions:
+### chi.sq
+### cor.result
+### lin.reg
+### km.log.test
+### km.log.test.OS
+### cox.result.OS
+### cox.result.surv
+### cox.multivar.surv_8
+### cox.multivar.surv.PNET5_7
+### cox.multivar.surv.Schwalbe_4
+### km.log.test.EFS
+### logisticRegression
+### updatepData
+### clinPathAssess
+### cox.dataframe
+### annotate.HTseq.IDs
+### log.reg.dataframe
+
 ##############################################################################################
 
 ### Function Number 1

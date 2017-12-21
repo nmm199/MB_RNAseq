@@ -357,26 +357,17 @@ extract.logreg.TP53.df <- log.reg.dataframe(pval = logreg.TP53.pval, OR = logreg
 
 ######################################################################
 ### if wish to make a list of all the logistic regression results 
-### get "extract.logreg...."
-
-# logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg"))) 
+logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg"))) 
 
 ######################################################################
 
 ### creating log reg list for all significant variables
-
-#significant.logreg.df.all <- logreg.allresults.df[which(cox.allresults.df[, 2]<0.05)]
+# significant.logreg.df.all <- logistic.reg.results[which(logistic.reg.results[, 2]<0.05),] ### this does not work because logistic.reg.results object is a list
 
 
 #######################################################################
 
 ### extract chi square p value
-
-#results <- extract.km.OS.pval.SHH(results.master)
-
-# name <- "list.age.cat.infant"
-# extract.chi.all(results.master, "list.age.cat.infant")
-
 
 chi.age.cat.infant.result <- extract.chi.all(results.master, name = "list.age.cat.infant")
 chi.CSI.result <- extract.chi.all(results.master, name = "list.CSI")
@@ -451,7 +442,7 @@ multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox.PFS.SHH (results.master,
 
 significant.multivar.cox.OS.combined.cat <- multivar.cox.OS.combined.cat.df [which(multivar.cox.OS.combined.cat.df[,2]<0.05), ]
 
-significant.multivar.cox.OS.combined.cont <- multivar.cox.OS.combined.cont.df [which(multivar.cox.OS.combined.cont.df[,2]<0.05), ]
+significant.multivar.cox.OS.combined.cont <- multivar.cox.OS.combined.cont.df [which(multivar.cox.OS.combined.cont.df[,2]<0.05), ] ###n=13 21/12/17 for all transcripts
 
 significant.multivar.cox.OS.lancetG3G4.cat <- multivar.cox.OS.lancetG3G4.cat.df[which(multivar.cox.OS.lancetG3G4.cat.df[,2]<0.05),]
 
@@ -465,39 +456,62 @@ significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(mu
 
 significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),]
 
+###need to check this Jan 2018
 
-### up to here 19/12/17# ### need to continue with significant dataframes for multicox PFS then create significant df for logisit regression
+significant.multivar.cox.PFS.combined.cat <- multivar.cox.PFS.combined.cat.df [which (multivar.cox.PFS.combined.cat.df[,2]<0.05), ] ###need to check this Jan 2018
+
+significant.multivar.cox.PFS.combined.cont <- multivar.cox.PFS.combined.cont.df [which (multivar.cox.PFS.combined.cont.df[,2]<0.05), ]  ###need to check this Jan 2018
+
+significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ###need to check this Jan 2018
+
+### up to here 21/12/17 ### generate significant dataframes from here Jan 2018
+
+# multivar.cox.PFS.lancetG3G4.cont.df 
+
+# multivar.cox.PFS.PNET5.cat.df
+
+#multivar.cox.PFS.PNET5.cont.df
+
+#multivar.cox.PFS.SHHold.cat.df
+
+#multivar.cox.PFS.SHHold.cont.df
 
 
+### annotated dataframes for significant multivar cox 
 
-### significant.chi.MYCMYCN <- chi.MYCMYCN.result[which(chi.MYCMYCN.result[,2]<0.05), ]  ### example code
+
+try(annot.sig.multi.cox.OS.combined.cat <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cat)),silent = T)
+try(annot.sig.multi.cox.OS.combined.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cont)), silent =T) ### error that given dataset hsapiens_gene_ensembl is not valid, use listDatasets() function to check
+try(annot.sig.multi.cox.OS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.lancetG3G4.cont)), silent = T) ###note that sometimes need to run the annotate separately outside of the try statement for it to work
+try(annot.sig.multi.cox.OS.PNET5.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.PNET5.cont)),silent = T)
+try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.SHHold.cont)), silent = T) ###  may not exist
 
 
-### then annotate these significant transcripts
-
+### can also add in explicitly where to make changes if new results.master file is being utilised as the basis for this clinical_data_extract_DW.R file
 ############################################################################
 ############################################################################
+### decision not to make this as a function Dec 2017
 
 ### function to return files:
-extracted.dataframes <- list(cox.PFS.cat.all.df, 
-                             cox.PFS.cont.all.df,
-                             cox.PFS.cat.G3G4.df,
-                             cox.PFS.cont.G3G4.df,
-                             cox.PFS.cat.SHH.df,
-                             cox.PFS.cont.SHH.df,
-                             cox.PFS.cat.SHH.old.df,
-                             cox.PFS.cont.SHH.old.df,
-                             cox.OS.cat.all.df,
-                             cox.OS.cont.all.df,
-                             cox.OS.cat.G3G4.df,
-                             cox.OS.cont.G3G4.df,
-                             cox.OS.cat.SHH.df,
-                             cox.OS.cont.SHH.df,
-                             cox.OS.cat.SHH.old.df,
-                             cox.OS.cont.SHH.old.df,
-                             cox.EFS.cat.all.df,
-                             cox.EFS.cat.G3G4.df 
-)
+# extracted.dataframes <- list(cox.PFS.cat.all.df, 
+                           #  cox.PFS.cont.all.df,
+                           #  cox.PFS.cat.G3G4.df,
+                           #  cox.PFS.cont.G3G4.df,
+                           #  cox.PFS.cat.SHH.df,
+                           #  cox.PFS.cont.SHH.df,
+                           #  cox.PFS.cat.SHH.old.df,
+                           #  cox.PFS.cont.SHH.old.df,
+                           #  cox.OS.cat.all.df,
+                           #  cox.OS.cont.all.df,
+                           #  cox.OS.cat.G3G4.df,
+                           #  cox.OS.cont.G3G4.df,
+                          #   cox.OS.cat.SHH.df,
+                          #   cox.OS.cont.SHH.df,
+                          #   cox.OS.cat.SHH.old.df,
+                          #   cox.OS.cont.SHH.old.df,
+                         #    cox.EFS.cat.all.df,
+                         #    cox.EFS.cat.G3G4.df 
+# )
 
 ### for ease can list all of the dataframes up above to assist with understanding the outputs 4/12/17
 # return (extracted.dataframes)
