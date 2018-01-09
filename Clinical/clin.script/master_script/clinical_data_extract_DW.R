@@ -456,7 +456,7 @@ significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(mu
 
 significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),]
 
-###need to check this Jan 2018
+###need to check the PFS data Jan 2018, as the adjusted p value for the PFS dataframes are mostly =1, therefore the transcripts being extracted for the significant dataframes are those with infinite hazard ratio 95CI
 
 significant.multivar.cox.PFS.combined.cat <- multivar.cox.PFS.combined.cat.df [which (multivar.cox.PFS.combined.cat.df[,2]<0.05), ] ###need to check this Jan 2018
 
@@ -464,20 +464,18 @@ significant.multivar.cox.PFS.combined.cont <- multivar.cox.PFS.combined.cont.df 
 
 significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ###need to check this Jan 2018
 
-### up to here 21/12/17 ### generate significant dataframes from here Jan 2018
+significant.multivar.cox.PFS.lancetG3G4.cont <- multivar.cox.PFS.lancetG3G4.cont.df[which (multivar.cox.PFS.lancetG3G4.cont.df[,2]<0.05),]
 
-# multivar.cox.PFS.lancetG3G4.cont.df 
+significant.multivar.cox.PFS.PNET5.cat <- multivar.cox.PFS.PNET5.cat.df[which(multivar.cox.PFS.PNET5.cat.df[,2]<0.05),]
 
-# multivar.cox.PFS.PNET5.cat.df
+significant.multivar.cox.PFS.PNET5.cont <- multivar.cox.PFS.PNET5.cont.df[which(multivar.cox.PFS.PNET5.cont.df[,2]<0.05),]
 
-#multivar.cox.PFS.PNET5.cont.df
+significant.multivar.cox.PFS.SHHold.cat <- multivar.cox.PFS.SHHold.cat.df[which(multivar.cox.PFS.SHHold.cat.df[,2]<0.05),]
 
-#multivar.cox.PFS.SHHold.cat.df
-
-#multivar.cox.PFS.SHHold.cont.df
+significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[which(multivar.cox.PFS.SHHold.cont.df[,2]<0.05),]
 
 
-### annotated dataframes for significant multivar cox 
+### annotated dataframes for significant multivar cox  ### note that the rownames (ENSG id) have been truncated so may need to be optimised 4/1/18
 
 
 try(annot.sig.multi.cox.OS.combined.cat <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cat)),silent = T)
@@ -487,35 +485,11 @@ try(annot.sig.multi.cox.OS.PNET5.cont <- annotate.HTseq.IDs(rownames(significant
 try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.SHHold.cont)), silent = T) ###  may not exist
 
 
+# write.csv(annot.sig.multi.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.sig.multi.cox.OS.lancetG3G4.cont.csv")
+          
 ### can also add in explicitly where to make changes if new results.master file is being utilised as the basis for this clinical_data_extract_DW.R file
 ############################################################################
 ############################################################################
-### decision not to make this as a function Dec 2017
-
-### function to return files:
-# extracted.dataframes <- list(cox.PFS.cat.all.df, 
-                           #  cox.PFS.cont.all.df,
-                           #  cox.PFS.cat.G3G4.df,
-                           #  cox.PFS.cont.G3G4.df,
-                           #  cox.PFS.cat.SHH.df,
-                           #  cox.PFS.cont.SHH.df,
-                           #  cox.PFS.cat.SHH.old.df,
-                           #  cox.PFS.cont.SHH.old.df,
-                           #  cox.OS.cat.all.df,
-                           #  cox.OS.cont.all.df,
-                           #  cox.OS.cat.G3G4.df,
-                           #  cox.OS.cont.G3G4.df,
-                          #   cox.OS.cat.SHH.df,
-                          #   cox.OS.cont.SHH.df,
-                          #   cox.OS.cat.SHH.old.df,
-                          #   cox.OS.cont.SHH.old.df,
-                         #    cox.EFS.cat.all.df,
-                         #    cox.EFS.cat.G3G4.df 
-# )
-
-### for ease can list all of the dataframes up above to assist with understanding the outputs 4/12/17
-# return (extracted.dataframes)
-###########################################
 
 ### schema when integrating new subsetting into a function
 ### 1. determine relevant formulae e. extract.cox.OS, cox.dataframe

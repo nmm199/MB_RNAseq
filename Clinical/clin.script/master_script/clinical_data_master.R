@@ -82,7 +82,7 @@ mb.vsd.novel <- read.delim(file="/home/dan/mygit/rna_seq_mb/paper/vsd.novel.txt"
 
 mb.vsd <- read.delim(RNA.data)
 
-# mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
+mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
 
 
 ##############################################################################
@@ -154,31 +154,31 @@ tic()
 # }
 
 ### unhash when running the randomised dataset 1/11/17 ### on server
-# results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
-#  as.numeric(mb.vsd.random [i,]) -> x
-#  names(x) <- colnames(mb.vsd.random)
-#  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd.random) as error may have been related to the object being matrix not dataframe
-#  return(clinPathAssess(test.pData,x)) 
-# }
+ results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
+  as.numeric(mb.vsd.random [i,]) -> x
+  names(x) <- colnames(mb.vsd.random)
+  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd.random) as error may have been related to the object being matrix not dataframe
+  return(clinPathAssess(test.pData,x)) 
+ }
 
 
 ### unhash when running the novel transcript set
 
- results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
- as.numeric(mb.vsd.novel[i,]) -> x
- names(x) <- colnames(mb.vsd.novel)
- names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
- return(clinPathAssess(test.pData,x)) 
- }
+# results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
+# as.numeric(mb.vsd.novel[i,]) -> x
+# names(x) <- colnames(mb.vsd.novel)
+# names(x) <- gsub("T","",names(mb.vsd.novel)) ### check that this is correct
+# return(clinPathAssess(test.pData,x)) 
+# }
 
 
-### script for [1:10] ie isolated set of transcripts. have changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+### script for  isolated set of transcripts to see that function is working. Changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 ### this is for the main expression dataset
 # i = 1
 # results.master <- foreach(i = 1:25)%dopar%{
-# as.numeric(mb.vsd.random[i,]) -> x
-# names(x) <- colnames(mb.vsd.random)
-# names(x) <- gsub("T","",names(mb.vsd.random)) 
+# as.numeric(mb.vsd[i,]) -> x
+# names(x) <- colnames(mb.vsd)
+# names(x) <- gsub("T","",names(mb.vsd)) 
 # return(clinPathAssess(test.pData,x))
 # }
 
@@ -195,8 +195,8 @@ tic()
 ### unhash the relevant name for the output 
 
 # names(results.master) <- row.names(mb.vsd)
-# names (results.master) <- row.names(mb.vsd.random)
- names(results.master) <- row.names(mb.vsd.novel)
+ names (results.master) <- row.names(mb.vsd.random)
+# names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
 # names(results.master) <- row.names(mb.vsd)[1:10]
 
@@ -212,9 +212,9 @@ toc()
 ### 17/10/17 note: once this runs for the randomised file, then can save RDS
 
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
-# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.rds")
-# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.random.rds")
- saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
+ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.random.20180104.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
 
 ### then reload this when examining the results
 
@@ -225,14 +225,14 @@ toc()
 ### Annotate with known gene sets
 
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
- annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
+# annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-# annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
+ annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
 
 
-# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.allgenes.csv")
- write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.csv") ### this is the novel transcripts
-# write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.csv")
+# write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.allgenes.20180104.csv")
+# write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.20180104.csv") ### this is the novel transcripts
+ write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.20180104.csv")
 
 ###############################################################################
 ###############################################################################
@@ -266,7 +266,7 @@ MYC <- as.numeric(mb.vsd["ENSG00000136997.15_1",])
 names(MYC) <- colnames(mb.vsd)
 guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)
 
-annotate.HTseq.IDs(rownames(guilt.res.MYC)) -> annot
+annot <- annotate.HTseq.IDs(rownames(guilt.res.MYC)) ### note this worked when I loaded the annotate.HTseq.IDs function again (clinical_data_functions_master.R)
 cbind(guilt.res.MYC, adj.p.val=p.adjust(guilt.res.MYC[,2], method = "BH"), annot) -> guilt.res.MYC
 guilt.res.MYC[!is.na(guilt.res.MYC[,1]),] -> guilt.res.MYC
 head(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the first 20 associated transcripts 
@@ -298,4 +298,5 @@ library(powerSurvEpi)
 ### where E=experimental group, C=control group, pE= probability of event in the experimental group, RR is relative risk
 ### if calculating ratios between E:C group, where k=ratio E:C, m= total number of expected events over both groups
 # powerCT.default0(k=, m=, RR=, alpha=)
+
 

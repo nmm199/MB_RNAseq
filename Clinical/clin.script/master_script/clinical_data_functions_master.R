@@ -700,21 +700,22 @@ clinPathAssess <- function(test.pData,
      # pdf.file = NULL
      # log.file = NULL
   
-  ### MM stipulating inputs 140917
+  ### MM stipulating inputs 140917, best to refresh environment and restart R
   ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below. 
   ### if then interrogate functions, will need to generate matched.test.pData
   
   # goi <- "ENSG00000008196.12_1" ### TFAP2B
+  
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
   # goi.vsd <- as.numeric(mb.vsd[goi,])  ### make sure this is unhashed when running the clinPathAssess function
   
   ### the output would be a vector with a continuous variable, names equal NMB numbers
-   names(goi.vsd) <- gsub("T","",names(mb.vsd))
-   test.pData = test.pData
-    pdf.file = NULL
-    log.file = NULL
+  # names(goi.vsd) <- gsub("T","",names(mb.vsd)) ### check that new file is generated, lines 714 to 717 were hashed as of 4/1/18, file runs OK, this needs to be unhashed if running individual goi
+  # test.pData = test.pData
+  #  pdf.file = NULL
+  #  log.file = NULL
   ### 
   
   #############################################

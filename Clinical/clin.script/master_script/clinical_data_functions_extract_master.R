@@ -283,9 +283,12 @@ extract.multivar.cox.U95CI <- function (x, subset.index){
 }
 
 
-# results.master = results.master
-# subset.index = 1
+### unhash here if troubleshooting with individual functions
 
+ # results.master = results.master #
+ # subset.index = 1                #
+
+ 
 extract.multivar.cox <- function(results.master, subset.index){
   cox.dataframe (pval = lapply(results.master, extract.multivar.cox.pval, subset.index = subset.index), 
                  Zscore = lapply(results.master, extract.multivar.cox.Zscore, subset.index = subset.index), 
@@ -297,6 +300,7 @@ extract.multivar.cox <- function(results.master, subset.index){
 
 
 ####################################
+### if wish to check the individual function, could run cox.dataframe(pval... onwards) to create dataframe to check
 
 extract.multivar.cox.PFS <- function(results.master, subset.index){
   cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.pval, subset.index = subset.index),
@@ -306,6 +310,52 @@ extract.multivar.cox.PFS <- function(results.master, subset.index){
                 U95CI = lapply(results.master, extract.multivar.cox.PFS.U95CI, subset.index = subset.index)
   )
 }
+
+
+
+### or create a new function for extract.multivar.cox.PFS based on directly naming the variable
+### example: 
+# extract.chi.all <- function(results.master, name){
+  #extracted.chi.all.pval <- lapply(results.master, function(x){return(x[["chi.sq.list"]][[name]][["p.value"]])}) 
+  #extracted.chi.all.pval.assembled <- do.call(rbind, extracted.chi.all.pval)
+  #adjusted.p.chi.all <-p.adjust(extracted.chi.all.pval.assembled, method = "BH") 
+  #chi.pvalue <- cbind(extracted.chi.all.pval.assembled, adjusted.p.chi.all)
+  #colnames(chi.pvalue) <- c("chi.p.value", "adjusted.pval")
+  #return(chi.pvalue)
+
+### trying this here, but not quite working yet
+# extract.multivar.cox.PFS.all <- function(results.master, name){
+  #extracted.multivar.cox.PFS.pval <- lapply(results.master, function(x){return(x[["cox.multivar.p.values.list"]][[name]][["cox.pval"]])})
+  #extracted.multivar.cox.PFS.HR <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.HR"]]})
+  #extracted.multivar.cox.PFS.L95CI <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.lower.95CI"]]})
+  #extracted.multivar.cox.PFS.U95CI <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.upper.95CI"]]})
+  #extracted.multivar.cox.PFS.Zscore <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.Zscore"]]})
+  
+  ##cox.pval.assembled <- do.call(rbind(extracted.multivar.cox.PFS.pval))
+  #extracted.adjusted.pval <- p.adjust(cox.pval.assembled, method = "BH")
+  #extracted.multivar.cox.dataframe <- (pval = extracted.multivar.cox.PFS.pval, 
+   #                     adj.p.val = extracted.adjusted.pval,
+    #                    Zscore = extracted.multivar.cox.PFS.Zscore, 
+     #                   HR = extracted.multivar.cox.PFS.HR, 
+      #                  L95CI = extracted.multivar.cox.PFS.L95CI,
+       #                 U95CI = extracted.multivar.cox.PFS.U95CI)
+  #return(extracted.multivar.cox.dataframe)
+#}
+
+
+# trial.multi.cox.PFS.combined.cat <- extract.multivar.cox.PFS.all (results.master, name = "multivar.cox.PFS.combined.cat")
+# results.master = results.master
+# name = "multivar.cox.PFS.combined.cat"
+
+  # x =1 
+# subset.index = 1
+
+#extract.multivar.cox.pval <-  function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA, ### was 3
+#                ifelse(length(x[[5]][[subset.index]])< 6, NA,  ### was < 6
+#                       ifelse(length(x[[5]][[subset.index]][[1]])<1, NA,
+#                              x[[5]][[subset.index]][[1]]))))
+#}
 
 
 extract.multivar.cox.PFS.pval <- function(x, subset.index){
