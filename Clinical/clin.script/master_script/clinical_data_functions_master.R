@@ -33,6 +33,7 @@ library(survival)
 ### cox.dataframe
 ### annotate.HTseq.IDs
 ### log.reg.dataframe
+### gp.style.filter
 
 ##############################################################################################
 
@@ -701,22 +702,29 @@ clinPathAssess <- function(test.pData,
      # log.file = NULL
   
   ### MM stipulating inputs 140917, best to refresh environment and restart R
-  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below. 
+  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below, then will need to unhash the following:
+      ### 1. a goi line
+      ### 2. goi.vsd line 715 that links to mb.vsd
+      ### 3. names(goi.vsd) line 720
   ### if then interrogate functions, will need to generate matched.test.pData
   
   # goi <- "ENSG00000008196.12_1" ### TFAP2B
-  
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
   # goi <- "ENSG00000249859"
-  # goi.vsd <- as.numeric(mb.vsd[goi,])  ### make sure this is unhashed when running the clinPathAssess function
+  # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 720, 723-725.
+ #  goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
+ # goi.vsd <- as.numeric(mb.vsd[goi,]) ### 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function
   
   ### the output would be a vector with a continuous variable, names equal NMB numbers
-  # names(goi.vsd) <- gsub("T","",names(mb.vsd)) ### check that new file is generated, lines 714 to 717 were hashed as of 4/1/18, file runs OK, this needs to be unhashed if running individual goi
-  # test.pData = test.pData
-  #  pdf.file = NULL
-  #  log.file = NULL
-  ### 
+ 
+  # names(goi.vsd) <- names(mb.vsd) ### added 16/1/18
+  # goi.vsd <- names(goi.vsd)[- grep("T", names(goi.vsd))] ### added 30/1/18 to remove the duplicate sample numbers, this only generates names without dataframe
+
+  test.pData = test.pData
+  pdf.file = NULL
+  log.file = NULL
+   ### 
   
   #############################################
   ### setting up output files for log, messages and PDF files
@@ -732,6 +740,7 @@ clinPathAssess <- function(test.pData,
   #############################################
   
   ### matching the expression data (goi data) with the initially compiled clinical data with important variables
+  ### will need to exclude duplicates (two RNA samples separately listed, defined as "NMBnumberT") 16/1/18
   
   index <- match(names(goi.vsd), rownames(test.pData)) 
   matched.test.pData <- test.pData[index[!is.na(index)],] 
@@ -1068,6 +1077,13 @@ clinPathAssess <- function(test.pData,
   matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
   matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
   
+  
+  ###  include curative Yes/No as a filter 30/1/18 
+  # matched.test.incl.pData.cure <- matched.test.incl.pData[!is.na(matched.test.incl.pData$curative),] 
+  matched.test.incl.pData <- matched.test.incl.pData[which(matched.test.incl.pData$curative =="Yes"),] ### this yields n=166 which corresponds with primary database 16/1/18, rerun fulldataset, aim for n=148
+  
+  ### to move forward will need to rename matched.test.incl.pData.cure2 to matched.test.incl.pData so that all rest of script stays unchanged 
+  
   ### G3 and G4 combined dataframe
   
   #cat ("creating combined dataframe to assess biomarker in G3 G4 combined group, for survival cohort, aged 3-16 years, curative intent", sep = "\n")
@@ -1397,4 +1413,32 @@ log.reg.dataframe <- function(pval, OR, L95CI, U95CI){
   logreg.allresults.df <- cbind(logreg.pval.assembled, logreg.adj.pval, logreg.OR.assembled, logreg.L95CI.assembled, logreg.U95CI.assembled)
   colnames(logreg.allresults.df)<- c("logreg.pval", "logreg.adj.pval","logreg.OR", "logreg.OR.L95CI", "logreg.OR.U95CI" )
   return (logreg.allresults.df)
+}
+
+########################################################################################
+
+### Function called gp.style.filter that helps created a filtered file, using preset filters related to transcript expression (minimum, variance, fold chance)
+
+gp.style.filter<- function (x,fold.change, delta, prop, base, prop.base, na.rm = TRUE, neg.rm = TRUE) 
+{
+  if (na.rm == TRUE){x <- x[!is.na(x)]}
+  if (neg.rm == TRUE){x <- x[x > 0]}
+  lenx <- length(x)
+  if (lenx < 4 || lenx < prop + 1){return(FALSE)}
+  srtd <- sort(x)
+  if (prop < 1) {
+    bot <- lenx * prop
+  }else {bot <- prop}
+  top <- lenx - bot
+  fold.filter<-FALSE
+  delta.filter<-FALSE
+  base.filter<-FALSE
+  if (max(srtd[bot:top]) / min(srtd[bot:top]) > fold.change){fold.filter<-TRUE}
+  if (max(srtd[bot:top]) - min(srtd[bot:top]) > delta){delta.filter<-TRUE}
+  if (length(which(srtd > base))>(prop.base*lenx)){base.filter<-TRUE}
+  if (fold.filter ==TRUE & delta.filter == TRUE & base.filter == TRUE){
+    return(TRUE)
+  }else{
+    return(FALSE)
+  }
 }

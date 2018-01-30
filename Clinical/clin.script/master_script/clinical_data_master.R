@@ -107,7 +107,9 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 # goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, or can specify a goi within inverted commas
 
-# goi <- "ENSG00000008196"                
+# goi <- "ENSG00000008196"     
+# goi <- "ENSG00000173818.16"
+ 
 # goi.vsd <- as.numeric(mb.vsd[goi, ])    
 # names(mb.vsd) -> names(goi.vsd)        
 
@@ -143,7 +145,7 @@ tic()
 #  names(x) <- gsub("T","",names(mb.vsd.novel))
 #  clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
 
-### unhash when running the complete transcript set
+### unhash when running the complete unfiltered transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
 ### results.master <- foreach(i = 1:5)%dopar%{
@@ -154,14 +156,36 @@ tic()
 # }
 
 ### unhash when running the randomised dataset 1/11/17 ### on server
- results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
-  as.numeric(mb.vsd.random [i,]) -> x
-  names(x) <- colnames(mb.vsd.random)
-  names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd.random) as error may have been related to the object being matrix not dataframe
-  return(clinPathAssess(test.pData,x)) 
+# results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
+ # as.numeric(mb.vsd.random [i,]) -> x
+ # names(x) <- colnames(mb.vsd.random)
+ # names(x) <- gsub("T","",names(x)) ### changed this from names(mb.vsd.random) as error may have been related to the object being matrix not dataframe
+ # return(clinPathAssess(test.pData,x)) 
+# }
+
+
+### new script for grep 30/1/18 and filters
+ 
+### filtering out patients
+mb.vsd[-grep ("T", names(mb.vsd ))] -> filt.mb.vsd
+
+### filtering out samples based on preset filters of variance stabilised reads
+### filters include: change in expression levels, proportion (remove top and bottom x percent), base expression i.e lowest expression level, proportion of samples that need to express the minimum base level)
+
+gp.index <- apply(2^filt.mb.vsd,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+### the mb vsd expression set is transformed from log(2) to exponential, to allow characterisation of delta change (in absolute terms)
+
+### create a dataframe based on these transcripts that meet filter criteria, which will be passed through to the clinPathAssess function
+
+gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
+
+  results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
+   # results.master <- foreach(i = 1:5)%dopar%{
+   as.numeric(gp.filt.mb.vsd[i,]) -> x
+   names(x) <- colnames(gp.filt.mb.vsd)
+   return(clinPathAssess(test.pData,x)) 
  }
-
-
+ 
 ### unhash when running the novel transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
@@ -193,12 +217,16 @@ tic()
 ##############################################################################
 
 ### unhash the relevant name for the output 
+### relevant files are the unfiltered complete transcripts (mb.vsd), randomised complete (mb.vsd.random), complete novel (mb.vsd.novel)
+### sample filtered: will need to use these now with sample filtration (filt.mb.vsd)  
+### gene and sample filtered (gp.filt.mb.vsd)
 
 # names(results.master) <- row.names(mb.vsd)
- names (results.master) <- row.names(mb.vsd.random)
+  names (results.master) <- row.names(mb.vsd.random)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
 # names(results.master) <- row.names(mb.vsd)[1:10]
+  names (results.master)<- row.names(gp.filt.mb.vsd)
 
 toc()
 
@@ -213,7 +241,7 @@ toc()
 
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
- saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.random.20180104.rds")
+ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.random.20180104.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
 
 ### then reload this when examining the results

@@ -362,7 +362,7 @@ extract.multivar.cox.PFS.pval <- function(x, subset.index){
   return (ifelse(length(x[[5]])<14, NA, 
                  ifelse(length(x[[5]][[subset.index]])<3, NA, 
                         ifelse(length(x[[5]][[subset.index]][[1]])<1, NA, 
-                               x[[5]][[subset.index]][[2]]))))
+                               x[[5]][[subset.index]][[1]]))))  ### changed from 2 to 1 on 9/1/18
 }
 
 
