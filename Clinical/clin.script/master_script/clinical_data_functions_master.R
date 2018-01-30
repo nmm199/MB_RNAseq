@@ -710,16 +710,14 @@ clinPathAssess <- function(test.pData,
   
   # goi <- "ENSG00000008196.12_1" ### TFAP2B
   # goi <- "ENSG00000008196"
-  ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997"
+  ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997" ### unhash ** when running individual goi
   # goi <- "ENSG00000249859"
   # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 720, 723-725.
- #  goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
- # goi.vsd <- as.numeric(mb.vsd[goi,]) ### 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function
-  
+  # goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
+  # goi.vsd <- as.numeric(mb.vsd[goi,]) ### 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function ie. ### unhash ** when running individual goi
+   
   ### the output would be a vector with a continuous variable, names equal NMB numbers
- 
-  # names(goi.vsd) <- names(mb.vsd) ### added 16/1/18
-  # goi.vsd <- names(goi.vsd)[- grep("T", names(goi.vsd))] ### added 30/1/18 to remove the duplicate sample numbers, this only generates names without dataframe
+  # names(goi.vsd) <- names(mb.vsd) ### added 16/1/18, unhash ** when running individual goi
 
   test.pData = test.pData
   pdf.file = NULL

@@ -5,7 +5,8 @@
 
 ### file input
 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds") 
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds")
 # results.master <- readRDS(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/superceded/results.master.allgenes.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds") ### has cox Z score
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.12100.12150.rds")
@@ -581,4 +582,9 @@ hist(km.EFS.p.extract.assembled.all)
 lines(density(km.EFS.p.extract.assembled.all), col = "red")
 
 
+#########################################################################################################################################
+### evaluating the specifics of extracted data 30/1/18
+
+plot(ecdf(mb.vsd["ENSG00000188314",])) ### this showed a flat density curve, fn(x)=1
+mb.vsd["ENSG00000188314", ]  ### this showed that all expression values were the SAME, which explains why p value was 0 and cox z score infinite
 

@@ -137,24 +137,70 @@ registerDoParallel(16) ### best to do in multiples of 8 or 16 as divides easier 
 
 tic()
 
-### unhash here when trouble shooting
+###############################################################################
+################################################################################
+### creating filtered files 30/1/18
+### filtering out patients
+filt.mb.vsd <- mb.vsd[-grep ("T", names(mb.vsd ))] 
+filt.mb.vsd.random <- mb.vsd.random [-grep ("T", names(mb.vsd.random))]
+filt.mb.vsd.novel <- mb.vsd.novel[-grep("T", names(mb.vsd.novel))]
 
-# i=25 
-# as.numeric(mb.vsd.novel[i,]) -> x
-# names(x) <- colnames(mb.vsd.novel)
-#  names(x) <- gsub("T","",names(mb.vsd.novel))
-#  clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+### then can insert filt.mb.vsd directly into clinPathAssess function below
 
+### further filtering of samples based on preset filters of variance stabilised reads
+### filters include: change in expression levels, proportion (remove top and bottom x percent), base expression i.e lowest expression level, proportion of samples that need to express the minimum base level)
+
+gp.index <- apply(2^filt.mb.vsd,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+gp.index.novel <- apply(2^filt.mb.vsd.novel,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+# gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+### the mb vsd expression set is transformed from log(2) to exponential, to allow characterisation of delta change (in absolute terms)
+
+### create a dataframe based on these transcripts that meet filter criteria, which will be passed through to the clinPathAssess function below
+
+gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
+gp.filt.mb.vsd.novel <- filt.mb.vsd.novel[gp.index.novel, ]
+# gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
+
+#results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
+  ### results.master <- foreach(i = 1:5)%dopar%{
+  #as.numeric(gp.filt.mb.vsd[i,]) -> x
+  #names(x) <- colnames(gp.filt.mb.vsd)
+ # return(clinPathAssess(test.pData,x)) 
+#}
+
+######################################################################################################################################################################
+######################################################################################################################################################################
+### can run specific input transcript files, then choose the relevant input and output below, with results.master name and destination, annotated file for known genes
+######################################################################################################################################################################################################################################################
+### unhash when running the filtered transcript set (remove duplicates with "NMBXXXT")
+
+# results.master <- foreach(i = 1:nrow(filt.mb.vsd))%dopar%{
+  ### results.master <- foreach(i = 1:5)%dopar%{
+  # as.numeric(filt.mb.vsd[i,]) -> x
+  # names(x) <- colnames(filt.mb.vsd)
+  # return(clinPathAssess(test.pData,x)) 
+# }
+
+
+################################################################################
+results.master <- foreach(i = 1:nrow(filt.mb.vsd.novel))%dopar%{
+  # results.master <- foreach(i = 1:5)%dopar%{
+  as.numeric(filt.mb.vsd.novel[i,]) -> x
+  names(x) <- colnames(filt.mb.vsd.novel)
+  return(clinPathAssess(test.pData,x)) 
+}
+
+################################################################################
 ### unhash when running the complete unfiltered transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd))%dopar%{
-### results.master <- foreach(i = 1:5)%dopar%{
 # as.numeric(mb.vsd[i,]) -> x
 # names(x) <- colnames(mb.vsd)
 # names(x) <- gsub("T","",colnames(mb.vsd))
 # return(clinPathAssess(test.pData,x)) 
 # }
 
+################################################################################
 ### unhash when running the randomised dataset 1/11/17 ### on server
 # results.master <- foreach(i = 1:nrow(mb.vsd.random))%dopar%{
  # as.numeric(mb.vsd.random [i,]) -> x
@@ -163,29 +209,7 @@ tic()
  # return(clinPathAssess(test.pData,x)) 
 # }
 
-
-### new script for grep 30/1/18 and filters
- 
-### filtering out patients
-mb.vsd[-grep ("T", names(mb.vsd ))] -> filt.mb.vsd
-
-### filtering out samples based on preset filters of variance stabilised reads
-### filters include: change in expression levels, proportion (remove top and bottom x percent), base expression i.e lowest expression level, proportion of samples that need to express the minimum base level)
-
-gp.index <- apply(2^filt.mb.vsd,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
-### the mb vsd expression set is transformed from log(2) to exponential, to allow characterisation of delta change (in absolute terms)
-
-### create a dataframe based on these transcripts that meet filter criteria, which will be passed through to the clinPathAssess function
-
-gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
-
-  results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
-   # results.master <- foreach(i = 1:5)%dopar%{
-   as.numeric(gp.filt.mb.vsd[i,]) -> x
-   names(x) <- colnames(gp.filt.mb.vsd)
-   return(clinPathAssess(test.pData,x)) 
- }
- 
+################################################################################
 ### unhash when running the novel transcript set
 
 # results.master <- foreach(i = 1:nrow(mb.vsd.novel))%dopar%{
@@ -195,7 +219,8 @@ gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
 # return(clinPathAssess(test.pData,x)) 
 # }
 
-
+################################################################################
+### troubleshooting
 ### script for  isolated set of transcripts to see that function is working. Changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
 ### this is for the main expression dataset
 # i = 1
@@ -206,15 +231,23 @@ gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
 # return(clinPathAssess(test.pData,x))
 # }
 
-# results.master <- foreach(i = 12200:12250)%dopar%{      ### previously tried 12000 - 12050, 12100-12150 and ran successfully. #  i = 12109  ###  previous error was around this number
+# results.master <- foreach(i = 12200:12250)%dopar%{      ### investigating range to determine location of error
  # as.numeric(mb.vsd.novel[i,]) -> x
  #  names(x) <- colnames(mb.vsd.novel)
  # names(x) <- gsub("T","",names(mb.vsd.novel)) 
  #  return(clinPathAssess(test.pData,x))
  # }
 
- 
-##############################################################################
+### other troubleshooting
+
+# i=25 
+# as.numeric(mb.vsd.novel[i,]) -> x
+# names(x) <- colnames(mb.vsd.novel)
+#  names(x) <- gsub("T","",names(mb.vsd.novel))
+#  clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+
+################################################################################
+################################################################################
 
 ### unhash the relevant name for the output 
 ### relevant files are the unfiltered complete transcripts (mb.vsd), randomised complete (mb.vsd.random), complete novel (mb.vsd.novel)
@@ -222,11 +255,12 @@ gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
 ### gene and sample filtered (gp.filt.mb.vsd)
 
 # names(results.master) <- row.names(mb.vsd)
-  names (results.master) <- row.names(mb.vsd.random)
+# names (results.master) <- row.names(mb.vsd.random)
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:nrow(mb.vsd)]
 # names(results.master) <- row.names(mb.vsd)[1:10]
-  names (results.master)<- row.names(gp.filt.mb.vsd)
+#  names (results.master)<- row.names(gp.filt.mb.vsd)
+names (results.master)<- row.names(filt.mb.vsd.novel)
 
 toc()
 
@@ -237,12 +271,15 @@ toc()
 ### save RDS
 
 ### update name according to input file
-### 17/10/17 note: once this runs for the randomised file, then can save RDS
 
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
- saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.random.20180104.rds")
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.random.20180104.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
+
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds")
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.rds")
+saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.gp.filt.novel.20180130.rds")
 
 ### then reload this when examining the results
 
@@ -254,13 +291,16 @@ toc()
 
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
-
- annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
-
+# annot.random <- annotate.HTseq.IDs(row.names(mb.vsd.random))
+# annot.filt.results <- annotate.HTseq.IDs(row.names(filt.mb.vsd)) ### or can use gp.filt.mb.vsd
+annot.filt.novel <- annotate.HTseq.IDs(row.names(filt.mb.vsd.novel))
 
 # write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.allgenes.20180104.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.20180104.csv") ### this is the novel transcripts
- write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.20180104.csv")
+# write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.20180104.csv")
+# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.csv" )
+# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.csv" )
+ write.csv(annot.filt.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.novel.csv")
 
 ###############################################################################
 ###############################################################################
