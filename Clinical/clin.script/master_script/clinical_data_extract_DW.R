@@ -5,11 +5,10 @@
 
 ### file input
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds")
-# results.master <- readRDS(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/superceded/results.master.allgenes.rds")
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.10.051017.rds") ### has cox Z score
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.12100.12150.rds")
+ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.rds")   ### samples filtered only
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds") ### samples and genes filtered
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.novel.20180130.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")  ### currently error as file has error
 
 ### read in functions file
@@ -39,21 +38,21 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 
 ######################
 ### OS p values
-km.OS.all.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.all")
-km.OS.G3G4.results <- extract.km.OS.pval (results.master, name = "surv.km.OS.G3G4")
-km.OS.SHH.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH") ### this is an example to put into the clinical_data_extract_DW.R file
-km.OS.SHH.old.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH.old") 
+km.OS.all.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.all")               ### does not work (name does not exist) address this 13/2/18, could be curative dataframe changes
+km.OS.G3G4.results <- extract.km.OS.pval (results.master, name = "surv.km.OS.G3G4")              ### does not work
+km.OS.SHH.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH")             ### does not work
+km.OS.SHH.old.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH.old")             ### does not work
 
 ### EFS p values
-km.EFS.all.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.all")
-km.EFS.G3G4.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.G3G4")
+km.EFS.all.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.all")  ### does not work (name does not exist)
+km.EFS.G3G4.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.G3G4") ### this works
 
 ### PFS p values
-km.PFS.all.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.all")
-km.PFS.G3G4.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.G3G4")
-km.PFS.SHH.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH")
-km.PFS.SHH.old.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH.old")
-
+km.PFS.all.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.all")  ### does not work (name does not exist)
+km.PFS.G3G4.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.G3G4") ### this works
+km.PFS.SHH.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH")   ### this works
+km.PFS.SHH.old.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH.old")  ### this works
+ 
 
 ### significant dataframes for adjusted p values
 
@@ -66,9 +65,9 @@ significant.km.OS.SHH <- km.OS.SHH.results [which(km.OS.SHH.results [, 2]<0.05),
 significant.km.OS.SHH.old <- km.OS.SHH.old.results[which(km.OS.SHH.old.results[, 2]<0.05),]
 
 significant.km.PFS.all <- km.PFS.all.results[which(km.PFS.all.results[, 2]<0.05),]              ### 4/12/17 nrow = 452 (for mb.vsd)
-significant.km.PFS.G3G4 <- km.PFS.G3G4.results[which(km.PFS.G3G4.results[, 2]<0.05),]           ### 4/12/17 nrow = 379 (for mb.vsd)
-significant.km.PFS.SHH <- km.PFS.SHH.results[which(km.PFS.SHH.results[, 2]<0.05),]              ### 4/12/17 nrow = 223 (for mb.vsd)
-significant.km.PFS.SHH.old <- km.PFS.SHH.old.results[which(km.PFS.SHH.old.results[, 2]<0.05),]  ### 4/12/17 nrow = 570 (for mb.vsd)
+significant.km.PFS.G3G4 <- km.PFS.G3G4.results[which(km.PFS.G3G4.results[, 2]<0.05),]           ### 4/12/17 nrow = 379 (for mb.vsd) 6/2/18 nrow = 309 for filt.mb.vsd
+significant.km.PFS.SHH <- km.PFS.SHH.results[which(km.PFS.SHH.results[, 2]<0.05),]              ### 4/12/17 nrow = 223 (for mb.vsd) 6/2/18 nrow = 355 for filt.mb.vsd
+significant.km.PFS.SHH.old <- km.PFS.SHH.old.results[which(km.PFS.SHH.old.results[, 2]<0.05),]  ### 4/12/17 nrow = 570 (for mb.vsd) 6/2/18 nrow = 1068 for filt.mb.vsd
 
 
 ##########################################################################################################################
@@ -404,37 +403,39 @@ significant.chi.MYCMYCN <- chi.MYCMYCN.result[which(chi.MYCMYCN.result[,2]<0.05)
 ###  multivariate cox, looking for transcripts that are significant beyond either the current PNET5, the Lancet oncology paper (Schwalbe et al 2017) or a combined model taking both models together
 
 
-multivar.cox.OS.combined.cat.df <- extract.multivar.cox(results.master, 1)  ### updated so that p value is for biomarker not overall model p val 21/11/17
+multivar.cox.OS.combined.cat.df <- extract.multivar.cox(results.master,  "multivar.cox.OS.combined.cat" )  ### section updated 6/2/18 ### prev updated so that p value is for biomarker not overall model p val 21/11/17
 
-multivar.cox.OS.combined.cont.df <- extract.multivar.cox(results.master,2) 
+multivar.cox.OS.combined.cont.df <- extract.multivar.cox(results.master,"multivar.cox.OS.combined.contin")  
 
-multivar.cox.OS.lancetG3G4.cat.df <- extract.multivar.cox(results.master, 3) 
+multivar.cox.OS.lancetG3G4.cat.df <- extract.multivar.cox(results.master, "multivar.cox.OS.Lancet.G3G4.cat") 
 
-multivar.cox.OS.lancetG3G4.cont.df <- extract.multivar.cox(results.master, 4)
+multivar.cox.OS.lancetG3G4.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.Lancet.G3G4.contin" )
 
-multivar.cox.OS.PNET5.cat.df <- extract.multivar.cox(results.master, 5)
+multivar.cox.OS.PNET5.cat.df <- extract.multivar.cox(results.master, "multivar.cox.OS.PNET5.cat")
 
-multivar.cox.OS.PNET5.cont.df <- extract.multivar.cox(results.master, 6)
+multivar.cox.OS.PNET5.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.PNET5.contin") 
 
-multivar.cox.OS.SHHold.cat.df <- extract.multivar.cox(results.master, 7)
+multivar.cox.OS.SHHold.cat.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.cat")
 
-multivar.cox.OS.SHHold.cont.df <- extract.multivar.cox(results.master, 8)
+multivar.cox.OS.SHHold.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.contin")
 
-multivar.cox.PFS.combined.cat.df <- extract.multivar.cox.PFS(results.master, 9) 
 
-multivar.cox.PFS.combined.cont.df <- extract.multivar.cox.PFS (results.master, 10)  ### subsetting worked with x[[5]]<10
+### continue to make changes from here 6/2/18
+multivar.cox.PFS.combined.cat.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.combined.cat")  ### section updated 6/2/18, use same function as OS  ###"multivar.cox.PFS.combined.cat" does not exist in rerun filt.mb.vsd
 
-multivar.cox.PFS.lancetG3G4.cat.df <- extract.multivar.cox.PFS (results.master, 11) ### had to increase subset to x[[5]]< 12
+multivar.cox.PFS.combined.cont.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.combined.contin")  
 
-multivar.cox.PFS.lancetG3G4.cont.df <- extract.multivar.cox.PFS(results.master, 12) ### worked with x[[5]]<12
+multivar.cox.PFS.lancetG3G4.cat.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.Lancet.G3G4.cat")   
 
-multivar.cox.PFS.PNET5.cat.df <- extract.multivar.cox.PFS (results.master, 13) ### worked with x[[5]]<13
+multivar.cox.PFS.lancetG3G4.cont.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.Lancet.G3G4.contin") 
 
-multivar.cox.PFS.PNET5.cont.df <- extract.multivar.cox.PFS(results.master, 14) ### worked with x[[5]]<14
+multivar.cox.PFS.PNET5.cat.df <- extract.multivar.cox (results.master,  "multivar.cox.PFS.PNET5.cat" ) 
 
-multivar.cox.PFS.SHHold.cat.df <- extract.multivar.cox.PFS.SHH (results.master, 15) ### worked with x[[5]]<15 
+multivar.cox.PFS.PNET5.cont.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.PNET5.contin") 
 
-multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox.PFS.SHH (results.master, 16) ### worked with x[[5]]<16
+multivar.cox.PFS.SHHold.cat.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.SHH.old.cat")  
+
+multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.SHH.old.contin") 
 
 
 
@@ -443,37 +444,38 @@ multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox.PFS.SHH (results.master,
 
 significant.multivar.cox.OS.combined.cat <- multivar.cox.OS.combined.cat.df [which(multivar.cox.OS.combined.cat.df[,2]<0.05), ]
 
-significant.multivar.cox.OS.combined.cont <- multivar.cox.OS.combined.cont.df [which(multivar.cox.OS.combined.cont.df[,2]<0.05), ] ###n=13 21/12/17 for all transcripts
+significant.multivar.cox.OS.combined.cont <- multivar.cox.OS.combined.cont.df [which(multivar.cox.OS.combined.cont.df[,2]<0.05), ] ###n=13 21/12/17 for all transcripts. n=41 6/2/18 for allgenes.20180104.rds
 
-significant.multivar.cox.OS.lancetG3G4.cat <- multivar.cox.OS.lancetG3G4.cat.df[which(multivar.cox.OS.lancetG3G4.cat.df[,2]<0.05),]
+significant.multivar.cox.OS.lancetG3G4.cat <- multivar.cox.OS.lancetG3G4.cat.df[which(multivar.cox.OS.lancetG3G4.cat.df[,2]<0.05),] ### n=0 6/2/18 for all transcripts (allgenes.20180104.rds)
 
-significant.multivar.cox.OS.lancetG3G4.cont <- multivar.cox.OS.lancetG3G4.cont.df[which(multivar.cox.OS.lancetG3G4.cont.df[,2]<0.05),]
+significant.multivar.cox.OS.lancetG3G4.cont <- multivar.cox.OS.lancetG3G4.cont.df[which(multivar.cox.OS.lancetG3G4.cont.df[,2]<0.05),] ### n= 2 6/2/18
 
-significant.multivar.cox.OS.PNET5.cat <- multivar.cox.OS.PNET5.cat.df[which(multivar.cox.OS.PNET5.cat.df[,2]<0.05),]  ### n=43
+significant.multivar.cox.OS.PNET5.cat <- multivar.cox.OS.PNET5.cat.df[which(multivar.cox.OS.PNET5.cat.df[,2]<0.05),]  ### n=43 6/2/18 and Jan 2018
 
-significant.multivar.cox.OS.PNET5.cont <- multivar.cox.OS.PNET5.cont.df[which(multivar.cox.OS.PNET5.cont.df[,2]<0.05),] ### n=30
+significant.multivar.cox.OS.PNET5.cont <- multivar.cox.OS.PNET5.cont.df[which(multivar.cox.OS.PNET5.cont.df[,2]<0.05),] ### n=30 Jan 2018, n=48 6/2/18, need to filter real results
 
-significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(multivar.cox.OS.SHHold.cat.df[,2]<0.05), ]
+significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(multivar.cox.OS.SHHold.cat.df[,2]<0.05), ] ### n=0 6/2/18
 
-significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),]
+significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),] ### n=0 6/2/18
+
 
 ###need to check the PFS data Jan 2018, as the adjusted p value for the PFS dataframes are mostly =1, therefore the transcripts being extracted for the significant dataframes are those with infinite hazard ratio 95CI
 
-significant.multivar.cox.PFS.combined.cat <- multivar.cox.PFS.combined.cat.df [which (multivar.cox.PFS.combined.cat.df[,2]<0.05), ] ###need to check this Jan 2018
+significant.multivar.cox.PFS.combined.cat <- multivar.cox.PFS.combined.cat.df [which (multivar.cox.PFS.combined.cat.df[,2]<0.05), ] ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.combined.cont <- multivar.cox.PFS.combined.cont.df [which (multivar.cox.PFS.combined.cont.df[,2]<0.05), ]  ###need to check this Jan 2018
+significant.multivar.cox.PFS.combined.cont <- multivar.cox.PFS.combined.cont.df [which (multivar.cox.PFS.combined.cont.df[,2]<0.05), ]  ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ###need to check this Jan 2018
+significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ### n=4 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.lancetG3G4.cont <- multivar.cox.PFS.lancetG3G4.cont.df[which (multivar.cox.PFS.lancetG3G4.cont.df[,2]<0.05),]
+significant.multivar.cox.PFS.lancetG3G4.cont <- multivar.cox.PFS.lancetG3G4.cont.df[which (multivar.cox.PFS.lancetG3G4.cont.df[,2]<0.05),]  ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.PNET5.cat <- multivar.cox.PFS.PNET5.cat.df[which(multivar.cox.PFS.PNET5.cat.df[,2]<0.05),]
+significant.multivar.cox.PFS.PNET5.cat <- multivar.cox.PFS.PNET5.cat.df[which(multivar.cox.PFS.PNET5.cat.df[,2]<0.05),]  ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.PNET5.cont <- multivar.cox.PFS.PNET5.cont.df[which(multivar.cox.PFS.PNET5.cont.df[,2]<0.05),]
+significant.multivar.cox.PFS.PNET5.cont <- multivar.cox.PFS.PNET5.cont.df[which(multivar.cox.PFS.PNET5.cont.df[,2]<0.05),] ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.SHHold.cat <- multivar.cox.PFS.SHHold.cat.df[which(multivar.cox.PFS.SHHold.cat.df[,2]<0.05),]
+significant.multivar.cox.PFS.SHHold.cat <- multivar.cox.PFS.SHHold.cat.df[which(multivar.cox.PFS.SHHold.cat.df[,2]<0.05),] ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[which(multivar.cox.PFS.SHHold.cont.df[,2]<0.05),]
+significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[which(multivar.cox.PFS.SHHold.cont.df[,2]<0.05),]  ### n=2, however not realistic 6/2/18 allgenes.20180104.rds
 
 
 ### annotated dataframes for significant multivar cox  ### note that the rownames (ENSG id) have been truncated so may need to be optimised 4/1/18

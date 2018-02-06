@@ -29,16 +29,6 @@ extract.km.OS.pval <- function(results.master, name){
   return(OS.pvalue)
 } 
 
-### km.EFS
-extract.km.EFS.pval <- function(results.master, name){
-  extracted.km.EFS.pval<- lapply(results.master, function(x){return(x[["surv.p.values.list"]][[name]][["EFS.p.val"]])}) 
-  km.EFS.p.extract.assembled <- do.call(rbind, extracted.km.EFS.pval)
-  adjusted.p.km.EFS <-p.adjust(km.EFS.p.extract.assembled, method = "BH") 
-  EFS.pvalue <- cbind(km.EFS.p.extract.assembled, adjusted.p.km.EFS)
-  colnames(EFS.pvalue) <- c("EFS.p.value", "EFS.adjusted.pval")
-  return(EFS.pvalue)
-} 
-
 ### km.PFS
 extract.km.PFS.pval <- function(results.master, name){
   extracted.km.PFS.pval<- lapply(results.master, function(x){return(x[["surv.p.values.list"]][[name]][["PFS.p.val"]])}) 
@@ -49,6 +39,15 @@ extract.km.PFS.pval <- function(results.master, name){
   return(PFS.pvalue)
 } 
 
+### km.EFS
+extract.km.EFS.pval <- function(results.master, name){
+  extracted.km.EFS.pval<- lapply(results.master, function(x){return(x[["surv.p.values.list"]][[name]][["EFS.p.val"]])}) 
+  km.EFS.p.extract.assembled <- do.call(rbind, extracted.km.EFS.pval)
+  adjusted.p.km.EFS <-p.adjust(km.EFS.p.extract.assembled, method = "BH") 
+  EFS.pvalue <- cbind(km.EFS.p.extract.assembled, adjusted.p.km.EFS)
+  colnames(EFS.pvalue) <- c("EFS.p.value", "EFS.adjusted.pval")
+  return(EFS.pvalue)
+} 
 
 ###
 cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
@@ -240,48 +239,6 @@ extract.cox.OS.U95CI <- function (x, subset.index){
 
 #################
 
-extract.multivar.cox.pval <-  function (x, subset.index){
-  return(ifelse(length(x[[5]])< 1, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])< 6, NA,  ### was < 6
-                       ifelse(length(x[[5]][[subset.index]][[1]])<1, NA,
-                              x[[5]][[subset.index]][[1]]))))
-}
-
-
-extract.multivar.cox.HR <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 1, NA, 
-                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
-                              x[[5]][[subset.index]][[2]]))))
-}
-
-
-
-
-extract.multivar.cox.Zscore <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 1, NA,
-                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
-                              x[[5]][[subset.index]][[5]]))))
-}
-
-
-
-extract.multivar.cox.L95CI<- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 1, NA, 
-                ifelse(length(x[[5]][[subset.index]])< 6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
-                              x[[5]][[subset.index]][[3]]))))
-}
-
-
-extract.multivar.cox.U95CI <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 1, NA, 
-                ifelse(length(x[[5]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
-                              x[[5]][[subset.index]][[4]]))))
-}
-
 
 ### unhash here if troubleshooting with individual functions
 
@@ -289,73 +246,39 @@ extract.multivar.cox.U95CI <- function (x, subset.index){
  # subset.index = 1                #
 
  
+##################################################################################################################################
+
 extract.multivar.cox <- function(results.master, subset.index){
-  cox.dataframe (pval = lapply(results.master, extract.multivar.cox.pval, subset.index = subset.index), 
-                 Zscore = lapply(results.master, extract.multivar.cox.Zscore, subset.index = subset.index), 
-                 HR = lapply(results.master, extract.multivar.cox.HR,subset.index = subset.index ),
-                 L95CI = lapply(results.master, extract.multivar.cox.L95CI, subset.index = subset.index),
-                 U95CI = lapply(results.master, extract.multivar.cox.U95CI, subset.index = subset.index )
+  cox.dataframe (pval = lapply(results.master, function (x, subset.index){return(x[["cox.multivar.p.values.list"]][[subset.index]][["cox.pval"]])}, subset.index = subset.index), 
+                 Zscore = lapply(results.master, function (x, subset.index){return(x[["cox.multivar.p.values.list"]][[subset.index]][["cox.Zscore"]])}, subset.index = subset.index), 
+                 HR = lapply(results.master, function (x, subset.index){return(x[["cox.multivar.p.values.list"]][[subset.index]][["cox.HR"]])},subset.index = subset.index ),
+                 L95CI = lapply(results.master, function (x, subset.index){return(x[["cox.multivar.p.values.list"]][[subset.index]][["cox.lower.95CI"]])}, subset.index = subset.index),
+                 U95CI = lapply(results.master, function (x, subset.index){return(x[["cox.multivar.p.values.list"]][[subset.index]][["cox.upper.95CI"]])}, subset.index = subset.index )
   )               
 }
+
+# "multivar.cox.PFS.Lancet.G3G4.cat" -> subset.index
 
 
 ####################################
 ### if wish to check the individual function, could run cox.dataframe(pval... onwards) to create dataframe to check
 
-extract.multivar.cox.PFS <- function(results.master, subset.index){
-  cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.pval, subset.index = subset.index),
-                Zscore = lapply(results.master, extract.multivar.cox.PFS.Zscore, subset.index = subset.index),
-                HR = lapply(results.master, extract.multivar.cox.PFS.HR , subset.index = subset.index),
-                L95CI = lapply (results.master, extract.multivar.cox.PFS.L95CI, subset.index = subset.index),
-                U95CI = lapply(results.master, extract.multivar.cox.PFS.U95CI, subset.index = subset.index)
-  )
-}
+# extract.multivar.cox.PFS <- function(results.master, subset.index){
+  #cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.pval, subset.index = subset.index),
+   #             Zscore = lapply(results.master, extract.multivar.cox.PFS.Zscore, subset.index = subset.index),
+    #            HR = lapply(results.master, extract.multivar.cox.PFS.HR , subset.index = subset.index),
+     #           L95CI = lapply (results.master, extract.multivar.cox.PFS.L95CI, subset.index = subset.index),
+      #          U95CI = lapply(results.master, extract.multivar.cox.PFS.U95CI, subset.index = subset.index)
+#  )
+# }
 
 
-
-### or create a new function for extract.multivar.cox.PFS based on directly naming the variable
-### example: 
-# extract.chi.all <- function(results.master, name){
-  #extracted.chi.all.pval <- lapply(results.master, function(x){return(x[["chi.sq.list"]][[name]][["p.value"]])}) 
-  #extracted.chi.all.pval.assembled <- do.call(rbind, extracted.chi.all.pval)
-  #adjusted.p.chi.all <-p.adjust(extracted.chi.all.pval.assembled, method = "BH") 
-  #chi.pvalue <- cbind(extracted.chi.all.pval.assembled, adjusted.p.chi.all)
-  #colnames(chi.pvalue) <- c("chi.p.value", "adjusted.pval")
-  #return(chi.pvalue)
-
-### trying this here, but not quite working yet
-# extract.multivar.cox.PFS.all <- function(results.master, name){
-  #extracted.multivar.cox.PFS.pval <- lapply(results.master, function(x){return(x[["cox.multivar.p.values.list"]][[name]][["cox.pval"]])})
-  #extracted.multivar.cox.PFS.HR <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.HR"]]})
-  #extracted.multivar.cox.PFS.L95CI <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.lower.95CI"]]})
-  #extracted.multivar.cox.PFS.U95CI <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.upper.95CI"]]})
-  #extracted.multivar.cox.PFS.Zscore <- lapply(results.master, function(x){return(x)[["cox.multivar.p.values.list"]][[name]][["cox.Zscore"]]})
-  
-  ##cox.pval.assembled <- do.call(rbind(extracted.multivar.cox.PFS.pval))
-  #extracted.adjusted.pval <- p.adjust(cox.pval.assembled, method = "BH")
-  #extracted.multivar.cox.dataframe <- (pval = extracted.multivar.cox.PFS.pval, 
-   #                     adj.p.val = extracted.adjusted.pval,
-    #                    Zscore = extracted.multivar.cox.PFS.Zscore, 
-     #                   HR = extracted.multivar.cox.PFS.HR, 
-      #                  L95CI = extracted.multivar.cox.PFS.L95CI,
-       #                 U95CI = extracted.multivar.cox.PFS.U95CI)
-  #return(extracted.multivar.cox.dataframe)
-#}
-
-
-# trial.multi.cox.PFS.combined.cat <- extract.multivar.cox.PFS.all (results.master, name = "multivar.cox.PFS.combined.cat")
 # results.master = results.master
 # name = "multivar.cox.PFS.combined.cat"
 
   # x =1 
 # subset.index = 1
 
-#extract.multivar.cox.pval <-  function (x, subset.index){
-#  return(ifelse(length(x[[5]])< 1, NA, ### was 3
-#                ifelse(length(x[[5]][[subset.index]])< 6, NA,  ### was < 6
-#                       ifelse(length(x[[5]][[subset.index]][[1]])<1, NA,
-#                              x[[5]][[subset.index]][[1]]))))
-#}
 
 
 extract.multivar.cox.PFS.pval <- function(x, subset.index){
@@ -500,5 +423,62 @@ extract.chi.all <- function(results.master, name){
 #  temp.return <- cbind(pval, adj.pval)
 #  colnames(temp.return) <- c("pval", "adj.pval")
 #  return(temp.return)
+# }
+
+###############################
+### previous code for extract.multivar.cox.pval when used subsetting, replaced 6/2/18 
+### overall function
+
+#extract.multivar.cox <- function(results.master, subset.index){
+#  cox.dataframe (pval = lapply(results.master, extract.multivar.cox.pval, subset.index = subset.index), 
+#                 Zscore = lapply(results.master, extract.multivar.cox.Zscore, subset.index = subset.index), 
+#                 HR = lapply(results.master, extract.multivar.cox.HR,subset.index = subset.index ),
+#                 L95CI = lapply(results.master, extract.multivar.cox.L95CI, subset.index = subset.index),
+#                 U95CI = lapply(results.master, extract.multivar.cox.U95CI, subset.index = subset.index )
+#  )               
+#}
+
+
+
+# extract.multivar.cox.pval <-  function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA, ### was 3
+ #               ifelse(length(x[[5]][[subset.index]])< 6, NA,  ### was < 6
+  #                     ifelse(length(x[[5]][[subset.index]][[1]])<1, NA,
+   #                           x[[5]][[subset.index]][[1]]))))
+# }
+
+
+# extract.multivar.cox.HR <- function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA, 
+ #               ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+  #                     ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
+   #                           x[[5]][[subset.index]][[2]]))))
+# }
+
+
+
+
+# extract.multivar.cox.Zscore <- function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA,
+ #               ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+  #                     ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
+   #                           x[[5]][[subset.index]][[5]]))))
+# }
+
+
+
+# extract.multivar.cox.L95CI<- function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA, 
+ #               ifelse(length(x[[5]][[subset.index]])< 6, NA, 
+  #                     ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
+   #                           x[[5]][[subset.index]][[3]]))))
+# }
+
+
+# extract.multivar.cox.U95CI <- function (x, subset.index){
+#  return(ifelse(length(x[[5]])< 1, NA, 
+ #               ifelse(length(x[[5]][[subset.index]])<6, NA, 
+  #                     ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
+   #                           x[[5]][[subset.index]][[4]]))))
 # }
 

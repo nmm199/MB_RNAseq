@@ -704,7 +704,7 @@ clinPathAssess <- function(test.pData,
   ### MM stipulating inputs 140917, best to refresh environment and restart R
   ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below, then will need to unhash the following:
       ### 1. a goi line
-      ### 2. goi.vsd line 715 that links to mb.vsd
+      ### 2. goi.vsd line 717 that links to mb.vsd
       ### 3. names(goi.vsd) line 720
   ### if then interrogate functions, will need to generate matched.test.pData
   
@@ -712,16 +712,16 @@ clinPathAssess <- function(test.pData,
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997" ### unhash ** when running individual goi
   # goi <- "ENSG00000249859"
-  # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 720, 723-725.
+  # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 717, 720, 723-725.
   # goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
   # goi.vsd <- as.numeric(mb.vsd[goi,]) ### 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function ie. ### unhash ** when running individual goi
    
   ### the output would be a vector with a continuous variable, names equal NMB numbers
   # names(goi.vsd) <- names(mb.vsd) ### added 16/1/18, unhash ** when running individual goi
 
-  test.pData = test.pData
-  pdf.file = NULL
-  log.file = NULL
+  # test.pData = test.pData
+  # pdf.file = NULL
+  # log.file = NULL
    ### 
   
   #############################################
@@ -988,13 +988,11 @@ clinPathAssess <- function(test.pData,
   
   ### restrict analysis to age 3-16 yo, treated with curative intent including CSI
   
-  #cat ("create dataframe for age 3-16 years, curative intent called age.incl.df", sep = "\n")
+  #cat ("first create dataframe for age 3-16 years, age.incl.df", sep = "\n") 
   
   Age.incl <- matched.test.pData$age.filter== "TRUE"
   Age.incl.df <- matched.test.pData [Age.incl,]
   #summary(Age.incl.df)
-  
-  ### compare to prior dataframes to check accuracy of new dataframe
   
   #cat ("comparing with previous data frames for accuracy", sep = "\n")
   #summary(test.pData)
@@ -1067,20 +1065,26 @@ clinPathAssess <- function(test.pData,
   ### creating dataframe for survival analysis
   #cat ("restrict survival analysis for age 3-16 years, curative intent", sep = "\n")
   
-  ### check whether to retain the two dataframes Age.incl.df and matched.test.incl.pData 
+  ###  matched.test.incl.pData is the dataframe that contains survival group for further analysis
+  ### previous script lines 1073-1076 
+  
+  # index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
+  # matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
+  # matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
+  # matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
   
   index.incl <- match(names(goi.vsd), rownames(Age.incl.df)) 
-  matched.test.incl.pData <- Age.incl.df[index.incl[!is.na(index.incl)],] 
-  #is.vector(matched.test.incl.pData)
-  matched.goi.vsd.incl <- goi.vsd[!is.na(index.incl)] 
-  matched.goi.vsd.cat.incl <- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
-  
+  matched.test.incl.pData.prelim <- Age.incl.df[index.incl[!is.na(index.incl)],] 
+  matched.goi.vsd.incl.prelim <- goi.vsd[!is.na(index.incl)] 
+
   
   ###  include curative Yes/No as a filter 30/1/18 
-  # matched.test.incl.pData.cure <- matched.test.incl.pData[!is.na(matched.test.incl.pData$curative),] 
-  matched.test.incl.pData <- matched.test.incl.pData[which(matched.test.incl.pData$curative =="Yes"),] ### this yields n=166 which corresponds with primary database 16/1/18, rerun fulldataset, aim for n=148
+  ### then create same size matched dataframes, then rerun the script on the server 6/2/18
   
-  ### to move forward will need to rename matched.test.incl.pData.cure2 to matched.test.incl.pData so that all rest of script stays unchanged 
+  matched.test.incl.pData <- matched.test.incl.pData.prelim[which(matched.test.incl.pData.prelim$curative =="Yes"),] ### this yields n=145 (primary database n=166, 16/1/18), this account for RNA drop off and is good to continue
+  index.final.incl <- match(names(matched.goi.vsd.incl.prelim), rownames(matched.test.incl.pData))
+  matched.goi.vsd.incl <- matched.goi.vsd.incl.prelim[!is.na(index.final.incl)]
+  matched.goi.vsd.cat.incl<- ifelse(matched.goi.vsd.incl>median(goi.vsd, na.rm = T), "high","low")
   
   ### G3 and G4 combined dataframe
   

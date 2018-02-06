@@ -277,9 +277,9 @@ toc()
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.random.20180104.rds")
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
 
-# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds")
-# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.rds")
-saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.gp.filt.novel.20180130.rds")
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.rds") ### this is the filtered file for samples, contains > 60000 transcripts.
+saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.novel.20180130.rds")
 
 ### then reload this when examining the results
 
@@ -298,8 +298,8 @@ annot.filt.novel <- annotate.HTseq.IDs(row.names(filt.mb.vsd.novel))
 # write.csv(annot.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.allgenes.20180104.csv")
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.20180104.csv") ### this is the novel transcripts
 # write.csv(annot.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.random.20180104.csv")
-# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.csv" )
-# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.csv" )
+# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts
+# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.csv" ) ### this is the filtered file for samples, contains > 60000 transcripts.
  write.csv(annot.filt.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.novel.csv")
 
 ###############################################################################
