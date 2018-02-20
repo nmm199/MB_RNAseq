@@ -5,10 +5,10 @@
 
 ### file input
 
- results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180130.rds")   ### samples filtered only
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.allgenes.20180130.rds") ### samples and genes filtered
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.novel.20180130.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds")   ### samples filtered only
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### samples and genes filtered
+ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")  ### currently error as file has error
 
 ### read in functions file
@@ -415,9 +415,9 @@ multivar.cox.OS.PNET5.cat.df <- extract.multivar.cox(results.master, "multivar.c
 
 multivar.cox.OS.PNET5.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.PNET5.contin") 
 
-multivar.cox.OS.SHHold.cat.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.cat")
+multivar.cox.OS.SHHold.cat.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.cat") ### something to sort out 20/02/18 as generating 0/inf for 95CI and same p val/adj p val
 
-multivar.cox.OS.SHHold.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.contin")
+multivar.cox.OS.SHHold.cont.df <- extract.multivar.cox(results.master, "multivar.cox.OS.SHH.old.contin") ### as above 20/02/18
 
 
 ### continue to make changes from here 6/2/18
@@ -459,13 +459,13 @@ significant.multivar.cox.OS.SHHold.cat <- multivar.cox.OS.SHHold.cat.df[which(mu
 significant.multivar.cox.OS.SHHold.cont <- multivar.cox.OS.SHHold.cont.df[which(multivar.cox.OS.SHHold.cont.df[,2]<0.05),] ### n=0 6/2/18
 
 
-###need to check the PFS data Jan 2018, as the adjusted p value for the PFS dataframes are mostly =1, therefore the transcripts being extracted for the significant dataframes are those with infinite hazard ratio 95CI
+### multivariate PFS modelling
 
 significant.multivar.cox.PFS.combined.cat <- multivar.cox.PFS.combined.cat.df [which (multivar.cox.PFS.combined.cat.df[,2]<0.05), ] ### n=0 6/2/18 allgenes.20180104.rds
 
 significant.multivar.cox.PFS.combined.cont <- multivar.cox.PFS.combined.cont.df [which (multivar.cox.PFS.combined.cont.df[,2]<0.05), ]  ### n=0 6/2/18 allgenes.20180104.rds
 
-significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ### n=4 6/2/18 allgenes.20180104.rds
+significant.multivar.cox.PFS.lancetG3G4.cat <- multivar.cox.PFS.lancetG3G4.cat.df [which (multivar.cox.PFS.lancetG3G4.cat.df[,2]<0.05), ]  ### n=4 6/2/18 allgenes.20180104.rds, n=4 filt.mb.vsd (results.filt.genefilter.20180220.rds)
 
 significant.multivar.cox.PFS.lancetG3G4.cont <- multivar.cox.PFS.lancetG3G4.cont.df[which (multivar.cox.PFS.lancetG3G4.cont.df[,2]<0.05),]  ### n=0 6/2/18 allgenes.20180104.rds
 
@@ -477,18 +477,30 @@ significant.multivar.cox.PFS.SHHold.cat <- multivar.cox.PFS.SHHold.cat.df[which(
 
 significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[which(multivar.cox.PFS.SHHold.cont.df[,2]<0.05),]  ### n=2, however not realistic 6/2/18 allgenes.20180104.rds
 
+########################################################################
+### writing out relevant csv files for significant transcripts on multivariate analyses, with annotation attached
+### examples below from gp.filt.mb.vsd file
+
+write.csv(significant.multivar.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.OS.combined.cat.20180220.csv")
+# write.csv(annot.sig.multi.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.sig.multi.cox.OS.lancetG3G4.cont.20180220.csv")
+write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cont.20180220.csv")
+# write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cat.genefilter.novel.20180220.csv"  )
+ write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cont.genefilter.novel.20180220.csv"  )
+
 
 ### annotated dataframes for significant multivar cox  ### note that the rownames (ENSG id) have been truncated so may need to be optimised 4/1/18
-
+### annotation does not work if there is no object to annotate; sometimes need to run the script twice and OUTSIDE of the try statement separately, as is temperamental.
 
 try(annot.sig.multi.cox.OS.combined.cat <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cat)),silent = T)
-try(annot.sig.multi.cox.OS.combined.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cont)), silent =T) ### error that given dataset hsapiens_gene_ensembl is not valid, use listDatasets() function to check
-try(annot.sig.multi.cox.OS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.lancetG3G4.cont)), silent = T) ###note that sometimes need to run the annotate separately outside of the try statement for it to work
+try(annot.sig.multi.cox.OS.combined.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.combined.cont)), silent =T) 
+try(annot.sig.multi.cox.OS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.lancetG3G4.cont)), silent = T) 
 try(annot.sig.multi.cox.OS.PNET5.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.PNET5.cont)),silent = T)
-try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.SHHold.cont)), silent = T) ###  may not exist
+try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.OS.SHHold.cont)), silent = T) 
 
+# annot.sig.multivar.cox.PFS.lancetG3G4.cat <- annotate.HTseq.IDs(rownames(significant.multivar.cox.PFS.lancetG3G4.cat)) 
+# annot.sig.multivar.cox.PFS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(significant.multivar.cox.PFS.lancetG3G4.cont)) 
 
-# write.csv(annot.sig.multi.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.sig.multi.cox.OS.lancetG3G4.cont.csv")
+### need to run the annotation script twice in order to overcome "error" about "the given dataset: hsapiens_gene_ensembl , is not valid. Correct dataset names can be obtained with the listDatasets() function. 
           
 ### can also add in explicitly where to make changes if new results.master file is being utilised as the basis for this clinical_data_extract_DW.R file
 ############################################################################
