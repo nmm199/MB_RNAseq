@@ -334,7 +334,7 @@ extract.multivar.cox.PFS.SHH.pval <- function(x, subset.index){
   return (ifelse(length(x[[5]])<16, NA,  ### increased from 14
                  ifelse(length(x[[5]][[subset.index]])<3, NA, ### where subset.index is 15
                         ifelse(length(x[[5]][[subset.index]][[1]])<1, NA, 
-                               x[[5]][[subset.index]][[2]]))))
+                               x[[5]][[subset.index]][[1]]))))   ### changed from 2 to 1 on 20/2/18
 }
 
 
