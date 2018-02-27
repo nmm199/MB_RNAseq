@@ -65,6 +65,23 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
 }
 
 
+### Extract.cox function for univariate cox regression
+
+### names(results.master[[1]]) gives "cox.p.values.list" as slot 4
+### names(results.master[[1]][[4]][[1]]) "cox.pval", "cox.HR", "cox.lower.95CI", "cox.upper.95CI", "cox.Zscore", "n", "n.event"
+### subset.index <- 1
+ extract.cox <- function (results.master, subset.index){
+   cox.dataframe (pval = lapply(results.master, function (x, subset.index){return (x[["cox.p.values.list"]][[subset.index]][["cox.pval"]])}, subset.index = subset.index),
+                  Zscore = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.Zscore"]])}, subset.index = subset.index), 
+                  HR = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.HR"]])},subset.index = subset.index ),
+                  L95CI = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.lower.95CI"]])}, subset.index = subset.index),
+                  U95CI = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.upper.95CI"]])}, subset.index = subset.index)
+   )
+ }
+
+                  
+### hoping to replace the following sections with extract.cox.pval etc
+ 
 extract.cox.pval<- function (x, subset.index){
   return(ifelse(length(x[[4]])< 4, NA,  ### changed from < 3 (9/10/17), check i=25
                 ifelse(length(x[[4]][[subset.index]])<1, NA, ### changed from < 6  (9/10/17)

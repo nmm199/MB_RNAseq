@@ -7,8 +7,8 @@
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds")   ### samples filtered only
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### samples and genes filtered
- results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
+ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### samples and genes filtered
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.allgenes.novel.rds")  ### currently error as file has error
 
 ### read in functions file
@@ -38,20 +38,20 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 
 ######################
 ### OS p values
-km.OS.all.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.all")               ### does not work (name does not exist) address this 13/2/18, could be curative dataframe changes
-km.OS.G3G4.results <- extract.km.OS.pval (results.master, name = "surv.km.OS.G3G4")              ### does not work
-km.OS.SHH.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH")             ### does not work
-km.OS.SHH.old.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH.old")             ### does not work
+km.OS.all.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.all")               
+km.OS.G3G4.results <- extract.km.OS.pval (results.master, name = "surv.km.OS.G3G4")              
+km.OS.SHH.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH")             
+km.OS.SHH.old.results <- extract.km.OS.pval(results.master, name = "surv.km.OS.SHH.old")            
 
 ### EFS p values
-km.EFS.all.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.all")  ### does not work (name does not exist)
-km.EFS.G3G4.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.G3G4") ### this works
+km.EFS.all.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.all")  
+km.EFS.G3G4.results <- extract.km.EFS.pval(results.master, name = "surv.km.EFS.G3G4") 
 
 ### PFS p values
-km.PFS.all.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.all")  ### does not work (name does not exist)
-km.PFS.G3G4.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.G3G4") ### this works
-km.PFS.SHH.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH")   ### this works
-km.PFS.SHH.old.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH.old")  ### this works
+km.PFS.all.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.all")  
+km.PFS.G3G4.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.G3G4") 
+km.PFS.SHH.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH")  
+km.PFS.SHH.old.results <- extract.km.PFS.pval(results.master, name = "surv.km.PFS.SHH.old")  
  
 
 ### significant dataframes for adjusted p values
@@ -74,32 +74,32 @@ significant.km.PFS.SHH.old <- km.PFS.SHH.old.results[which(km.PFS.SHH.old.result
 ##########################################################################################################################
 
 ### cox PFS for continuous variable, overall category
-### this section has been updated below , specify results.master then subset.index
+### this section has been updated below , specify results.master then subset.index as a name (27/2/18)
 
-cox.PFS.cat.all.df <- extract.cox (results.master, 3)
+cox.PFS.cat.all.df <- extract.cox (results.master, "surv.cox.relapse.incl.cat" ) ### was 3
 
-cox.PFS.cont.all.df <- extract.cox(results.master, 4)
+cox.PFS.cont.all.df <- extract.cox(results.master, "surv.cox.relapse.incl.contin" ) ### was 4, and so forth for below
 
-cox.PFS.cat.G3G4.df <- extract.cox(results.master, 5)
+cox.PFS.cat.G3G4.df <- extract.cox(results.master, "surv.cox.relapse.incl.G3G4.cat")
 
-cox.PFS.cont.G3G4.df <- extract.cox(results.master, 6)
+cox.PFS.cont.G3G4.df <- extract.cox(results.master, "surv.cox.relapse.incl.G3G4.contin")
 
-cox.PFS.cat.SHH.df <- extract.cox (results.master, 7)
+cox.PFS.cat.SHH.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.cat")
 
-cox.PFS.cont.SHH.df <- extract.cox (results.master, 8)
+cox.PFS.cont.SHH.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.contin")
 
-cox.PFS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, 9) 
+cox.PFS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.relapse.incl.SHH.old.cat") 
                                        
-cox.PFS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, 10) 
+cox.PFS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.relapse.incl.SHH.old.contin") 
 
 
 ### then to filter the lists by a defined threshold e.g adjusted p<0.05
 
 ### create significant dataframes  
 
-sig.cox.PFS.cat.all <- cox.PFS.cat.all.df [which(cox.PFS.cat.all.df[, 2]<0.05),]  ### nrow = 81
+sig.cox.PFS.cat.all <- cox.PFS.cat.all.df [which(cox.PFS.cat.all.df[, 2]<0.05),]  ### nrow = 81 for complete transcripts
 
-sig.cox.PFS.cont.all <- cox.PFS.cont.all.df[which(cox.PFS.cont.all.df[, 2]<0.05),] ### nrow = 698
+sig.cox.PFS.cont.all <- cox.PFS.cont.all.df[which(cox.PFS.cont.all.df[, 2]<0.05),] ### nrow = 698 for complete transcripts
 
 sig.cox.PFS.cat.G3G4 <- cox.PFS.cat.G3G4.df[which(cox.PFS.cat.G3G4.df[, 2]<0.05),]
 
@@ -163,28 +163,29 @@ try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Cl
 ########################################################################################
 ########################################################################################
 
-### Cox OS overall for categorical variable
+### Cox OS overall for categorical variable ### updated 27/2/18 
 
-cox.OS.cat.all.df <- extract.cox.OS (results.master, 11) 
 
-cox.OS.cont.all.df <- extract.cox.OS (results.master, 12)
 
-cox.OS.cat.G3G4.df <- extract.cox.OS (results.master, 13)
+cox.OS.cat.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.cat") ### was 11; and so forth below
 
-cox.OS.cont.G3G4.df <- extract.cox.OS (results.master, 14)
+cox.OS.cont.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.contin")
 
-cox.OS.cat.SHH.df <- extract.cox.SHH.old (results.master, 15)
+cox.OS.cat.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.cat" )
 
-cox.OS.cont.SHH.df <- extract.cox.SHH.old (results.master, 16)
+cox.OS.cont.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.contin")
 
-cox.OS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, 17)
+cox.OS.cat.SHH.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.cat")
 
-cox.OS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, 18)
+cox.OS.cont.SHH.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.contin")
+
+cox.OS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.old.cat")
+
+cox.OS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.old.contin")
 
 ##################
 
 ### significant dataframes & annotation
-### can work on this more later for SHH, SHH.old if needed
 
 sig.cox.OS.cat.all <- cox.OS.cat.all.df[which(cox.OS.cat.all.df[, 2]<0.05),]
 
@@ -223,24 +224,15 @@ sig.cox.OS.cont.SHH.old.df <- cox.OS.cont.SHH.old.df [which(cox.OS.cont.SHH.old.
 
 ### Cox EFS for all - these are all categorical expression data
 
+# cox.EFS.cat.all.df <- extract.cox.OS (results.master, 1) ### previous script which is now replaced by extract.cox function and specific names
+cox.EFS.cat.all.df <- extract.cox(results.master, "surv.cox.EFS.incl") 
 
-cox.EFS.cat.all.df <- extract.cox.OS (results.master, 1)
-
-cox.EFS.cat.G3G4.df <- extract.cox.OS (results.master, 2)
-
-# cox.EFS.cat.G3G4.v2.df <- extract.cox.SHH.old (results.master, 2) ### this is to compare the output when subsetting is increased to x[[4]]<17
+cox.EFS.cat.G3G4.df <- extract.cox(results.master, "surv.cox.EFS.incl.G3G4")
 
 
 sig.cox.EFS.cat.all <- cox.EFS.cat.all.df[which(cox.EFS.cat.all.df[, 2]<0.05),]
 
 sig.cox.EFS.cat.G3G4 <- cox.EFS.cat.G3G4.df[which(cox.EFS.cat.G3G4.df[,2]<0.05), ]
-
-# sig.cox.EFS.cat.G3G4.v2 <- cox.EFS.cat.G3G4.v2.df[which(cox.EFS.cat.G3G4.v2.df[, 2]<0.05), ] 
-
-### explore difference from sig.cox.EFS.cat.G3G4, I wonder if it is related to the significant cox dataframe creation
-### seems to be that the more accurate subsetting, the more relevant targets are found within the dataset i.e x[[4]]< 6 for a more complete dataset is better than generic x[[4]]<17
-### there are fewer candidates found when have more liberal NA rule e.g for x[[4]]<17 (liberal, fewer candidates, less NAs) compared to x[[4]]<6 (strict)
-### other difference is the adjusted p value (perhaps with fewer candidates, there is less correction)
 
 
 try(write.csv(sig.cox.EFS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/sig.cox.EFS.all.csv"), silent =T)
@@ -485,8 +477,8 @@ write.csv(significant.multivar.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RN
 # write.csv(annot.sig.multi.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.sig.multi.cox.OS.lancetG3G4.cont.20180220.csv")
 write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cont.20180220.csv")
 # write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cat.genefilter.novel.20180220.csv"  )
- write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cont.genefilter.novel.20180220.csv"  )
-
+# write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.PFS.lancetG3G4.cont.genefilter.novel.20180220.csv"  )
+write.csv (significant.multivar.cox.OS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.sig.multivar.cox.OS.lancetG3G4.cont.genefilter.novel.20180220.csv"  )  
 
 ### annotated dataframes for significant multivar cox  ### note that the rownames (ENSG id) have been truncated so may need to be optimised 4/1/18
 ### annotation does not work if there is no object to annotate; sometimes need to run the script twice and OUTSIDE of the try statement separately, as is temperamental.
@@ -513,6 +505,9 @@ try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(signifi
 ### 4. then move new function into main "clinical_data_functions_extract_master.R" file
 ### 5. OR can name the index, such as $p.val rather than [[subset.index]] described as a number
   
+
+### now have replaced subset x[[5]]<15 for all, used to have following tips:
+### there are fewer candidates found when have more liberal NA rule e.g for x[[4]]<17 (liberal, fewer candidates, less NAs) compared to x[[4]]<6 (strict)
 ########################################
 
 #########################################################
