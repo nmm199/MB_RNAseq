@@ -88,12 +88,10 @@ cox.PFS.cat.SHH.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.ca
 
 cox.PFS.cont.SHH.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.contin")
 
-cox.PFS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.relapse.incl.SHH.old.cat") 
+cox.PFS.cat.SHH.old.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.old.cat") 
                                        
-cox.PFS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.relapse.incl.SHH.old.contin") 
+cox.PFS.cont.SHH.old.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.old.contin") 
 
-
-### then to filter the lists by a defined threshold e.g adjusted p<0.05
 
 ### create significant dataframes  
 
@@ -167,21 +165,21 @@ try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Cl
 
 
 
-cox.OS.cat.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.cat") ### was 11; and so forth below
+cox.OS.cat.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.cat") ### was 11; and so forth below, note different function for extract.cox.OS
 
-cox.OS.cont.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.contin")
+cox.OS.cont.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.contin")  
 
-cox.OS.cat.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.cat" )
+cox.OS.cat.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.cat" )  
 
-cox.OS.cont.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.contin")
+cox.OS.cont.G3G4.df <- extract.cox.OS (results.master, "surv.cox.result.OS.G3G4.contin")  
 
-cox.OS.cat.SHH.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.cat")
+cox.OS.cat.SHH.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.cat")
 
-cox.OS.cont.SHH.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.contin")
+cox.OS.cont.SHH.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.contin")
 
-cox.OS.cat.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.old.cat")
+cox.OS.cat.SHH.old.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.old.cat")
 
-cox.OS.cont.SHH.old.df <- extract.cox.SHH.old (results.master, "surv.cox.result.OS.SHH.old.contin")
+cox.OS.cont.SHH.old.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.old.contin")
 
 ##################
 

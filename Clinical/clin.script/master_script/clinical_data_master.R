@@ -85,6 +85,7 @@ mb.vsd <- read.delim(RNA.data)
 mb.vsd.random <- randomize(mb.vsd) ### generate this first then run the clinPathAssess function on this.
 rownames(mb.vsd.random) <- rownames(mb.vsd)
 
+
 ##############################################################################
 
 source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clinical_data_functions_master.R")
@@ -142,7 +143,8 @@ tic()
 ### creating filtered files 30/1/18
 ### filtering out patients
 filt.mb.vsd <- mb.vsd[-grep ("T", names(mb.vsd ))] 
-filt.mb.vsd.random <- mb.vsd.random [-grep ("T", names(mb.vsd.random))]
+filt.mb.vsd.random <- mb.vsd.random [, -grep ("T", colnames(mb.vsd.random))] ### or names (mb.vsd.random) 27/2/18
+# rownames(filt.mb.vsd.random)<- rownames(mb.vsd)
 filt.mb.vsd.novel <- mb.vsd.novel[-grep("T", names(mb.vsd.novel))]
 
 ### then can insert filt.mb.vsd directly into clinPathAssess function below
@@ -152,7 +154,7 @@ filt.mb.vsd.novel <- mb.vsd.novel[-grep("T", names(mb.vsd.novel))]
 
 gp.index <- apply(2^filt.mb.vsd,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
 gp.index.novel <- apply(2^filt.mb.vsd.novel,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
-# gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
 ### the mb vsd expression set is transformed from log(2) to exponential, to allow characterisation of delta change (in absolute terms)
 
 ### create a dataframe based on these transcripts that meet filter criteria, which will be passed through to the clinPathAssess function below
@@ -201,9 +203,9 @@ gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
 ################################################################################
 ### unhash when running the randomised dataset  ### can interchange with gp.filt.mb.vsd.random 
 
- results.master <- foreach(i = 1:nrow(filt.mb.vsd.random))%dopar%{
-  as.numeric(filt.mb.vsd.random [i,]) -> x
-  names(x) <- colnames(filt.mb.vsd.random)
+ results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd.random))%dopar%{
+  as.numeric(gp.filt.mb.vsd.random [i,]) -> x
+  names(x) <- colnames(gp.filt.mb.vsd.random)
   return(clinPathAssess(test.pData,x)) 
  }
 
@@ -263,7 +265,7 @@ gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
 # names (results.master) <- row.names (filt.mb.vsd)
 # names (results.master)<- row.names(gp.filt.mb.vsd) 
 # names (results.master)<- row.names(filt.mb.vsd.novel) ### interchange (gp.)filt.mb.vsd.novel
-names (results.master) <- row.names(filt.mb.vsd.random) ### interchange (gp.)filt.mb.vsd.random
+names (results.master) <- row.names(gp.filt.mb.vsd.random) ### interchange (gp.)filt.mb.vsd.random
 
 toc()
 
@@ -283,7 +285,7 @@ toc()
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this is the filtered file for samples, contains > 60000 transcripts (filt.mb.vsd)
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.novel.20180220.rds") ### interchange with complete.novel and genefilter.novel
- saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.random.20180227.rds") ### randomised file, interchange with genefilter.random
+ saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.rds") ### randomised file, interchange with genefilter.random
 
 ### to examine results, reload relevant results master file and see clinical_data_extract_DW.R script file
 
@@ -299,12 +301,12 @@ toc()
 
 # annot.filt.results <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd)) ### interchange filt.mb.vsd and  gp.filt.mb.vsd
 # annot.filt.novel <- annotate.HTseq.IDs(row.names(filt.mb.vsd.novel)) ### interchange filt.mb.vsd.novel and gp.filt.mb.vsd.novel
- annot.filt.random <- annotate.HTseq.IDs(row.names(filt.mb.vsd.random))
+ annot.filt.random <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd.random))
 
 # write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.filt.complete.20180220.csv") ### filt.mb.vsd this is the filtered file for samples only, > 60000 transcripts
 # write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts 
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.20180104.csv") ### this is the novel transcripts
- write.csv(annot.filt.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.random.20180227.csv") ### interchange genefilter.random and complete.random
+ write.csv(annot.filt.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.csv") ### interchange genefilter.random and complete.random
 # write.csv(annot.filt.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.novel.20180220.csv") ### interchange genefilter.novel and complete.novel
 
 ###############################################################################

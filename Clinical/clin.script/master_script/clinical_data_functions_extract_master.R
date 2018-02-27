@@ -6,19 +6,14 @@
 ### extract.km.EFS.pval
 ### extract.km.PFS.pval
 ### cox.dataframe
-### extract.cox.pval
-### extract.cox.pval.SHH.old
-### extract.cox.Zscore
-### extract.cox.Zscore.SHH.old
-### extract.cox.HR
-### extract.cox.HR.SHH.old
-### extract.cox.L95CI.HR
-### extract.cox.L95CI.SHH.old
-### extract.cox.U95CI.SHH.old
-### extract.cox.U95CI.SHH.old
+### extract.cox
+### extract.cox.OS
 ### log.reg.dataframe
 
-#####################################################################################
+##################################################################################################################################
+### univariate
+##################################################################################################################################
+
 ### km.OS
 extract.km.OS.pval <- function(results.master, name){
   extracted.km.OS.pval <- lapply(results.master, function(x){return(x[["surv.p.values.list"]][[name]][["OS.p.val"]])}) 
@@ -64,12 +59,12 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
   return (cox.allresults.df)
 }
 
-
 ### Extract.cox function for univariate cox regression
 
 ### names(results.master[[1]]) gives "cox.p.values.list" as slot 4
 ### names(results.master[[1]][[4]][[1]]) "cox.pval", "cox.HR", "cox.lower.95CI", "cox.upper.95CI", "cox.Zscore", "n", "n.event"
 ### subset.index <- 1
+
  extract.cox <- function (results.master, subset.index){
    cox.dataframe (pval = lapply(results.master, function (x, subset.index){return (x[["cox.p.values.list"]][[subset.index]][["cox.pval"]])}, subset.index = subset.index),
                   Zscore = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.Zscore"]])}, subset.index = subset.index), 
@@ -79,190 +74,19 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
    )
  }
 
+ 
+ extract.cox.OS <- function (results.master, subset.index){
+   cox.dataframe (pval = lapply(results.master, function (x, subset.index){return (x[["cox.p.values.list"]][[subset.index]][["cox.OS.p.val"]])}, subset.index = subset.index),
+                  Zscore = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.OS.Zscore"]])}, subset.index = subset.index), 
+                  HR = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.OS.HR"]])},subset.index = subset.index ),
+                  L95CI = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.OS.lower.95CI"]])}, subset.index = subset.index),
+                  U95CI = lapply(results.master, function (x, subset.index){return(x[["cox.p.values.list"]][[subset.index]][["cox.OS.upper.95CI"]])}, subset.index = subset.index)
+   )
+ }
                   
-### hoping to replace the following sections with extract.cox.pval etc
  
-extract.cox.pval<- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 4, NA,  ### changed from < 3 (9/10/17), check i=25
-                ifelse(length(x[[4]][[subset.index]])<1, NA, ### changed from < 6  (9/10/17)
-                       ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
-                              x[[4]][[subset.index]][[1]]))))
-}
-
-
-extract.cox.pval.SHH.old <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 17, NA, ###  used to be 10. Change to <15, then < 17. works with length < 3 and < 4 above for PFS for all groups, change it to 10 for it to work for G3G4 PFS 11/10/17
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
-                              x[[4]][[subset.index]][[1]]))))
-}
-  
-
-
-extract.cox.Zscore <- function(x, subset.index){
-  return(ifelse(length(x[[4]])<4, NA,    ### changed from < 3 (9/10/17)
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[5]])<1, NA,
-                              x[[4]][[subset.index]][[5]]))))
-}
-
-
-extract.cox.Zscore.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<17, NA,
-                 ifelse(length(x[[4]][[subset.index]])<6, NA,
-                        ifelse(length(x[[4]][[subset.index]][[5]])<1, NA, 
-                               x[[4]][[subset.index]][[5]]))))
-}
-
-
-
-extract.cox.HR <- function(x, subset.index){
-  ifelse(length(x[[4]])<4, NA,  ### 9/10/17 update:  was < 3, works for all values 4, 5, 6
-         ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                ifelse(length(x[[4]][[subset.index]][[2]])<1, NA,
-                       x[[4]][[subset.index]][[2]])))
-}
-
-
-extract.cox.HR.SHH.old <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 17, NA, 
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[2]])<1, NA,
-                              x[[4]][[subset.index]][[2]]))))
-}
-
-
-extract.cox.L95CI.HR <- function(x, subset.index){
-  ifelse(length(x[[4]])<4, NA,  ### 9/10/17 update:  was < 3, works for all values 4, 5, 6
-         ifelse(length(x[[4]][[subset.index]])<6, NA,  ### original script has <4 for this parameter, updated 5/10/17. ### 12109 is where the error is occurring
-                ifelse(length(x[[4]][[subset.index]][[3]])<1, NA,
-                       x[[4]][[subset.index]][[3]])))
-}
-
-
-extract.cox.L95CI.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<17, NA,
-                 ifelse(length(x[[4]][[subset.index]])<6, NA,
-                        ifelse(length(x[[4]][[subset.index]][[3]])<1, NA, 
-                               x[[4]][[subset.index]][[3]]))))
-}
-
-extract.cox.U95CI.HR <- function(x, subset.index){
-  return(ifelse(length(x[[4]]) < 4, NA,  ### 9/10/17 update:  was < 3, works 
-                ifelse(length(x[[4]][[subset.index]])<6, NA, ### changed from <4, to < 6. May need to alter for other RDS input file
-                       ifelse(length(x[[4]][[subset.index]][[4]])<1, NA, ### updated
-                              x[[4]][[subset.index]][[4]]))))
-}
-
-
-extract.cox.U95CI.SHH.old <- function(x, subset.index){
-  return (ifelse(length(x[[4]])<17, NA,
-                 ifelse(length(x[[4]][[subset.index]])<6, NA,
-                        ifelse(length(x[[4]][[subset.index]][[4]])<1, NA, 
-                               x[[4]][[subset.index]][[4]]))))
-}
-
-
-
-
-######################################################################
-
-extract.cox <- function(results.master, subset.index){
-  cox.dataframe(pval = lapply(results.master, extract.cox.pval, subset.index = subset.index),
-                Zscore = lapply(results.master, extract.cox.Zscore, subset.index = subset.index),
-                HR = lapply(results.master, extract.cox.HR, subset.index = subset.index),
-                L95CI = lapply (results.master, extract.cox.L95CI.HR, subset.index = subset.index),
-                U95CI = lapply(results.master, extract.cox.U95CI.HR, subset.index = subset.index)
-  )
-}
-
-
-
-
-extract.cox.SHH.old <- function (results.master, subset.index){
-   cox.dataframe(pval = lapply(results.master, extract.cox.pval.SHH.old, subset.index=subset.index),
-                 Zscore = lapply (results.master, extract.cox.Zscore.SHH.old, subset.index=subset.index),
-                 HR = lapply(results.master, extract.cox.HR.SHH.old, subset.index=subset.index),
-                 L95CI = lapply(results.master, extract.cox.L95CI.SHH.old, subset.index=subset.index),
-                 U95CI = lapply(results.master, extract.cox.U95CI.SHH.old, subset.index=subset.index)
-    )
- }
- 
- 
-
-######################################################################
-
-
- extract.cox.OS <- function(results.master, subset.index){
- cox.dataframe (pval = lapply(results.master, extract.cox.OS.pval, subset.index = subset.index), 
-               Zscore = lapply (results.master, extract.cox.OS.Zscore, subset.index = subset.index),
-               HR = lapply(results.master, extract.cox.OS.HR,subset.index = subset.index ),
-               L95CI = lapply (results.master, extract.cox.OS.L95CI, subset.index = subset.index),
-               U95CI = lapply(results.master, extract.cox.OS.U95CI,subset.index = subset.index )
-  )               
- }
-
-
-
-########################################
-
-### creating cox OS function with subsets < 5, < 6, <1
-### 17/10/17:have had to increase the subsetting for subsequent cox OS dataframes
-### currently (> 11 worked for extract.cox.OS to work for cox.OS.cat, then  > 12 needed for cox.OS.cont, then  x[[4]]>13 (increasing each time)needed for cox.OS.cat.G3G4, then > 14 needed for cox.OS.cont.G3G4, now up to 14 
-
-extract.cox.OS.pval <-  function (x, subset.index){
-  return(ifelse(length(x[[4]])< 14, NA, ###  works with length < 3 above for PFS for all groups, I had to change it to 11 for OS, then changed to 12 for cox.cont.OS
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[1]])<1, NA,
-                              x[[4]][[subset.index]][[1]]))))
-}
-
-
-extract.cox.OS.HR <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 14, NA, ###  see comment for extract.cox.OS.pval, which applies to all extract cox OS functions below
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[2]])<1, NA,
-                              x[[4]][[subset.index]][[2]]))))
-}
-
-
-extract.cox.OS.Zscore <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 14, NA,
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[5]])<1, NA,
-                              x[[4]][[subset.index]][[5]]))))
-}
-
-
-
-
-extract.cox.OS.L95CI<- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 14, NA, 
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[3]])<1, NA,
-                              x[[4]][[subset.index]][[3]]))))
-}
-
-
-extract.cox.OS.U95CI <- function (x, subset.index){
-  return(ifelse(length(x[[4]])< 14, NA, 
-                ifelse(length(x[[4]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[4]][[subset.index]][[4]])<1, NA,
-                              x[[4]][[subset.index]][[4]]))))
-}
-
-
-
-
-#################
-
-
-### unhash here if troubleshooting with individual functions
-
- # results.master = results.master #
- # subset.index = 1                #
-
- 
+##################################################################################################################################
+### multivariate
 ##################################################################################################################################
 
 extract.multivar.cox <- function(results.master, subset.index){
@@ -274,116 +98,19 @@ extract.multivar.cox <- function(results.master, subset.index){
   )               
 }
 
+ 
+##################################################################################################################################
+### Troubleshooting
+##################################################################################################################################
+### unhash here if troubleshooting with individual functions
+ 
+ # results.master = results.master #
+ # subset.index = 1                #
+ 
 # "multivar.cox.PFS.Lancet.G3G4.cat" -> subset.index
-
 
 ####################################
 ### if wish to check the individual function, could run cox.dataframe(pval... onwards) to create dataframe to check
-
-# extract.multivar.cox.PFS <- function(results.master, subset.index){
-  #cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.pval, subset.index = subset.index),
-   #             Zscore = lapply(results.master, extract.multivar.cox.PFS.Zscore, subset.index = subset.index),
-    #            HR = lapply(results.master, extract.multivar.cox.PFS.HR , subset.index = subset.index),
-     #           L95CI = lapply (results.master, extract.multivar.cox.PFS.L95CI, subset.index = subset.index),
-      #          U95CI = lapply(results.master, extract.multivar.cox.PFS.U95CI, subset.index = subset.index)
-#  )
-# }
-
-
-# results.master = results.master
-# name = "multivar.cox.PFS.combined.cat"
-
-  # x =1 
-# subset.index = 1
-
-
-
-extract.multivar.cox.PFS.pval <- function(x, subset.index){
-  return (ifelse(length(x[[5]])<14, NA, 
-                 ifelse(length(x[[5]][[subset.index]])<3, NA, 
-                        ifelse(length(x[[5]][[subset.index]][[1]])<1, NA, 
-                               x[[5]][[subset.index]][[1]]))))  ### changed from 2 to 1 on 9/1/18
-}
-
-
-extract.multivar.cox.PFS.HR <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 14, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, ### was 6
-                       ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
-                              x[[5]][[subset.index]][[2]]))))
-}
-
-extract.multivar.cox.PFS.L95CI <-  function (x, subset.index){
-  return(ifelse(length(x[[5]])< 14, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
-                              x[[5]][[subset.index]][[3]]))))
-}
-
-extract.multivar.cox.PFS.U95CI <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 14, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
-                              x[[5]][[subset.index]][[4]]))))
-}
-
-
-extract.multivar.cox.PFS.Zscore <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 14, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
-                              x[[5]][[subset.index]][[5]]))))
-}
-
-##################
-
-extract.multivar.cox.PFS.SHH <- function(results.master, subset.index){
-  cox.dataframe(pval = lapply(results.master, extract.multivar.cox.PFS.SHH.pval, subset.index = subset.index),
-                Zscore = lapply(results.master, extract.multivar.cox.PFS.SHH.Zscore, subset.index = subset.index),
-                HR = lapply(results.master, extract.multivar.cox.PFS.SHH.HR , subset.index = subset.index),
-                L95CI = lapply (results.master, extract.multivar.cox.PFS.SHH.L95CI, subset.index = subset.index),
-                U95CI = lapply(results.master, extract.multivar.cox.PFS.SHH.U95CI, subset.index = subset.index)
-  )
-}
-
-
-extract.multivar.cox.PFS.SHH.pval <- function(x, subset.index){
-  return (ifelse(length(x[[5]])<16, NA,  ### increased from 14
-                 ifelse(length(x[[5]][[subset.index]])<3, NA, ### where subset.index is 15
-                        ifelse(length(x[[5]][[subset.index]][[1]])<1, NA, 
-                               x[[5]][[subset.index]][[1]]))))   ### changed from 2 to 1 on 20/2/18
-}
-
-
-extract.multivar.cox.PFS.SHH.HR <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 16, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, ### was 6
-                       ifelse(length(x[[5]][[subset.index]][[2]])<1, NA,
-                              x[[5]][[15]][[2]]))))
-}
-
-extract.multivar.cox.PFS.SHH.L95CI <-  function (x, subset.index){
-  return(ifelse(length(x[[5]])< 16, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[3]])<1, NA,
-                              x[[5]][[subset.index]][[3]]))))
-}
-
-extract.multivar.cox.PFS.SHH.U95CI <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 16, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<3, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[4]])<1, NA,
-                              x[[5]][[subset.index]][[4]]))))
-}
-
-
-extract.multivar.cox.PFS.SHH.Zscore <- function (x, subset.index){
-  return(ifelse(length(x[[5]])< 16, NA, ### was 3
-                ifelse(length(x[[5]][[subset.index]])<6, NA, 
-                       ifelse(length(x[[5]][[subset.index]][[5]])<1, NA,
-                              x[[5]][[subset.index]][[5]]))))
-}
-
 
 
 ##############################################
