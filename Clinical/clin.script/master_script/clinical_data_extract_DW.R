@@ -376,9 +376,6 @@ chi.sex.result <- extract.chi.all(results.master, name = "list.sex")
 chi.TERT.result <- extract.chi.all(results.master, name = "list.TERT")
 chi.TP53.result <- extract.chi.all(results.master, name = "list.TP53")
 
-
-### later if wish to extract the chi squared statistic, will need to rerun results.master with the updated naming for the chi squared function 4/12/17
-
 ### extract adj p <0.05 for relapse, mstatus, MYC, MYCN, MYCMYCN
 
 significant.chi.relapse <- chi.relapse.result[which(chi.relapse.result[,2]<0.05), ]  ### n=4388 4/12/17 for mb.vsd
@@ -510,88 +507,4 @@ try(annot.sig.multivar.cox.OS.SHHold.cont <- annotate.HTseq.IDs(rownames(signifi
 
 #########################################################
 #########################################################
-
-### graphical depiction of p values against adjusted p values, may wish to add in abline
-### may wish to alter graphics later
-
-histo.p.adj.km.EFS.all <- hist(adjusted.p.km.EFS.all)
-
-# library(density)
-plot(ecdf(adjusted.p.km.EFS.all))
-plot(density(adjusted.p.km.EFS.all))
-hist(km.EFS.p.extract.assembled.all)
-lines(density(km.EFS.p.extract.assembled.all), col = "red")
-
-cox.PFS.cat.G3G4.df
-
-
-head(cox.PFS.cat.G3G4.df)
-
-hist(cox.PFS.cat.G3G4.df[,1])
-hist(cox.PFS.cat.G3G4.df[,2])
-
-cox.PFS.cat.G3G4.df[,1] -> x
-"Cox PFS categorical G3/G4" -> test.name
-breaks = 100
-
-plotHist <- function(x, test.name, breaks = 100, xlab = "p-value", cutoff = 0.05, text.pos = 0.9){
-  hist.res <- hist(x, breaks = breaks, plot = F)
-  max(hist.res$counts) -> temp.height
-  length(which(x<0.05)) -> temp.no.sig
-  
-  if(length(cutoff)==1){
-  ifelse(hist.res$breaks<cutoff,"red", "grey") -> hist.cols
-  }else{
-    ifelse(hist.res$breaks<cutoff[1]|hist.res$breaks>cutoff[2],"red", "grey") -> hist.cols
-  }
-  
-    hist(x, breaks = breaks,  xlab = xlab, main = paste("Histogram of", test.name), col = hist.cols)
-    
-    if(length(cutoff)==1){
-      abline(v= cutoff, lty = 2 , col = "red")
-      text(text.pos, temp.height-(temp.height*0.1), paste("Number Genes p <", cutoff, "=", temp.no.sig), pos = 2)
-    }else{
-      abline(v= cutoff, lty = 2 , col = "red")
-      text(text.pos, temp.height-(temp.height*0.1), paste("Number Genes p <", cutoff[1],"or p >", cutoff[2],"=", temp.no.sig), pos = 2)
-    }
-}
-
-cox.PFS.cat.G3G4.df[,3] -> x
-
-plotEcdf <- function(x, y = NULL, test.name, xlab = "z-score", cutoff=c(-2,2)){
-  cdf.x <- ecdf(x)
-  plot(ecdf(x), xlab = xlab, main = paste("cumulative density plot of", test.name), col = "red")
-  abline(h = 0.5, v = 0)
-  abline(v = cutoff, lty = 2)
-  min(x, na.rm = T) -> min.x
-  temp.no.dn.x <- length(which(x<cutoff[1]))
-  max(x, na.rm = T) -> max.x
-  temp.no.up.x <- length(which(x>cutoff[2]))
-  text(min.x-(0.1*min.x), 0.9, paste("Number Genes z <", cutoff[1],temp.no.dn.x), pos = 4)
-  text(max.x-(0.1*max.x), 0.2, paste("Number Genes z >", cutoff[2],temp.no.up.x), pos = 2)
-  if(!is.null(y)){
-    cdf.y <- ecdf(y)
-  }  
-  
-}
-
-
-
-plotHist(cox.PFS.cat.G3G4.df[,1], "Cox PFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.PFS.cat.G3G4.df[,3], "Cox PFS categorical G3/G4", breaks = 100, xlab = "Z-score", cutoff = c(-2, 2))
-
-
-
-plot(ecdf(cox.PFS.cat.G3G4.df[,3]))
-plot(density(x, na.rm = "T"))
-hist(km.EFS.p.extract.assembled.all)
-lines(density(km.EFS.p.extract.assembled.all), col = "red")
-
-
-#########################################################################################################################################
-### evaluating the specifics of extracted data 30/1/18
-
-plot(ecdf(mb.vsd["ENSG00000188314",])) ### this showed a flat density curve, fn(x)=1
-mb.vsd["ENSG00000188314", ]  ### this showed that all expression values were the SAME, which explains why p value was 0 and cox z score infinite
 

@@ -1161,7 +1161,7 @@ clinPathAssess <- function(test.pData,
   EFS.SHH.bin.incl <- ifelse(matched.SHH.incl.pData$Event == "Event", 1,0)
   EFS.SHH.old.bin.incl <- ifelse(matched.SHH.old.incl.pData$Event == "Event", 1,0)
   
-  #### PFS
+  #### PFS ### this is where the graphs are generated again
   
   #cat("running km survival curve for PFS and biomarker, graphical output to PDF", sep = "\n")
   ### incldes overall group, G3G4 combined, SHH overall and SHH_Child (SHH.old)
