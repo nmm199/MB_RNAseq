@@ -161,8 +161,10 @@ gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3
 
 gp.filt.mb.vsd <- filt.mb.vsd[gp.index,]
 gp.filt.mb.vsd.novel <- filt.mb.vsd.novel[gp.index.novel, ]
-gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
 
+# gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
+gp.filt.mb.vsd.random <- randomize(gp.filt.mb.vsd) ### previous gp.filt.mb.vsd.random did not filter from the larger file, therefore randomise on different file
+rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 
 ######################################################################################################################################################################
 ######################################################################################################################################################################
@@ -208,6 +210,7 @@ gp.filt.mb.vsd.random <- filt.mb.vsd.random[gp.index.random, ]
   names(x) <- colnames(gp.filt.mb.vsd.random)
   return(clinPathAssess(test.pData,x)) 
  }
+
 
 ################################################################################
 ### unhash when running the novel transcript set
@@ -285,7 +288,7 @@ toc()
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this is the filtered file for samples, contains > 60000 transcripts (filt.mb.vsd)
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.novel.20180220.rds") ### interchange with complete.novel and genefilter.novel
- saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.rds") ### randomised file, interchange with genefilter.random
+ saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180314.rds") ### randomised file, interchange with genefilter.random
 
 ### to examine results, reload relevant results master file and see clinical_data_extract_DW.R script file
 
