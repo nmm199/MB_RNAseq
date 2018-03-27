@@ -154,7 +154,7 @@ filt.mb.vsd.novel <- mb.vsd.novel[-grep("T", names(mb.vsd.novel))]
 
 gp.index <- apply(2^filt.mb.vsd,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
 gp.index.novel <- apply(2^filt.mb.vsd.novel,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
-gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
+# gp.index.random <- apply(2^filt.mb.vsd.random,1,gp.style.filter, fold.change = 3, delta = 300, prop = 0.05, base = 30, prop.base = 0.05)
 ### the mb vsd expression set is transformed from log(2) to exponential, to allow characterisation of delta change (in absolute terms)
 
 ### create a dataframe based on these transcripts that meet filter criteria, which will be passed through to the clinPathAssess function below
@@ -211,6 +211,11 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
   return(clinPathAssess(test.pData,x)) 
  }
 
+# results.master.try <- foreach(i= 1:100)%dopar%{
+ #  as.numeric(gp.filt.mb.vsd.random [i,]) -> x
+ #  names(x) <- colnames(gp.filt.mb.vsd.random)
+ #  return(clinPathAssess(test.pData,x)) 
+# }
 
 ################################################################################
 ### unhash when running the novel transcript set
@@ -315,6 +320,8 @@ toc()
 ###############################################################################
 ###############################################################################
 
+### script for mb.vsd dataset for Janet
+ 
 guiltByAssociation <-function(data, associated.gene, cores = 10){
   library(foreach)
   library(tictoc)
@@ -322,9 +329,9 @@ guiltByAssociation <-function(data, associated.gene, cores = 10){
   library(doParallel)
   registerDoParallel(cores)
   
-  match(names(data), names(associated.gene)) -> index
-  data[,!is.na(index)] -> matched.data
-  associated.gene[index[!is.na(index)]] -> matched.associated.gene
+  index <- match(names(data), names(associated.gene))
+  matched.data <- data[,!is.na(index)]
+  matched.associated.gene <- associated.gene[index[!is.na(index)]] 
   
   guiltAssociation <- function(x,y){
     return(c(cor = cor.test(x,y)$estimate,
@@ -332,7 +339,7 @@ guiltByAssociation <-function(data, associated.gene, cores = 10){
   }
   
   res <- foreach(i = 1:nrow(data), .combine = rbind)%dopar%{
-    as.numeric(matched.data[i,]) -> x
+    x <- as.numeric(matched.data[i,])
     return(guiltAssociation(x,matched.associated.gene))
   }
   
@@ -340,6 +347,7 @@ guiltByAssociation <-function(data, associated.gene, cores = 10){
   return(res)
 }
 
+ 
 MYC <- as.numeric(mb.vsd["ENSG00000136997.15_1",])
 names(MYC) <- colnames(mb.vsd)
 guilt.res.MYC <- guiltByAssociation(mb.vsd, MYC)

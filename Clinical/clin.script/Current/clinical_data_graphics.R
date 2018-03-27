@@ -13,7 +13,8 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180314.rds")
 ### results.filt.genefilter.20180220.rds: this is a gene filtered file for transcripts and relationship to survival and clinical characteristics within childhood medulloblastoma cohort)
 
 ### run clinical_data_extract_DW.R on results.master (such as results.filt.genefilter.20180220.rds)
@@ -217,6 +218,10 @@ plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xla
 plotHist(cox.PFS.cat.G3G4.df[,3], "Cox PFS categorical G3/G4", breaks = 100, xlab = "Z-score", cutoff = c(-2, 2)) ### Z score
 
 
+### when wish to view PDF then need dev.off, sink()
+
+dev.off()
+# sink()
 #########################################################################################################################################
 
 ### Hardcoding for graphs (examples)
@@ -325,7 +330,7 @@ readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.E
 #matplot(x, cbind(y1,y2))
 #matplot(x, cbind(y1,y2), pch=1)
 
-dev.off()
+# dev.off()
 
 
 
@@ -345,55 +350,13 @@ dev.off()
                          #   inset = c(0.1, 0.1) : % (from 0 to 1) to draw the legend away from x and y axis
                           ###  You can also give the X and Y coordinate of the legend: legend(3, 5, legend = c(“A”, “B”))
                           ### Note that an equivalent page exist concerning legends with ggplot2.
+                          ### see example of this in the pdf_graphics_example.R file 
                             
                             
                             
                             
                             
-                            # Create data:
-                            a=c(1:5)
-                            b=c(5,3,4,5,5)
-                            c=c(4,5,4,3,1)
-                            
-                            # Make a basic graph
-                            plot( b~a , type="b" , bty="l" , xlab="value of a" , ylab="value of b" , col=rgb(0.2,0.4,0.1,0.7) , lwd=3 , pch=17 , ylim=c(1,5) )
-                            lines(c ~a , col=rgb(0.8,0.4,0.1,0.7) , lwd=3 , pch=19 , type="b" )
-                            
-                            # Add a legend
-                            legend("bottomleft", 
-                                   legend = c("Group 1", "Group 2"), 
-                                   col = c(rgb(0.2,0.4,0.1,0.7), 
-                                           rgb(0.8,0.4,0.1,0.7)), 
-                                   pch = c(17,19), 
-                                   bty = "n", 
-                                   pt.cex = 2, 
-                                   cex = 1.2, 
-                                   text.col = "black", 
-                                   horiz = F , 
-                                   inset = c(0.1, 0.1))
                             
                             
-                            
-                            # Create data:
-                            a=c(1:5)
-                            b=c(5,3,4,5,5)
-                            c=c(4,5,4,3,1)
-                            
-                            # Make a basic graph
-                            plot( b~a , type="b" , bty="l" , xlab="value of a" , ylab="value of b" , col=rgb(0.2,0.4,0.1,0.7) , lwd=3 , pch=17 , ylim=c(1,5) )
-                            lines(c ~a , col=rgb(0.8,0.4,0.1,0.7) , lwd=3 , pch=19 , type="b" )
-                            
-                            # Add a legend
-                            legend("bottomleft", 
-                                   legend = c("Group 1", "Group 2"), 
-                                   col = c(rgb(0.2,0.4,0.1,0.7), 
-                                           rgb(0.8,0.4,0.1,0.7)), 
-                                   pch = c(17,19), 
-                                   bty = "n", 
-                                   pt.cex = 2, 
-                                   cex = 1.2, 
-                                   text.col = "black", 
-                                   horiz = F , 
-                                   inset = c(0.1, 0.1))
-                            
+                         
                             
