@@ -34,6 +34,11 @@ par (mfrow = c(1,1))
 ### set file for log output
 log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.report.data.txt"
 
+### write out tables as required. 
+# log.report.transpose
+
+
+
 #########################################################################################################################################
 ### Functions in this file:
 ### plotEcdf function
@@ -133,7 +138,6 @@ plotEcdf.Zscore <- function(x, y = NULL, test.name, xlab = "z-score", cutoff=c(-
   
 }
 
-
 #########################################################################################################################################
 
 ### FUNCTION 4: plotHist function
@@ -176,8 +180,6 @@ plotHist <- function(x, test.name, breaks = 100, xlab = "p-value", cutoff = 0.05
 }
 
 #########################################################################################################################################
-
-
 #########################################################################################################################################
 ### here is the start of the script to execute to generate graphics
 #########################################################################################################################################
@@ -271,22 +273,6 @@ plotHist(multivar.cox.PFS.lancetG3G4.cat.df[,2],  "Cox OS lancet G3G4 multivar c
 plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,1],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
 plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,2],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
-
-### lancet SHH older model ### not all these graphs are useful
-
-plotHist(multivar.cox.OS.SHHold.cat.df[,1],  "Cox OS SHH older multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
-# plotHist(multivar.cox.OS.SHHold.cat.df[,2],  "Cox OS SHH older multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-
-plotHist(multivar.cox.OS.SHHold.cont.df[,1],  "Cox OS SHH older multivar continuous", breaks = 100, xlab = "p-value", cutoff = 0.05)
-# plotHist(multivar.cox.OS.SHHold.cont.df[,2],  "Cox OS SHH older multivar continuous", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-
-plotHist(multivar.cox.PFS.SHHold.cat.df[,1],  "Cox PFS SHH older multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
-# plotHist(multivar.cox.PFS.SHHold.cat.df[,2],  "Cox PFS SHH older multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-
-plotHist(multivar.cox.PFS.SHHold.cont.df[,1],  "Cox PFS SHH older multivar continuous", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(multivar.cox.PFS.SHHold.cont.df[,2],  "Cox PFS SHH older multivar continuous", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-
-
 #########################################################################################################################################
 
 ### wrapper function would contain similar to
@@ -295,6 +281,68 @@ plotHist(multivar.cox.PFS.SHHold.cont.df[,2],  "Cox PFS SHH older multivar conti
 ### loop through different "test.name" options
 ### plotHist(x [,2], "test.name", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
+#########################################################################################################################################
+#########################################################################################################################################
+### COX MULTIVARIATE using plotEcdf
+
+### combined model
+plotEcdf.double(x=multivar.cox.OS.combined.cat.df[,"cox.pval"], z= multivar.cox.OS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cat)")
+plotEcdf.double(x=multivar.cox.PFS.combined.cat.df[,"cox.pval"], z= multivar.cox.PFS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cat)")
+
+plotEcdf.double(x=multivar.cox.OS.combined.cont.df[,"cox.pval"], z= multivar.cox.OS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cont)")
+plotEcdf.double(x=multivar.cox.PFS.combined.cont.df[,"cox.pval"], z= multivar.cox.PFS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cont)")
+
+### PNET5 
+plotEcdf.double(x=multivar.cox.OS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cat)")
+plotEcdf.double(x=multivar.cox.PFS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cat)")
+
+plotEcdf.double(x=multivar.cox.OS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cont)")
+plotEcdf.double(x=multivar.cox.PFS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cont)")
+
+### G3G4
+
+plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4(cat)")
+plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cat)")
+
+plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4 (cont)")
+plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cont)")
+
+
+#########################################################################################################################################
+### MULTIVARIATE COX Z SCORES
+
+### combined model OS/PFS Z score
+
+plotEcdf.Zscore(x=multivar.cox.OS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cat)")
+plotEcdf.Zscore(x=multivar.cox.OS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cont)")
+
+plotEcdf.Zscore(x=multivar.cox.PFS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cat)")
+plotEcdf.Zscore(x=multivar.cox.PFS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cont)")
+
+
+### OS Z scores for other models (PNET4, lancetG3G4, SHHold)
+plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score (cont)")
+
+plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score (cont)")
+
+plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score (cont)")
+
+
+### PFS Z scores for other models (PNET4, lancetG3G4, SHHold)
+
+plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score (cont)")
+
+plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score (cont)")
+
+plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score  (cat)")
+plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score (cont)")
+
+#########################################################################################################################################
 #########################################################################################################################################
 
 ### UNIVARIATE CHI
@@ -324,15 +372,46 @@ chi.report.MYCN <- chi.report.function (chi.MYCN.result, results.master)
 chi.report.MYC <- chi.report.function (chi.MYC.result, result.master)
 chi.report.MYCMYCN <- chi.report.function(chi.MYCMYCN.result, results.master)
 
-chi.report.table <- as.data.frame(cbind(chi.report.mstatus, chi.report.MYC, chi.report.MYC, chi.report.MYCMYCN, chi.report.relapse, chi.report.resection)) ### solution: as.data.frame to return a number not just "numeric" for p.val.range
+chi.report.table <- as.data.frame(cbind(chi.report.mstatus, chi.report.MYC, chi.report.MYCN, chi.report.MYCMYCN, chi.report.relapse, chi.report.resection)) ### solution: as.data.frame to return a number not just "numeric" for p.val.range
 
 print(chi.report.table)
 
+# write.csv(chi.report.table, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/chireport.gp.filt.mb.vsd.20180413.csv") ### returns an error "unimplemented type 'list' in EncodeElement'
+
 ### aim to run a function ( run lapply within the function and return (list)), and return object is then written out as a dataframe
 
-# plot(chi.report.table[3,]) ### not helpful
+
+#########################################################################################################################################
+### LOGISTIC REGRESSION REPORTING FUNCTION
 
 
+Log.report.function <-  function (log.reg.test, results.master){
+  log.cohort <- nrow(log.reg.test)
+  range.logreg.pval <- range(log.reg.test[,"logreg.pval"])
+  range.logreg.adjpval <- range(log.reg.test[,"logreg.adj.pval"])
+  range.logreg.OR <- range(log.reg.test [, "logreg.OR"])
+  
+  p.sig.log.reg.test <- which(log.reg.test[, "logreg.pval"]<0.05)
+  adj.p.sig.log.reg.test <- which (log.reg.test[, "logreg.adj.pval"]<0.05)
+  
+ log.reg.list <- list ("transcript.number" = log.cohort,
+                    "p.val.range" = range.logreg.pval,
+                    "adj.p.val.range" = range.logreg.adjpval,
+                    "total.sig.pval.number" = length(p.sig.log.reg.test), 
+                    "total.sig.adj.pval.number" = length(adj.p.sig.log.reg.test)
+  )
+  return (log.reg.list)
+}
+
+
+
+log.report.list <- lapply(logistic.reg.results, Log.report.function)
+
+log.report.table <- as.data.frame (log.report.list)
+log.report.transpose <- t(log.report.table) ### transpose #
+print(log.report.transpose)
+
+write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/logreport.gp.filt.mb.vsd.20180413.csv")
 #########################################################################################################################################
 
 ### COX REGRESSION UNIVARIATE
@@ -354,11 +433,19 @@ plotEcdf.double(x = cox.OS.cont.G3G4.df[, "cox.pval"], z = cox.OS.cont.G3G4.df[,
 plotEcdf.double(x = cox.PFS.cont.G3G4.df[, "cox.pval"], z = cox.PFS.cont.G3G4.df[, "cox.adj.pval"], test.name = "cox PFS in G3G4 (continuous)", xlab = "p value", ylab = "Fn(p value)")
 
 
-cox.OS.cont.SHH.df
-cox.PFS.cont.SHH.df
+### SHH results (Some of these are significant for continuous variable for 9693 transcript file 13/4/18)
 
-cox.OS.cont.SHH.old.df
-cox.PFS.cont.SHH.old.df
+plotEcdf.double(x = cox.OS.cat.SHH.df[, "cox.pval"], z = cox.OS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.PFS.cat.SHH.df[, "cox.pval"], z = cox.PFS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.OS.cont.SHH.df[, "cox.pval"], z = cox.OS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.PFS.cont.SHH.df[, "cox.pval"], z = cox.PFS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
+
+
+plotEcdf.double(x = cox.OS.cat.SHH.old.df[, "cox.pval"], z = cox.OS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.PFS.cat.SHH.old.df[, "cox.pval"], z = cox.PFS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.OS.cont.SHH.old.df[, "cox.pval"], z = cox.OS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = cox.PFS.cont.SHH.old.df[, "cox.pval"], z = cox.PFS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
+
 
 ### Z scores
 
@@ -377,23 +464,66 @@ plotEcdf.Zscore(x = cox.OS.cont.G3G4.df[,3], test.name = "cox OS Z scores G3G4 (
 plotEcdf.Zscore(x = cox.PFS.cont.G3G4.df[,3], test.name = "cox PFS Z scores G3G4 (cont)", xlab = "Z-score")
 
 
+### Z scores SHH specific
+plotEcdf.Zscore(x = cox.OS.cat.SHH.df[,3], test.name = "cox OS Z scores SHH (cat)", xlab = "Z-score")
+plotEcdf.Zscore(x = cox.PFS.cat.SHH.df[,3], test.name = "cox PFS Z scores SHH (cat)", xlab = "Z-score")
+
+plotEcdf.Zscore(x = cox.OS.cat.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cat)", xlab = "Z-score")
+plotEcdf.Zscore(x = cox.PFS.cat.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cat)", xlab = "Z-score") ### Z score specific, cox uses categorical expression data
+
+plotEcdf.Zscore(x = cox.OS.cont.SHH.df[,3], test.name = "cox OS Z scores SHH (cont)", xlab = "Z-score")
+plotEcdf.Zscore(x = cox.PFS.cont.SHH.df[,3], test.name = "cox PFS Z scores SHH (cont)", xlab = "Z-score")
+
+plotEcdf.Zscore(x = cox.OS.cont.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cont)", xlab = "Z-score")
+plotEcdf.Zscore(x = cox.PFS.cont.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cont)", xlab = "Z-score")
+
+
 #########################################################################################################################################
 ### KAPLAN MEIER UNIVARIATE
-### plotEcdf function so that both p value and p adjust are on the same graph
+### use plotEcdf function so that both p value and p adjust are on the same graph
+### do for OS/PFS for km all and G3G4 (note that this is for continuous transcripts against a dichotomous survival outcome)
 
-### do for OS/PFS for km all and G3G4
+plotEcdf.double(x = km.OS.all.results[,1], z = km.OS.all.results[,2],  test.name = "kaplan meier OS", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = km.PFS.all.results[,1], z = km.PFS.all.results[,2],  test.name = "kaplan meier PFS", xlab = "p value", ylab = "Fn(p value)")
 plotEcdf.double(x = km.EFS.all.results[,1], z = km.EFS.all.results[,2],  test.name = "kaplan meier EFS", xlab = "p value", ylab = "Fn(p value)")
 
 
-# colnames(km.EFS.all.results)
+plotEcdf.double(x = km.OS.G3G4.results[,1], z = km.OS.G3G4.results [,2],  test.name = "kaplan meier OS G3G4", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = km.PFS.G3G4.results[,1], z = km.PFS.G3G4.results[,2],  test.name = "kaplan meier PFS G3G4", xlab = "p value", ylab = "Fn(p value)")
+plotEcdf.double(x = km.EFS.G3G4.results[,1], z = km.EFS.G3G4.results[,2],  test.name = "kaplan meier EFS G3G4", xlab = "p value", ylab = "Fn(p value)")
 
 
+### Z scores do not apply to the km survival (eg. columns are OS.p.value and OS.adjusted.pval) # colnames(km.OS.all.results)
 
 #########################################################################################################################################
+#########################################################################################################################################
+### RESULTS THAT ARE GENERATED HOWEVER SMALL NUMBERS AND GRAPHICS PROBLEMATIC
+
+### lancet SHH older model ### not all these graphs are useful
+
+plotHist(multivar.cox.OS.SHHold.cat.df[,1],  "Cox OS SHH older multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
+# plotHist(multivar.cox.OS.SHHold.cat.df[,2],  "Cox OS SHH older multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+
+plotHist(multivar.cox.OS.SHHold.cont.df[,1],  "Cox OS SHH older multivar continuous", breaks = 100, xlab = "p-value", cutoff = 0.05)
+# plotHist(multivar.cox.OS.SHHold.cont.df[,2],  "Cox OS SHH older multivar continuous", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+
+plotHist(multivar.cox.PFS.SHHold.cat.df[,1],  "Cox PFS SHH older multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
+# plotHist(multivar.cox.PFS.SHHold.cat.df[,2],  "Cox PFS SHH older multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+
+plotHist(multivar.cox.PFS.SHHold.cont.df[,1],  "Cox PFS SHH older multivar continuous", breaks = 100, xlab = "p-value", cutoff = 0.05)
+plotHist(multivar.cox.PFS.SHHold.cont.df[,2],  "Cox PFS SHH older multivar continuous", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
 
 
+### SHH older ### unusual results due to small numbers of patients? (cox.adj.pval = 1) ?exclude
+plotEcdf.double(x=multivar.cox.OS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cat)")
+plotEcdf.double(x=multivar.cox.PFS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cat)")
 
+plotEcdf.double(x=multivar.cox.OS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cont)")
+plotEcdf.double(x=multivar.cox.PFS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cont)")
+
+#########################################################################################################################################
+#########################################################################################################################################
 
 ### when wish to view PDF then need dev.off, sink()
 
@@ -401,6 +531,28 @@ dev.off()
 # sink()
 #########################################################################################################################################
 #########################################################################################################################################
+### GETTING STARTED WITH WRITING FUNCTIONS
+### DETERMINE DATASET, RANGES, STRUCTURE, NAMES (names/colnames), length/nrow
+
+#names(logistic.reg.results)
+#head(logistic.reg.results)
+#colnames(logistic.reg.results[[1]])
+#"logreg.pval" 
+#"logreg.adj.pval" 
+
+#nrow(extract.logreg.LCA.df) ### 9693
+#length(extract.logreg.LCA.df) ### 48465
+
+#range(extract.logreg.LCA.df[,"logreg.pval"])
+#range(extract.logreg.LCA.df[, "logreg.adj.pval"])
+#range(extract.logreg.LCA.df[,"logreg.OR"])
+
+# rm(log.reg.test)
+# log.reg.test <- extract.logreg.LCA.df
+# results.master <- results.master
+
+#########################################################################################################################################
+
 ### REMOVE THIS HARDCODING WHEN FILE IS COMPLETE
 ### Hardcoding for graphs (examples)
 
