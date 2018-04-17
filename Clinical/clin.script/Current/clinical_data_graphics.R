@@ -13,8 +13,9 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180314.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 ### results.filt.genefilter.20180220.rds: this is a gene filtered file for transcripts and relationship to survival and clinical characteristics within childhood medulloblastoma cohort)
 
 ### need to extract clinical data results
@@ -35,7 +36,13 @@ par (mfrow = c(1,1))
 log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.report.data.txt"
 
 ### write out tables as required. 
-# log.report.transpose
+### log.report.transpose
+### chi.report.table
+### Results.cox  (this is a list of results from p, adjusted p [from plotEcdf.double function] and Z scores </> cutoff [plotEcdf.Z function], univar and multivar
+### where it is not specified as multivariate, the cox regression results are univariate
+
+### Results.km (list of km univariate survival associations)
+### Nb: Hist.cox.p.adjp.results are all contained within Results.cox, as plotHist results output single p/ adj p (total number < 0.05) while plotEcdf.double outputs both p and adjusted p in same function
 
 
 
@@ -43,7 +50,10 @@ log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.report.data.
 ### Functions in this file:
 ### plotEcdf function
 ### plotEcdf.double (for both p and adj p)
+### plotEcdf.Zscore
 ### plotHist
+### chi.report.function
+### Log.report.function
 
 
 
@@ -81,7 +91,6 @@ plotEcdf <- function(x, y = NULL, test.name, xlab = "p value", ylab = "Fn(p valu
   }  
   
 }
-
 
 #########################################################################################################################################
 ### FUNCTION 2: plotEcdf.double function
@@ -135,7 +144,7 @@ plotEcdf.Zscore <- function(x, y = NULL, test.name, xlab = "z-score", cutoff=c(-
   if(!is.null(y)){
     cdf.y <- ecdf(y)
   }  
-  
+  return(as.data.frame(cbind("Number transcripts z < cutoff" = temp.no.dn.x, "number transcripts z>cutoff" = temp.no.up.x), row.names = test.name)) ### added 17/4/18 
 }
 
 #########################################################################################################################################
@@ -180,6 +189,49 @@ plotHist <- function(x, test.name, breaks = 100, xlab = "p-value", cutoff = 0.05
 }
 
 #########################################################################################################################################
+
+### FUNCTION 5: chi.report.function
+### chi.report.function for Chi squared test
+### e.g output is chi.mstatus.result, names(chi.mstatus.result = "chi.p.value", "adjusted.pval")
+
+chi.report.function <-  function (chi.test, results.master){
+  chi.cohort <- nrow(chi.test)
+  range.chi.cohort <- range(chi.test)
+  grep.infinite <- grep ("inf", chi.test[, "chi.p.value"])
+  p.sig.chi.test <- which(chi.test[, "chi.p.value"]<0.05)
+  adj.p.sig.chi.test <- which (chi.test[, "adjusted.pval"]<0.05)
+  
+  chi.list <- list ("transcript.number" = chi.cohort,
+                    "p.val.range" = range.chi.cohort, 
+                    "total.sig.pval.number" = length(p.sig.chi.test), 
+                    "total.sig.adj.pval.number" = length(adj.p.sig.chi.test)
+  )
+  return (chi.list)
+}  
+#########################################################################################################################################
+### FUNCTION 6: Log.report.function for univariate logistic regression results
+### uses lapply to run through all variables within a list
+### output for number of transcripts examined, range of p value, range of adjusted p value, significant p value (n transcripts), significant adjustsed p value (n transcripts)
+
+Log.report.function <-  function (log.reg.test, results.master){
+  log.cohort <- nrow(log.reg.test)
+  range.logreg.pval <- range(log.reg.test[,"logreg.pval"])
+  range.logreg.adjpval <- range(log.reg.test[,"logreg.adj.pval"])
+  range.logreg.OR <- range(log.reg.test [, "logreg.OR"])
+  
+  p.sig.log.reg.test <- which(log.reg.test[, "logreg.pval"]<0.05)
+  adj.p.sig.log.reg.test <- which (log.reg.test[, "logreg.adj.pval"]<0.05)
+  
+  log.reg.list <- list ("transcript.number" = log.cohort,
+                        "p.val.range" = range.logreg.pval,
+                        "adj.p.val.range" = range.logreg.adjpval,
+                        "total.sig.pval.number" = length(p.sig.log.reg.test), 
+                        "total.sig.adj.pval.number" = length(adj.p.sig.log.reg.test)
+  )
+  return (log.reg.list)
+}
+
+
 #########################################################################################################################################
 ### here is the start of the script to execute to generate graphics
 #########################################################################################################################################
@@ -199,36 +251,46 @@ plotHist <- function(x, test.name, breaks = 100, xlab = "p-value", cutoff = 0.05
 
 ### categorical expression data for OS, PFS, EFS for both overall (all data) and G3G4
 
-plotHist(cox.OS.cat.all.df[,1],  "Cox OS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.OS.cat.all.df[,2],  "Cox OS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.OS.cat.G3G4.df[,1], "Cox OS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.OS.cat.G3G4.df[,2], "Cox OS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.OS.cat.all <- plotHist(cox.OS.cat.all.df[,1],  "Cox OS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05) ###
 
-plotHist(cox.PFS.cat.all.df[,1],  "Cox PFS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.PFS.cat.all.df[,2],  "Cox PFS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.PFS.cat.G3G4.df[,1], "Cox PFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+### can then do mget with "Hist.cox" e.g Hist.cox.OS.cat.all
+### example to make a list of all the logistic regression results from clinical_data_extract_DW.R
+### logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg")))
 
-plotHist(cox.EFS.cat.all.df[,1],  "Cox EFS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.EFS.cat.all.df[,2],  "Cox EFS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.EFS.cat.G3G4.df[,1], "Cox EFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.EFS.cat.G3G4.df[,2], "Cox EFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.adjp.OS.cat.all <- plotHist(cox.OS.cat.all.df[,2],  "Cox OS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.OS.cat.G3G4 <- plotHist(cox.OS.cat.G3G4.df[,1], "Cox OS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.OS.cat.G3G4 <- plotHist(cox.OS.cat.G3G4.df[,2], "Cox OS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.PFS.cat.all <- plotHist(cox.PFS.cat.all.df[,1],  "Cox PFS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.PFS.cat.all <- plotHist(cox.PFS.cat.all.df[,2],  "Cox PFS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.PFS.cat.G3G4 <- plotHist(cox.PFS.cat.G3G4.df[,1], "Cox PFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.PFS.cat.G3G4 <- plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.EFS.cat.all <- plotHist(cox.EFS.cat.all.df[,1],  "Cox EFS categorical overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.EFS.cat.all <- plotHist(cox.EFS.cat.all.df[,2],  "Cox EFS categorical overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.EFS.cat.G3G4 <- plotHist(cox.EFS.cat.G3G4.df[,1], "Cox EFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.EFS.cat.G3G4 <- plotHist(cox.EFS.cat.G3G4.df[,2], "Cox EFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
 ### continuous expression data for OS, PFS for both overall (all data) and G3G4. Cox EFS data does not exist for continuous transcript expression
+ 
+Hist.cox.p.OS.cont.all <- plotHist(cox.OS.cont.all.df[,1],  "Cox OS continuous overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.OS.cont.all <- plotHist(cox.OS.cont.all.df[,2],  "Cox OS continuous overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.OS.cont.G3G4 <- plotHist(cox.OS.cont.G3G4.df[,1], "Cox OS continuous G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.OS.cont.G3G4 <- plotHist(cox.OS.cont.G3G4.df[,2], "Cox OS continuous G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
-plotHist(cox.OS.cont.all.df[,1],  "Cox OS continuous overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.OS.cont.all.df[,2],  "Cox OS continuous overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.OS.cont.G3G4.df[,1], "Cox OS continuous G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.OS.cont.G3G4.df[,2], "Cox OS continuous G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.PFS.cont.all <- plotHist(cox.PFS.cont.all.df[,1],  "Cox PFS continuous overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.PFS.cont.all <- plotHist(cox.PFS.cont.all.df[,2],  "Cox PFS continuous overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+Hist.cox.p.PFS.cont.G3G4 <- plotHist(cox.PFS.cont.G3G4.df[,1], "Cox PFS continuous G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
+Hist.cox.adjp.PFS.cont.G3G4 <- plotHist(cox.PFS.cont.G3G4.df[,2], "Cox PFS continuous G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
-plotHist(cox.PFS.cont.all.df[,1],  "Cox PFS continuous overall", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.PFS.cont.all.df[,2],  "Cox PFS continuous overall", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
-plotHist(cox.PFS.cont.G3G4.df[,1], "Cox PFS continuous G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(cox.PFS.cont.G3G4.df[,2], "Cox PFS continuous G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+
+Hist.cox.p.adjp.results <- as.list(mget(ls(pattern = "Hist.cox")))
+print(Hist.cox.p.adjp.results)
+# Hist.cox.results.df <- as.data.frame(Hist.cox.p.adjp.results)
+# write.csv(Hist.cox.results.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Hist_cox_results.csv") ### see what output looks like
 
 #########################################################################################################################################
 ### MULTIVARIATE
 ### for multivariate cox regression models 
+### note that the plotEcdf function generates all the below results in tabular form, therefore do not need to replicate here within plotHist
 
 ### combined model
 
@@ -286,26 +348,26 @@ plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,2],  "Cox OS lancet G3G4 multivar 
 ### COX MULTIVARIATE using plotEcdf
 
 ### combined model
-plotEcdf.double(x=multivar.cox.OS.combined.cat.df[,"cox.pval"], z= multivar.cox.OS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cat)")
-plotEcdf.double(x=multivar.cox.PFS.combined.cat.df[,"cox.pval"], z= multivar.cox.PFS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cat)")
+Results.cox.multivar.OS.combined.cat <- plotEcdf.double(x=multivar.cox.OS.combined.cat.df[,"cox.pval"], z= multivar.cox.OS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cat)")
+Results.cox.multivar.PFS.combined.cat <- plotEcdf.double(x=multivar.cox.PFS.combined.cat.df[,"cox.pval"], z= multivar.cox.PFS.combined.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cat)")
 
-plotEcdf.double(x=multivar.cox.OS.combined.cont.df[,"cox.pval"], z= multivar.cox.OS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cont)")
-plotEcdf.double(x=multivar.cox.PFS.combined.cont.df[,"cox.pval"], z= multivar.cox.PFS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cont)")
+Results.cox.multivar.OS.combined.cont <- plotEcdf.double(x=multivar.cox.OS.combined.cont.df[,"cox.pval"], z= multivar.cox.OS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS combined (cont)")
+Results.cox.multivar.PFS.combined.cont <- plotEcdf.double(x=multivar.cox.PFS.combined.cont.df[,"cox.pval"], z= multivar.cox.PFS.combined.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS combined (cont)")
 
 ### PNET5 
-plotEcdf.double(x=multivar.cox.OS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cat)")
-plotEcdf.double(x=multivar.cox.PFS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cat)")
+Results.cox.multivar.OS.PNET5.cat <- plotEcdf.double(x=multivar.cox.OS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cat)")
+Results.cox.multivar.PFS.PNET5.cat <- plotEcdf.double(x=multivar.cox.PFS.PNET5.cat.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cat)")
 
-plotEcdf.double(x=multivar.cox.OS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cont)")
-plotEcdf.double(x=multivar.cox.PFS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cont)")
+Results.cox.multivar.OS.PNET5.cont <- plotEcdf.double(x=multivar.cox.OS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.OS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS PNET5 (cont)")
+Results.cox.multivar.PFS.PNET5.cont <- plotEcdf.double(x=multivar.cox.PFS.PNET5.cont.df[,"cox.pval"], z= multivar.cox.PFS.PNET5.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS PNET5 (cont)")
 
 ### G3G4
 
-plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4(cat)")
-plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cat)")
+Results.cox.multivar.OS.lancetG3G4.cat <- plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4(cat)")
+Results.cox.multivar.PFS.lancetG3G4.cat <- plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cat.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cat)")
 
-plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4 (cont)")
-plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cont)")
+Results.cox.multivar.OS.lancetG3G4.cont <- plotEcdf.double(x=multivar.cox.OS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.OS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS G3G4 (cont)")
+Results.cox.multivar.PFS.lancetG3G4.cont <- plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.cox.PFS.lancetG3G4.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS G3G4 (cont)")
 
 
 #########################################################################################################################################
@@ -313,57 +375,39 @@ plotEcdf.double(x=multivar.cox.PFS.lancetG3G4.cont.df[,"cox.pval"], z= multivar.
 
 ### combined model OS/PFS Z score
 
-plotEcdf.Zscore(x=multivar.cox.OS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cat)")
-plotEcdf.Zscore(x=multivar.cox.OS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cont)")
+Results.cox.Z.multivar.OS.combined.cat <- plotEcdf.Zscore(x=multivar.cox.OS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cat)")
+Results.cox.Z.multivar.OS.combined.cont <- plotEcdf.Zscore(x=multivar.cox.OS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox OS comb Z score (cont)")
 
-plotEcdf.Zscore(x=multivar.cox.PFS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cat)")
-plotEcdf.Zscore(x=multivar.cox.PFS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cont)")
-
+Results.cox.Z.multivar.PFS.combined.cat <- plotEcdf.Zscore(x=multivar.cox.PFS.combined.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cat)")
+Results.cox.Z.multivar.PFS.combined.cont <- plotEcdf.Zscore(x=multivar.cox.PFS.combined.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS comb Z score (cont)")
 
 ### OS Z scores for other models (PNET4, lancetG3G4, SHHold)
-plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score (cont)")
+Results.cox.Z.multivar.OS.PNET5.cat <- plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score  (cat)")
+Results.cox.Z.multivar.OS.PNET5.cont <- plotEcdf.Zscore(x=multivar.cox.OS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox OS PNET5 Z score (cont)")
 
-plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score (cont)")
+Results.cox.Z.multivar.OS.lancetG3G4.cat <- plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score  (cat)")
+Results.cox.Z.multivar.OS.lancetG3G4.cont <- plotEcdf.Zscore(x=multivar.cox.OS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox OS G3G4 Z score (cont)")
 
-plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score (cont)")
+Results.cox.Z.multivar.OS.SHHold.cat <- plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score  (cat)")
+Results.cox.Z.multivar.OS.SHHold.cont <- plotEcdf.Zscore(x=multivar.cox.OS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox OS SHH older Z score (cont)")
 
 
 ### PFS Z scores for other models (PNET4, lancetG3G4, SHHold)
 
-plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score (cont)")
+Results.cox.Z.multivar.PFS.PNET5.cat <- plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score  (cat)")
+Results.cox.Z.multivar.PFS.PNET5.cont <- plotEcdf.Zscore(x=multivar.cox.PFS.PNET5.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS PNET5 Z score (cont)")
 
-plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score (cont)")
+Results.cox.Z.multivar.PFS.lancetG3G4.cat <- plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score  (cat)")
+Results.cox.Z.multivar.PFS.lancetG3G4.cont <-plotEcdf.Zscore(x=multivar.cox.PFS.lancetG3G4.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS G3G4 Z score (cont)")
 
-plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score  (cat)")
-plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score (cont)")
+Results.cox.Z.multivar.PFS.SHHold.cat <- plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cat.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score  (cat)")
+Results.cox.Z.multivar.PFS.SHHold.cont <- plotEcdf.Zscore(x=multivar.cox.PFS.SHHold.cont.df[, "cox.Zscore"], test.name = "multivar cox PFS SHH older Z score (cont)")
+
 
 #########################################################################################################################################
 #########################################################################################################################################
 
 ### UNIVARIATE CHI
-
-### chi.report.function for Chi squared test
-### e.g output is chi.mstatus.result, names(chi.mstatus.result = "chi.p.value", "adjusted.pval")
-
-chi.report.function <-  function (chi.test, results.master){
-  chi.cohort <- nrow(chi.test)
-  range.chi.cohort <- range(chi.test)
-  grep.infinite <- grep ("inf", chi.test[, "chi.p.value"])
-  p.sig.chi.test <- which(chi.test[, "chi.p.value"]<0.05)
-  adj.p.sig.chi.test <- which (chi.test[, "adjusted.pval"]<0.05)
-
-chi.list <- list ("transcript.number" = chi.cohort,
-       "p.val.range" = range.chi.cohort, 
-       "total.sig.pval.number" = length(p.sig.chi.test), 
-       "total.sig.adj.pval.number" = length(adj.p.sig.chi.test)
-       )
-return (chi.list)
-}      
 
 chi.report.mstatus <- chi.report.function(chi.mstatus.result, results.master)
 chi.report.relapse <- chi.report.function(chi.relapse.result, results.master)
@@ -376,34 +420,13 @@ chi.report.table <- as.data.frame(cbind(chi.report.mstatus, chi.report.MYC, chi.
 
 print(chi.report.table)
 
-# write.csv(chi.report.table, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/chireport.gp.filt.mb.vsd.20180413.csv") ### returns an error "unimplemented type 'list' in EncodeElement'
+write.csv(chi.report.table, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/chireport.gp.filt.mb.vsd.20180417.csv") 
 
 ### aim to run a function ( run lapply within the function and return (list)), and return object is then written out as a dataframe
 
 
 #########################################################################################################################################
-### LOGISTIC REGRESSION REPORTING FUNCTION
-
-
-Log.report.function <-  function (log.reg.test, results.master){
-  log.cohort <- nrow(log.reg.test)
-  range.logreg.pval <- range(log.reg.test[,"logreg.pval"])
-  range.logreg.adjpval <- range(log.reg.test[,"logreg.adj.pval"])
-  range.logreg.OR <- range(log.reg.test [, "logreg.OR"])
-  
-  p.sig.log.reg.test <- which(log.reg.test[, "logreg.pval"]<0.05)
-  adj.p.sig.log.reg.test <- which (log.reg.test[, "logreg.adj.pval"]<0.05)
-  
- log.reg.list <- list ("transcript.number" = log.cohort,
-                    "p.val.range" = range.logreg.pval,
-                    "adj.p.val.range" = range.logreg.adjpval,
-                    "total.sig.pval.number" = length(p.sig.log.reg.test), 
-                    "total.sig.adj.pval.number" = length(adj.p.sig.log.reg.test)
-  )
-  return (log.reg.list)
-}
-
-
+### LOGISTIC REGRESSION UNIVARIATE
 
 log.report.list <- lapply(logistic.reg.results, Log.report.function)
 
@@ -411,89 +434,91 @@ log.report.table <- as.data.frame (log.report.list)
 log.report.transpose <- t(log.report.table) ### transpose #
 print(log.report.transpose)
 
-write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/logreport.gp.filt.mb.vsd.20180413.csv")
+### adjust this
+write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/logreport.gp.filt.mb.vsd.20180413.csv")
+
 #########################################################################################################################################
 
 ### COX REGRESSION UNIVARIATE
 ### example: cox.PFS.cat.G3G4.df
 # colnames(cox.PFS.cat.G3G4.df)
 
-plotEcdf.double(x = cox.OS.cat.all.df[, "cox.pval"], z = cox.OS.cat.all.df[, "cox.adj.pval"], test.name = "cox OS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cat.all.df[, "cox.pval"], z = cox.PFS.cat.all.df[, "cox.adj.pval"], test.name = "cox PFS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.EFS.cat.all.df[, "cox.pval"], z = cox.EFS.cat.all.df[, "cox.adj.pval"], test.name = "cox EFS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cat.all <- plotEcdf.double(x = cox.OS.cat.all.df[, "cox.pval"], z = cox.OS.cat.all.df[, "cox.adj.pval"], test.name = "cox OS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cat.all <- plotEcdf.double(x = cox.PFS.cat.all.df[, "cox.pval"], z = cox.PFS.cat.all.df[, "cox.adj.pval"], test.name = "cox PFS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.EFS.cat.all <- plotEcdf.double(x = cox.EFS.cat.all.df[, "cox.pval"], z = cox.EFS.cat.all.df[, "cox.adj.pval"], test.name = "cox EFS in all (categorical)", xlab = "p value", ylab = "Fn(p value)")
 
-plotEcdf.double(x = cox.OS.cat.G3G4.df[, "cox.pval"], z = cox.OS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox OS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cat.G3G4.df[, "cox.pval"], z = cox.PFS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox PFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.EFS.cat.G3G4.df[, "cox.pval"], z = cox.EFS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox EFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cat.G3G4 <- plotEcdf.double(x = cox.OS.cat.G3G4.df[, "cox.pval"], z = cox.OS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox OS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cat.G3G4 <- plotEcdf.double(x = cox.PFS.cat.G3G4.df[, "cox.pval"], z = cox.PFS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox PFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.EFS.cat.G3G4 <- plotEcdf.double(x = cox.EFS.cat.G3G4.df[, "cox.pval"], z = cox.EFS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox EFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
 
-plotEcdf.double(x = cox.OS.cont.all.df[, "cox.pval"], z = cox.OS.cont.all.df[, "cox.adj.pval"], test.name = "cox OS in all (continuous)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cont.all.df[, "cox.pval"], z = cox.PFS.cont.all.df[, "cox.adj.pval"], test.name = "cox PFS in all (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cont.all <- plotEcdf.double(x = cox.OS.cont.all.df[, "cox.pval"], z = cox.OS.cont.all.df[, "cox.adj.pval"], test.name = "cox OS in all (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cont.all <- plotEcdf.double(x = cox.PFS.cont.all.df[, "cox.pval"], z = cox.PFS.cont.all.df[, "cox.adj.pval"], test.name = "cox PFS in all (continuous)", xlab = "p value", ylab = "Fn(p value)")
 
-plotEcdf.double(x = cox.OS.cont.G3G4.df[, "cox.pval"], z = cox.OS.cont.G3G4.df[, "cox.adj.pval"], test.name = "cox OS in G3G4 (continuous)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cont.G3G4.df[, "cox.pval"], z = cox.PFS.cont.G3G4.df[, "cox.adj.pval"], test.name = "cox PFS in G3G4 (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cont.G3G4 <- plotEcdf.double(x = cox.OS.cont.G3G4.df[, "cox.pval"], z = cox.OS.cont.G3G4.df[, "cox.adj.pval"], test.name = "cox OS in G3G4 (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cont.G3G4 <- plotEcdf.double(x = cox.PFS.cont.G3G4.df[, "cox.pval"], z = cox.PFS.cont.G3G4.df[, "cox.adj.pval"], test.name = "cox PFS in G3G4 (continuous)", xlab = "p value", ylab = "Fn(p value)")
 
 
 ### SHH results (Some of these are significant for continuous variable for 9693 transcript file 13/4/18)
 
-plotEcdf.double(x = cox.OS.cat.SHH.df[, "cox.pval"], z = cox.OS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cat.SHH.df[, "cox.pval"], z = cox.PFS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.OS.cont.SHH.df[, "cox.pval"], z = cox.OS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cont.SHH.df[, "cox.pval"], z = cox.PFS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cat.SHH <- plotEcdf.double(x = cox.OS.cat.SHH.df[, "cox.pval"], z = cox.OS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cat.SHH <- plotEcdf.double(x = cox.PFS.cat.SHH.df[, "cox.pval"], z = cox.PFS.cat.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cont.SHH <- plotEcdf.double(x = cox.OS.cont.SHH.df[, "cox.pval"], z = cox.OS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox OS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cont.SHH <- plotEcdf.double(x = cox.PFS.cont.SHH.df[, "cox.pval"], z = cox.PFS.cont.SHH.df[, "cox.adj.pval"], test.name = "cox PFS in SHH (continuous)", xlab = "p value", ylab = "Fn(p value)")
 
 
-plotEcdf.double(x = cox.OS.cat.SHH.old.df[, "cox.pval"], z = cox.OS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cat.SHH.old.df[, "cox.pval"], z = cox.PFS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.OS.cont.SHH.old.df[, "cox.pval"], z = cox.OS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = cox.PFS.cont.SHH.old.df[, "cox.pval"], z = cox.PFS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cat.SHHold <- plotEcdf.double(x = cox.OS.cat.SHH.old.df[, "cox.pval"], z = cox.OS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cat.SHHold <- plotEcdf.double(x = cox.PFS.cat.SHH.old.df[, "cox.pval"], z = cox.PFS.cat.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (categorical)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.OS.cont.SHHold <- plotEcdf.double(x = cox.OS.cont.SHH.old.df[, "cox.pval"], z = cox.OS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox OS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
+Results.cox.PFS.cont.SHHold <- plotEcdf.double(x = cox.PFS.cont.SHH.old.df[, "cox.pval"], z = cox.PFS.cont.SHH.old.df[, "cox.adj.pval"], test.name = "cox PFS in SHH older (continuous)", xlab = "p value", ylab = "Fn(p value)")
 
 
 ### Z scores
 
-plotEcdf.Zscore(x = cox.OS.cat.all.df[,3], test.name = "cox OS Z scores all (cat)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cat.all.df[,3], test.name = "cox PFS Z scores all (cat)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.EFS.cat.all.df[,3], test.name = "cox EFS Z scores all (cat)", xlab = "Z-score")
+Results.cox.Z.OS.cat.all <- plotEcdf.Zscore(x = cox.OS.cat.all.df[,3], test.name = "cox OS Z scores all (cat)", xlab = "Z-score")
+Results.cox.Z.PFS.cat.all <- plotEcdf.Zscore(x = cox.PFS.cat.all.df[,3], test.name = "cox PFS Z scores all (cat)", xlab = "Z-score")
+Results.cox.Z.EFS.cat.all <- plotEcdf.Zscore(x = cox.EFS.cat.all.df[,3], test.name = "cox EFS Z scores all (cat)", xlab = "Z-score")
 
-plotEcdf.Zscore(x = cox.OS.cat.G3G4.df[,3], test.name = "cox OS Z scores G3G4 (cat)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cat.G3G4.df[,3], test.name = "cox PFS Z scores G3G4 (cat)", xlab = "Z-score") ### Z score specific, cox uses categorical expression data
-plotEcdf.Zscore(x = cox.EFS.cat.G3G4.df[,3], test.name = "cox EFS Z scores G3G4 (cat)", xlab = "Z-score")
+Results.cox.Z.OS.cat.G3G4 <- plotEcdf.Zscore(x = cox.OS.cat.G3G4.df[,3], test.name = "cox OS Z scores G3G4 (cat)", xlab = "Z-score")
+Results.cox.Z.PFS.cat.G3G4 <- plotEcdf.Zscore(x = cox.PFS.cat.G3G4.df[,3], test.name = "cox PFS Z scores G3G4 (cat)", xlab = "Z-score") ### Z score specific, cox uses categorical expression data
+Results.cox.Z.EFS.cat.G3G4 <- plotEcdf.Zscore(x = cox.EFS.cat.G3G4.df[,3], test.name = "cox EFS Z scores G3G4 (cat)", xlab = "Z-score")
 
-plotEcdf.Zscore(x = cox.OS.cont.all.df[,3], test.name = "cox OS Z scores all (cont)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cont.all.df[,3], test.name = "cox PFS Z scores all (cont)", xlab = "Z-score")
+Results.cox.Z.OS.cont.all <- plotEcdf.Zscore(x = cox.OS.cont.all.df[,3], test.name = "cox OS Z scores all (cont)", xlab = "Z-score")
+Results.cox.Z.PFS.cont.all <- plotEcdf.Zscore(x = cox.PFS.cont.all.df[,3], test.name = "cox PFS Z scores all (cont)", xlab = "Z-score")
 
-plotEcdf.Zscore(x = cox.OS.cont.G3G4.df[,3], test.name = "cox OS Z scores G3G4 (cont)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cont.G3G4.df[,3], test.name = "cox PFS Z scores G3G4 (cont)", xlab = "Z-score")
+Results.cox.Z.OS.cont.G3G4 <- plotEcdf.Zscore(x = cox.OS.cont.G3G4.df[,3], test.name = "cox OS Z scores G3G4 (cont)", xlab = "Z-score")
+Results.cox.Z.PFS.cont.G3G4 <- plotEcdf.Zscore(x = cox.PFS.cont.G3G4.df[,3], test.name = "cox PFS Z scores G3G4 (cont)", xlab = "Z-score")
 
 
 ### Z scores SHH specific
-plotEcdf.Zscore(x = cox.OS.cat.SHH.df[,3], test.name = "cox OS Z scores SHH (cat)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cat.SHH.df[,3], test.name = "cox PFS Z scores SHH (cat)", xlab = "Z-score")
+Results.cox.Z.OS.cat.SHH <- plotEcdf.Zscore(x = cox.OS.cat.SHH.df[,3], test.name = "cox OS Z scores SHH (cat)", xlab = "Z-score")
+Results.cox.Z.PFS.cat.SHH <- plotEcdf.Zscore(x = cox.PFS.cat.SHH.df[,3], test.name = "cox PFS Z scores SHH (cat)", xlab = "Z-score")
 
-plotEcdf.Zscore(x = cox.OS.cat.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cat)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cat.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cat)", xlab = "Z-score") ### Z score specific, cox uses categorical expression data
+Results.cox.Z.OS.cat.SHHold <- plotEcdf.Zscore(x = cox.OS.cat.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cat)", xlab = "Z-score")
+Results.cox.Z.PFS.cat.SHHold <- plotEcdf.Zscore(x = cox.PFS.cat.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cat)", xlab = "Z-score") ### Z score specific, cox uses categorical expression data
 
-plotEcdf.Zscore(x = cox.OS.cont.SHH.df[,3], test.name = "cox OS Z scores SHH (cont)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cont.SHH.df[,3], test.name = "cox PFS Z scores SHH (cont)", xlab = "Z-score")
+Results.cox.Z.OS.cont.SHH <- plotEcdf.Zscore(x = cox.OS.cont.SHH.df[,3], test.name = "cox OS Z scores SHH (cont)", xlab = "Z-score")
+Report.cox.Z.PFS.cont.SHH <- plotEcdf.Zscore(x = cox.PFS.cont.SHH.df[,3], test.name = "cox PFS Z scores SHH (cont)", xlab = "Z-score")
 
-plotEcdf.Zscore(x = cox.OS.cont.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cont)", xlab = "Z-score")
-plotEcdf.Zscore(x = cox.PFS.cont.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cont)", xlab = "Z-score")
+Results.cox.Z.OS.cont.SHHold <- plotEcdf.Zscore(x = cox.OS.cont.SHH.old.df[,3], test.name = "cox OS Z scores SHH older (cont)", xlab = "Z-score")
+Results.cox.Z.PFS.cont.SHHold <- plotEcdf.Zscore(x = cox.PFS.cont.SHH.old.df[,3], test.name = "cox PFS Z scores SHH older (cont)", xlab = "Z-score")
 
 
 #########################################################################################################################################
+
 ### KAPLAN MEIER UNIVARIATE
 ### use plotEcdf function so that both p value and p adjust are on the same graph
 ### do for OS/PFS for km all and G3G4 (note that this is for continuous transcripts against a dichotomous survival outcome)
 
-plotEcdf.double(x = km.OS.all.results[,1], z = km.OS.all.results[,2],  test.name = "kaplan meier OS", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = km.PFS.all.results[,1], z = km.PFS.all.results[,2],  test.name = "kaplan meier PFS", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = km.EFS.all.results[,1], z = km.EFS.all.results[,2],  test.name = "kaplan meier EFS", xlab = "p value", ylab = "Fn(p value)")
+Results.km.OS.all <- plotEcdf.double(x = km.OS.all.results[,1], z = km.OS.all.results[,2],  test.name = "kaplan meier OS", xlab = "p value", ylab = "Fn(p value)")
+Results.km.PFS.all <- plotEcdf.double(x = km.PFS.all.results[,1], z = km.PFS.all.results[,2],  test.name = "kaplan meier PFS", xlab = "p value", ylab = "Fn(p value)")
+Results.km.EFS.all <- plotEcdf.double(x = km.EFS.all.results[,1], z = km.EFS.all.results[,2],  test.name = "kaplan meier EFS", xlab = "p value", ylab = "Fn(p value)")
 
-
-plotEcdf.double(x = km.OS.G3G4.results[,1], z = km.OS.G3G4.results [,2],  test.name = "kaplan meier OS G3G4", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = km.PFS.G3G4.results[,1], z = km.PFS.G3G4.results[,2],  test.name = "kaplan meier PFS G3G4", xlab = "p value", ylab = "Fn(p value)")
-plotEcdf.double(x = km.EFS.G3G4.results[,1], z = km.EFS.G3G4.results[,2],  test.name = "kaplan meier EFS G3G4", xlab = "p value", ylab = "Fn(p value)")
-
+Results.km.OS.G3G4 <- plotEcdf.double(x = km.OS.G3G4.results[,1], z = km.OS.G3G4.results [,2],  test.name = "kaplan meier OS G3G4", xlab = "p value", ylab = "Fn(p value)")
+Results.km.PFS.G3G4 <- plotEcdf.double(x = km.PFS.G3G4.results[,1], z = km.PFS.G3G4.results[,2],  test.name = "kaplan meier PFS G3G4", xlab = "p value", ylab = "Fn(p value)")
+Results.km.EFS.G3G4 <- plotEcdf.double(x = km.EFS.G3G4.results[,1], z = km.EFS.G3G4.results[,2],  test.name = "kaplan meier EFS G3G4", xlab = "p value", ylab = "Fn(p value)")
 
 ### Z scores do not apply to the km survival (eg. columns are OS.p.value and OS.adjusted.pval) # colnames(km.OS.all.results)
+Results.km <- as.list(mget(ls(pattern = "Results.km")))
 
 #########################################################################################################################################
 #########################################################################################################################################
@@ -516,19 +541,26 @@ plotHist(multivar.cox.PFS.SHHold.cont.df[,2],  "Cox PFS SHH older multivar conti
 
 
 ### SHH older ### unusual results due to small numbers of patients? (cox.adj.pval = 1) ?exclude
-plotEcdf.double(x=multivar.cox.OS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cat)")
-plotEcdf.double(x=multivar.cox.PFS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cat)")
+Results.cox.multivar.OS.SHHold.cat <- plotEcdf.double(x=multivar.cox.OS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cat)")
+Results.cox.multivar.PFS.SHHold.cat <- plotEcdf.double(x=multivar.cox.PFS.SHHold.cat.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cat.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cat)")
 
-plotEcdf.double(x=multivar.cox.OS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cont)")
-plotEcdf.double(x=multivar.cox.PFS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cont)")
+Results.cox.multivar.OS.SHHold.cont <- plotEcdf.double(x=multivar.cox.OS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.OS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox OS SHH older (cont)")
+Results.cox.multivar.PFS.SHHold.cont <- plotEcdf.double(x=multivar.cox.PFS.SHHold.cont.df[,"cox.pval"], z= multivar.cox.PFS.SHHold.cont.df[,"cox.adj.pval"], test.name = "multivar cox PFS SHH older (cont)")
 
 #########################################################################################################################################
 #########################################################################################################################################
+### Create a list of all univariate and multivariate cox results (p, adj p, Z score)
+Results.cox <- as.list(mget(ls(pattern = "Results.cox")))
+
+#########################################################################################################################################
+
+### return results.cox, results.km, log.report.transpose, chi.report.table
 
 ### when wish to view PDF then need dev.off, sink()
 
 dev.off()
 # sink()
+
 #########################################################################################################################################
 #########################################################################################################################################
 ### GETTING STARTED WITH WRITING FUNCTIONS
@@ -552,59 +584,6 @@ dev.off()
 # results.master <- results.master
 
 #########################################################################################################################################
-
-### REMOVE THIS HARDCODING WHEN FILE IS COMPLETE
-### Hardcoding for graphs (examples)
-
-### Ecdf plots that describe the empirical cumulative distribution frequency
-
-# plot(ecdf(p.km.EFS.all)) 
-# plot(ecdf(adjusted.p.km.EFS.all))  ### km.EFS.all.results[,"EFS.adjusted.pval"]
-
-### Histograms
-
-# hist(cox.PFS.cat.G3G4.df[,1])
-# hist(cox.PFS.cat.G3G4.df[,2])
-
-
-### redundant script removed above, for example:
-# plotEcdf(x = cox.PFS.cat.G3G4.df[,1], test.name = "cox PFS p values for G3G4", xlab = "p value")
-# plotEcdf (x = cox.PFS.cat.G3G4.df[,2], test.name = "cox PFS adj p values for G3G4", xlab = "adjusted p value")
-# p.cox.PFS.cat.G3G4 <- cox.PFS.cat.G3G4.df[,1]
-# p.adj.cox.PFS.cat.G3G4 <- cox.PFS.cat.G3G4.df[,2]
-# plotEcdf.double(x = p.cox.PFS.cat.G3G4, z = p.adj.cox.PFS.cat.G3G4, test.name = "cox PFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
-### has been replaced by:
-# plotEcdf.double(x = cox.EFS.cat.G3G4.df[, "cox.pval"], z = cox.EFS.cat.G3G4.df[, "cox.adj.pval"], test.name = "cox EFS in G3G4 (categorical)", xlab = "p value", ylab = "Fn(p value)")
-
-
-### another example
-# plotEcdf(x = p.km.EFS.all, test.name = "kaplan meier EFS", xlab = "p value") ### entire cohort fpr just p value
-# plotEcdf(x = adjusted.p.km.EFS.all, test.name = "kaplan meier EFS", xlab = "adjusted p value", ylab = "Fn(adjusted p value)") ### entire cohort for adjusted p value
-### has been replaced by:
-# plotEcdf.double(x = p.km.EFS.all, z = adjusted.p.km.EFS.all,  test.name = "kaplan meier EFS", xlab = "p value", ylab = "Fn(p value)")
-
-
-### another example of simplified coding
-#p.km.EFS.all <- km.EFS.all.results[, "EFS.p.value"]
-#adjusted.p.km.EFS.all <- km.EFS.all.results[,"EFS.adjusted.pval"]
-#hist(p.km.EFS.all)
-#hist(adjusted.p.km.EFS.all)
-
-### replaced by
-# plotHist(cox.PFS.cat.G3G4.df[,1], "Cox PFS categorical G3/G4", breaks = 100, xlab = "p-value", cutoff = 0.05)
-# plotHist(cox.PFS.cat.G3G4.df[,2], "Cox PFS categorical G3/G4", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05) 
-#########################################################################################################################################
-
-
-# plot(density(x, na.rm = "T"))
-
-### remove the density plot as is not as useful as ecdf
-
-# plot(density(adjusted.p.km.EFS.all))
-# lines(density(adjusted.p.km.EFS.all), col = "red")
-# lines(density(p.km.EFS.all), col = "dodgerblue") ### this will overlay the unadjusted p value against the adjusted p value
-
-
 #########################################################################################################################################
 ### INTERROGATING SPECIFIC CLINICAL DATA AND SPECIFIC TRANSCRIPTS
 #########################################################################################################################################
@@ -679,41 +658,7 @@ readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.E
 
 
 
-#########################################################################################################################################
-### Examples from external sources for plotting 2 or more sets of data on same graph
-#plot(x, y1, ylim=range(c(y1,y2)))
-# second plot  EDIT: needs to have same ylim
-###par(new = TRUE)
-#plot(x, y2, ylim=range(c(y1,y2)), axes = FALSE, xlab = "", ylab = "")
 
-#matplot(x, cbind(y1,y2))
-#matplot(x, cbind(y1,y2), pch=1)
-
-# dev.off()
-
-
-
-### This page aims to explain how to add a legend to R plot made in base R. It is done using the legend() function. The main arguments are:
-
-# topright : where do you want to add the legend ? You can put : “bottomright”, “bottom”, “bottomleft”, “left”, “topleft”, “top”, “topright”, “right”, “center”).
-#legend = c(“name1”, “name2”) : names you want to show.
-#col = c(“red”, “blue”) : colors of the symbols
-#pch = 15 : type of symbols (see graph # to know what symbol number you need
-                        #    bty = “n” : If you don’t want a box around the legend. Write “o” if you want one
-                         #   pt.cex = 2 : Size of the symbols
-                         #   cex = 0.8 : Size of the text
-                         #   text.col = “black” : color of the text
-                         #   horiz = TRUE : legend in column or in row ?
-                         #   inset = c(0.1, 0.1) : % (from 0 to 1) to draw the legend away from x and y axis
-                          ###  You can also give the X and Y coordinate of the legend: legend(3, 5, legend = c(“A”, “B”))
-                          ### Note that an equivalent page exist concerning legends with ggplot2.
-                          ### see example of this in the pdf_graphics_example.R file 
-                            
-                            
-                            
-                            
-                            
-                            
                             
                          
                             
