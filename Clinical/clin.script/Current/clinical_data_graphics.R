@@ -13,9 +13,10 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+# results.master >- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this will be for running Z score ranking for GSEA (17/4/18)
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 ### results.filt.genefilter.20180220.rds: this is a gene filtered file for transcripts and relationship to survival and clinical characteristics within childhood medulloblastoma cohort)
 
 ### need to extract clinical data results
@@ -434,7 +435,7 @@ log.report.table <- as.data.frame (log.report.list)
 log.report.transpose <- t(log.report.table) ### transpose #
 print(log.report.transpose)
 
-### adjust this
+
 write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/logreport.gp.filt.mb.vsd.20180413.csv")
 
 #########################################################################################################################################
@@ -519,6 +520,7 @@ Results.km.EFS.G3G4 <- plotEcdf.double(x = km.EFS.G3G4.results[,1], z = km.EFS.G
 
 ### Z scores do not apply to the km survival (eg. columns are OS.p.value and OS.adjusted.pval) # colnames(km.OS.all.results)
 Results.km <- as.list(mget(ls(pattern = "Results.km")))
+save(Results.km, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Results.km.Rdata")
 
 #########################################################################################################################################
 #########################################################################################################################################
@@ -551,6 +553,7 @@ Results.cox.multivar.PFS.SHHold.cont <- plotEcdf.double(x=multivar.cox.PFS.SHHol
 #########################################################################################################################################
 ### Create a list of all univariate and multivariate cox results (p, adj p, Z score)
 Results.cox <- as.list(mget(ls(pattern = "Results.cox")))
+save(Results.cox, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Results.cox.Rdata")
 
 #########################################################################################################################################
 
