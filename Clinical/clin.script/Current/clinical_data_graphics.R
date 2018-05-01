@@ -13,7 +13,7 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
 # results.master >- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this will be for running Z score ranking for GSEA (17/4/18)
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
@@ -520,7 +520,7 @@ Results.km.EFS.G3G4 <- plotEcdf.double(x = km.EFS.G3G4.results[,1], z = km.EFS.G
 
 ### Z scores do not apply to the km survival (eg. columns are OS.p.value and OS.adjusted.pval) # colnames(km.OS.all.results)
 Results.km <- as.list(mget(ls(pattern = "Results.km")))
-save(Results.km, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Results.km.Rdata")
+save(Results.km, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts/Results.km.Rdata")
 
 #########################################################################################################################################
 #########################################################################################################################################

@@ -1398,7 +1398,9 @@ annotate.HTseq.IDs<-function(HTseq.IDs){
   return(cbind(HTseq.IDs,annotatedGenes))
 }
 
+###  If you are a user of biomaRt (a part of the Bioconductor library) change the host from 'www.biomart.org' to 'www.ensembl.org'. 24/4/18)
 
+#listMarts(mart = NULL, host = "www.ensembl.org", path = "/biomart/martservice", port = 80, includeHosts= FALSE, archive = FALSE, ssl.verifypeer = TRUE, ensemblRedirect = TRUE, verbose = FALSE)
 #ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
 #listAttributes(ensembl) ### if wish to add further components to the annotate function that exist within the ensembl database. Adds computing power/time
 
