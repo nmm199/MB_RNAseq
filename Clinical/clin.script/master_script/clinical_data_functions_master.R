@@ -758,7 +758,7 @@ clinPathAssess <- function(test.pData,
   ### summary data for all variables within the age 3-16 yo group, to construct survival cohort
   
   age.df <- data.frame(test.pData$NMB, test.pData$age.filter, test.pData$age.cont)
-  # summary(age.df)
+  summary(age.df)
   
   ##############################################
   

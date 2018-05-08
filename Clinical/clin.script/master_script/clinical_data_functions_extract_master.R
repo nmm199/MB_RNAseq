@@ -9,6 +9,7 @@
 ### extract.cox
 ### extract.cox.OS
 ### log.reg.dataframe
+### ranked.file 
 
 ##################################################################################################################################
 ### univariate
@@ -145,8 +146,18 @@ extract.chi.all <- function(results.master, name){
 
 
 ##############################################
-
-
+### ranked file function
+### used to annotate the file with Biomart gene annotation and then create as a combined dataframe with original dataframe and annotated dataframe
+ 
+ ranked.file <- function(dataset){
+   try(annot.dataset <- annotate.HTseq.IDs(rownames(dataset)), silent = T)
+   annot.dataset.df <- cbind (dataset, annot.dataset)
+   return(annot.dataset.df)
+   #write.csv (annot.dataset.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts/dataset.csv")
+ }
+ 
+#############################################
+##############################################
 ### cox OS dataframe
 
 # cox.OS.cat.all.df <- cox.dataframe(pval = cox.OS.pval.cat.all , Zscore = cox.OS.Zscore.cat.all, HR = cox.OS.HR.cat.all, L95CI = cox.L95CI.OS.HR.cat.all, U95CI = cox.U95CI.OS.HR.cat.all)
