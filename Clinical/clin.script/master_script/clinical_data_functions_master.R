@@ -702,26 +702,29 @@ clinPathAssess <- function(test.pData,
      # log.file = NULL
   
   ### MM stipulating inputs 140917, best to refresh environment and restart R
-  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below, then will need to unhash the following:
+  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below, then will need to unhash the following then line 147-171 (for filtered matrix):
       ### 1. a goi line
       ### 2. goi.vsd line 717 that links to mb.vsd
       ### 3. names(goi.vsd) line 720
   ### if then interrogate functions, will need to generate matched.test.pData
+  ### unhash ** when running individual goi
   
+  # goi <- "ENSG00000124588"   ### NQO2 ** or equivalent goi of interest
   # goi <- "ENSG00000008196.12_1" ### TFAP2B
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997" ### unhash ** when running individual goi
-  # goi <- "ENSG00000249859"
+  # goi <- "ENSG00000168772"  ### CXXC4
   # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 717, 720, 723-725.
   # goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
-  # goi.vsd <- as.numeric(mb.vsd[goi,]) ### 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function ie. ### unhash ** when running individual goi
-   
+  ### unhash here for goi.vsd
+  # goi.vsd <- as.numeric(gp.filt.mb.vsd[goi,]) ### ** 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function ie. ### unhash ** when running individual goi
+                                          ###  12/6/18 use filtered file, have established that gp.filt.mb.vsd gives same results as filt.mb.vsd
   ### the output would be a vector with a continuous variable, names equal NMB numbers
-  # names(goi.vsd) <- names(mb.vsd) ### added 16/1/18, unhash ** when running individual goi
+  # names(goi.vsd) <- names(gp.filt.mb.vsd) ### ** added 16/1/18, unhash ** when running individual goi
 
-  # test.pData = test.pData
-  # pdf.file = NULL
-  # log.file = NULL
+  # test.pData = test.pData ###**
+  # pdf.file = NULL  ###**
+  # log.file = NULL  ###**
    ### 
   
   #############################################
@@ -739,6 +742,16 @@ clinPathAssess <- function(test.pData,
   
   ### matching the expression data (goi data) with the initially compiled clinical data with important variables
   ### will need to exclude duplicates (two RNA samples separately listed, defined as "NMBnumberT") 16/1/18
+  
+  ##### looking to combine dataset to plot expression data for alive vs dead patients
+  # matchdata <- test.pData[names(goi.vsd),]
+  # dim(matchdata)
+  # test <- cbind(matchdata,goi.vsd)
+  # plot(test$goi.vsd, col = ifelse(levels(test$OS.cat) =="Alive","red", "blue"), xlab = "matched patient sample", ylab = "Expression", main = "Expression within the cohort compared to survival")
+  # legend (x= "topright", lty=1:2, paste(text = c("alive","dead")), col = c("red", "blue"))
+  
+  #####
+  
   
   index <- match(names(goi.vsd), rownames(test.pData)) 
   matched.test.pData <- test.pData[index[!is.na(index)],] 

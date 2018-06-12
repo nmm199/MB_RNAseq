@@ -94,37 +94,41 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### set file for pdf output
- pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf"
+pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.pdf" ### this is the name of the file generated when run clinPathAssess
 # pdf.file <- "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/marker.results.novel.pdf"
 
 ### set file for log output
- log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
+log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 # log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.novel.txt"
 
 ### run up to here if wish to interrogate clinPathAssess function, by directly nominating input variables within clinical_data_functions_master.R
 ################################################################################
 
 ### Unhash this section as required (between lines 94 - 110) when running one goi within clinPathAssess function
+### look at marker.results.pdf graphs generated when do run of 1 in clinPathAssess OR see clinical_data_functions_master.R line 703 onwards for instructions on generating single KM curves within ClinPathAssess function
 
-# goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, or can specify a goi within inverted commas
 
+# goi <- "ENSG00000124588"   ### NQO2
 # goi <- "ENSG00000008196"     
 # goi <- "ENSG00000173818.16"
+
+### goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, OR can specify a goi within inverted commas 
+# goi.vsd <- as.numeric(mb.vsd[goi, ])   
  
-# goi.vsd <- as.numeric(mb.vsd[goi, ])    
 # names(mb.vsd) -> names(goi.vsd)        
 
 ## results for run of one
 # results.master <- clinPathAssess(test.pData,
-                        #  goi.vsd,
-                        # pdf.file = pdf.file,
-                         # log.file = log.file)
+                      #  goi.vsd,
+                      #  pdf.file = pdf.file,
+                       #  log.file = log.file)
 
 
 # names(results.master)<- row.names(goi.vsd)
 
-# saveRDS (results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
-# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/results.master.ENSG00000008196.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
+
+# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
 
 ###############################################################################
 
@@ -169,6 +173,45 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 ######################################################################################################################################################################
 ######################################################################################################################################################################
 ### can run specific input transcript files, then choose the relevant input and output below, with results.master name and destination, annotated file for known genes
+######################################################################################################################################################################
+
+### for run of n=1
+### define goi
+
+# goi <- "ENSG00000124588"   ### NQO2
+# goi <- "ENSG00000168772" ### CXXC4
+# goi <- "ENSG00000173818" ### ENDOV
+goi <- "ENSG00000165304" ### MELK
+
+###
+# goi.vsd <- as.numeric(filt.mb.vsd[goi, ])   
+goi.vsd <- as.numeric (gp.filt.mb.vsd[goi,])
+
+# names(goi.vsd) <- names(filt.mb.vsd)
+names(goi.vsd) <- names(gp.filt.mb.vsd)
+
+### to determine distribution of the biomarker using qqnorm (qqplot) to assess value as a biomarker
+# qqnorm(goi.vsd)
+
+
+## results for run of one
+results.master <- clinPathAssess(test.pData,
+  goi.vsd,
+  pdf.file = pdf.file,
+  log.file = log.file)
+
+
+ names(results.master)<- row.names(goi.vsd)
+
+ # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
+
+ saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000165304.gp.filt.mb.vsd.rds")
+ 
+### read results back in
+ 
+ readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
+
+ 
 ######################################################################################################################################################################
 
 ### unhash when running the filtered transcript set (filt.mb.vsd) (removed duplicates with "NMBXXXT")

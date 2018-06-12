@@ -29,7 +29,7 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 #########################################################################################################################################
 ### set output files
 
-pdf ("/home/nmm199/R/MB_RNAseq/Clinical/clin.results/stats.report.pdf") ### adjust to which data are being used
+pdf ("/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/ENSG00000124588.stats.report.pdf") ### adjust to which data are being used
 # par(mfrow = c(2,2)) ### will output all graphs in 2 x 2 format
 par (mfrow = c(1,1))
 
