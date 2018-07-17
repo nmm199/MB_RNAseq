@@ -713,6 +713,7 @@ clinPathAssess <- function(test.pData,
   # goi <- "ENSG00000008196.12_1" ### TFAP2B
   # goi <- "ENSG00000008196"
   ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997" ### unhash ** when running individual goi
+  # goi <- "ENSG00000136997"
   # goi <- "ENSG00000168772"  ### CXXC4
   # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 717, 720, 723-725.
   # goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
@@ -1150,7 +1151,18 @@ clinPathAssess <- function(test.pData,
   matched.goi.vsd.SHH.old.incl <- goi.vsd[!is.na(SHH.old.index.incl)] 
   matched.goi.vsd.cat.SHH.old.incl <- ifelse(matched.goi.vsd.SHH.old.incl>median(goi.vsd, na.rm = T), "high","low")
   
+  ### WNT (not included in original analysis, for descriptive purposes only 19/6/18)
+  # WNT.match <- matched.test.incl.pData$meth=="WNT" 
+  # WNT.match.df <- matched.test.incl.pData [WNT.match, ]
+  # WNT.incl <- matched.test.incl.pData$meth =="WNT"
+  # WNT.incl.df <- matched.test.incl.pData[WNT.incl, ]
   
+  ### Determining numbers for the dataset 19/6/18
+  
+  # levels(matched.test.incl.pData$meth)
+  # matched.data.G3 <- matched.test.incl.pData [matched.test.incl.pData$meth =="G3", ]
+  # matched.data.G3.na <- na.omit(matched.data.G3$meth) 
+  # length(matched.data.G3.na)
   
   #######################################################################################################
   
