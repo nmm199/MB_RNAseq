@@ -43,7 +43,9 @@ rownames(eset.exprs) <- gsub("_at", "", rownames(eset.exprs)) ## gets rid of the
 
 head(eset.exprs)
 
+# “/home/dan/mygit/consensus_scripts/taylor_data”
 
+# taylor <- View("/home/dan/mygit/consensus_scripts/taylor_data")
 
 ## the newer versions of the R biomaRt package run a series of smaller queries which are less likely to timeout internally without error install.packages("/home/yuri/biomaRt_2.37.0.tar.gz", repos = NULL, type="source") ## devel level version
 
@@ -139,9 +141,41 @@ matched.eset$LCA  <- ifelse((matched.eset$histology=="LCA"), "LCA", "non-LCA")
 matched.eset$mets <- ifelse(matched.eset$Met.status_.1.Met._0.M0.=="1","metastatic","non-metastatic")
 
 
-  ### include in multivariable analysis
+### include in multivariable cox regression analysis
 
-km.OS.MELK <- survfit(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$LCA + matched.eset$Gender + matched.eset$Subgroup + matched.eset$mets, type = "kaplan-meier", conf.type= "log")
+cox.OS.MELK <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$LCA + matched.eset$Gender + matched.eset$Subgroup + matched.eset$mets, data = matched.eset)
+
+#str(summary(cox.OS.MELK))
+
+cox.n <- summary(cox.OS.MELK)[[4]] ### n             ###cox.OS.MELK$n          ### cox.OS.MELK[[11]] 
+cox.nevent <- summary(cox.OS.MELK)[[6]] ### nevent   ###cox.OS.MELK$nevent     ### cox.OS.MELK[[12]] 
+
+summary(cox.OS.MELK)[[7]] ### this is the table of relevance p value
+cox.pval.MELK <- summary(cox.OS.MELK)[[7]][1,5] ### this accesses the p value for MELK (row 1, position 5)
+cox.HR.MELK <- summary(cox.OS.MELK)[[7]][1,2]
+cox.lower.95CI.MELK <- summary(cox.OS.MELK)[[8]][1,3]
+cox.upper.95CI.MELK <- summary (cox.OS.MELK)[[8]][1,4]
+summary.cox.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
+  
+
+### example from cox multivariate in clinical_data_functions
+
+# cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
+  # if(is.null(strata)){
+  #   cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB + FacC + FacD + FacE + FacF + FacG + FacH, data=data)
+  # }else {
+ #    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD + FacE + FacF + FacG + FacH, data=data)
+ #  }  
+ #  cox.p.val <- summary(cox.temp)$coefficients[1,5] ### updated 14/11
+ #  cox.HR <- summary(cox.temp)$coefficients[1,2] ### updated 14/11
+ # cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
+ # cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
+ # cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
+ # cox.n <-summary(cox.temp)$n
+ # cox.nevent <-summary(cox.temp)$nevent
+ # summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
+ # return (summary.cox)
+}
 
 ### restrict to G3G4 cohort
 View(matched.eset)
