@@ -13,9 +13,13 @@ library(BiocInstaller)
 
 biocLite(pkgs = "affy")
 biocLite("survival")
+biocLite(pkgs = "dplyr")
 
 library(affy)
 library(biomaRt)
+library (ggplot2)
+library(dplyr)
+
 # install.packages("affy")
 
 # sessionInfo()
@@ -111,8 +115,8 @@ eset$OS <- eset$OS_.years.
 # goi.cat <- ifelse(goi >median(goi, na.rm = T), "high","low")
 
 
-### match in data
-### this worked below 17/7/18 for MELK
+### match in data with MELK
+### this worked below 17/7/18 - 8/8/18 for MELK
 
 MELK <- eset.exprs["ENSG00000165304", ]
 # plot(MELK)
@@ -123,11 +127,12 @@ MELK.cat <- ifelse(MELK>median(MELK, na.rm = T), "high", "low")
 index <- match(names(MELK.cat), rownames(eset))
 matched.eset <- eset[index[!is.na(index)],]
 
-# View(matched.eset)
+### can add in MYC and MYCN data here
 
-### add in MELK categorical variable into the dataset directly to compare with OS outcomes, and look at G3G4 separately
+### add in MELK categorical variable into the matched dataset directly to compare with OS outcomes
 
 matched.eset$MELK <- MELK.cat
+matched.eset$MELKexp <- MELK
 
 # km.OS<- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
 km.OS.MELK <- survfit(Surv(eset$OS, eset$Dead)~MELK.cat, type = "kaplan-meier", conf.type= "log")
@@ -157,28 +162,92 @@ cox.lower.95CI.MELK <- summary(cox.OS.MELK)[[8]][1,3]
 cox.upper.95CI.MELK <- summary (cox.OS.MELK)[[8]][1,4]
 summary.cox.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
   
+### Plot transcript expression in Cavalli dataset, unfiltered, with median expression as cutoff
 
-### example from cox multivariate in clinical_data_functions
+plot(MELK, xlab = "individual samples", ylab = "MELK expression", main = "Expression of MELK in validation cohort")
+abline(h=median(MELK), lty = 1, col = "red") ### v for vertical ie x axis ### h, for horizontal
+  
+MELK.high <- which (MELK > median(MELK))
+length(MELK.high)
+MELK.low <- which (MELK < median (MELK))
+length (MELK.low)
+ 
+### look at expression in Group 3/Group 4. Generate dataframe for all expression data (rather than just matched.eset for MELK)
+### rename the matched.eset here
+matched.eset.test <- eset 
 
-# cox.multivar.surv_8 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, FacG, FacH, strata = NULL, data) {
-  # if(is.null(strata)){
-  #   cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB + FacC + FacD + FacE + FacF + FacG + FacH, data=data)
-  # }else {
- #    cox.temp <- coxph(Surv(time, event)~marker + FacA + FacB +FacC +FacD + FacE + FacF + FacG + FacH, data=data)
- #  }  
- #  cox.p.val <- summary(cox.temp)$coefficients[1,5] ### updated 14/11
- #  cox.HR <- summary(cox.temp)$coefficients[1,2] ### updated 14/11
- # cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### as now multivariate, therefore need to access 1st row results
- # cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
- # cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
- # cox.n <-summary(cox.temp)$n
- # cox.nevent <-summary(cox.temp)$nevent
- # summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
- # return (summary.cox)
-}
+# sub <- matched.eset.all$Subgroup
 
-### restrict to G3G4 cohort
-View(matched.eset)
+# matched.eset$LCA  <- ifelse((matched.eset$histology=="LCA"), "LCA", "non-LCA")
+# matched.eset$mets <- ifelse((matched.eset$Met.status_.1.Met._0.M0.=="1"),"metastatic","non-metastatic")
+sub <- matched.eset.test@phenoData@data$Subgroup ### an alternate way to access the expression data subcolumns
+Group3.exp <- matched.eset.test[,which(sub=="Group3")]
+fdata <- featureData(matched.eset.test)
+Group3.exp@featureData <- fdata ### upload feature data so that it contains data
+pData(Group3.exp) ### 144 samples, all expression features (21641)
+
+
+pData(Group3.Expression)
+### Group 3 and 4
+G3G4.exp <- matched.eset.test[, which(sub=="Group3"|sub=="Group4")]
+pData(G3G4.exp)
+### creating G3G4 subgroup
+
+#sub <- matched.eset@phenoData@data$Subgroup
+#sel <- which(sub=="Group3")
+#subset <- sub[sel]
+#sub_expression <- matched.eset[,subset]
+#g3 <- exprs(matched.eset)[,matched.eset@phenoData@data$Subgroup=="Group3"]
+#matched.eset [matched.eset$Subgroup == "Group3", ]
+
+### matched.eset.all is a dataframe that can be used to match any expression set in (goi)
+
+## goi 
+
+### create matched G3G4 dataframe with MELK expression data
+
+matched.eset.G3G4 <- matched.eset.test[index[!is.na(index)],]
+matched.eset.G3G4$MELK   <- eset.exprs["ENSG00000165304", ]
+plot(matched.eset.G3G4$MELK)
+
+plot(matched.eset.G3G4$MELK, xlab = "individual samples", ylab = "MELK expression", main = "Expression of MELK in G3G4 validation cohort")
+abline(h=median(matched.eset.G3G4$MELK), lty = 1, col = "red") ### v for vertical ie x axis ### h, for horizontal
+
+MELK.cat.G3G4 <- ifelse(matched.eset.G3G4$MELK>median(matched.eset.G3G4$MELK, na.rm = T), "high", "low")
+index <- match(names(MELK.cat.G3G4), rownames(G3G4.exp))
+matched.eset.G3G4$MELK.cat <- MELK.cat.G3G4
+# matched.eset.G3G4$MELKexp <- matched.eset.G3G4$MELK
+
+
+# km.OS<- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
+km.OS.G3G4.MELK <- survfit(Surv(matched.eset.G3G4$OS, matched.eset.G3G4$Dead)~matched.eset.G3G4$MELK.cat, type = "kaplan-meier", conf.type= "log") ### generates same curve as above code
+summary(km.OS.G3G4.MELK)
+plot(km.OS.G3G4.MELK)
+
+### create relevant variables to then use to adjust in multivariable analysis
+
+matched.eset.G3G4$LCA  <- ifelse((matched.eset.G3G4$histology=="LCA"), "LCA", "non-LCA")
+matched.eset.G3G4$mets <- ifelse(matched.eset.G3G4$Met.status_.1.Met._0.M0.=="1","metastatic","non-metastatic")
+
+
+### include in multivariable cox regression analysis
+
+cox.OS.G3G4.MELK <- coxph(Surv(matched.eset.G3G4$OS, matched.eset.G3G4$Dead)~matched.eset.G3G4$MELK + matched.eset.G3G4$LCA + matched.eset.G3G4$Gender + matched.eset.G3G4$S + matched.eset.G3G4$mets, data = matched.eset.G3G4)
+
+#str(summary(cox.OS.MELK))
+
+cox.n.G3G4 <- summary(cox.OS.G3G4.MELK)[[4]] ### n             ###cox.OS.MELK$n          ### cox.OS.MELK[[11]] 
+cox.nevent.G3G4 <- summary(cox.OS.G3G4.MELK)[[6]] ### nevent   ###cox.OS.MELK$nevent     ### cox.OS.MELK[[12]] 
+
+summary(cox.OS.G3G4.MELK)[[7]] ### this is the table of relevance p value
+cox.pval.G3G4.MELK <- summary(cox.OS.G3G4.MELK)[[7]][1,5] ### this accesses the p value for MELK (row 1, position 5)
+cox.HR.G3G4.MELK <- summary(cox.OS.G3G4.MELK)[[7]][1,2]
+cox.lower.95CI.G3G4.MELK <- summary(cox.OS.G3G4.MELK)[[8]][1,3]
+cox.upper.95CI.G3G4.MELK <- summary (cox.OS.G3G4.MELK)[[8]][1,4]
+summary.cox.G3G4.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
+
+
+### need to get high risk low risk G3G4 status and also to pull in MYC data
 ----------------------------------------------------------------------------------------------
 
 ### example of code that was trialled
@@ -191,3 +260,6 @@ View(matched.eset)
 #index <- match(colnames(eset), names(MELK.cat)) ### did not work
 
 # matched.eset <- eset[index[!is.na(index)], ] ### did not work 
+
+
+
