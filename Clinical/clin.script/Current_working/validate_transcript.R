@@ -54,13 +54,21 @@ head(eset.exprs)
 ## the newer versions of the R biomaRt package run a series of smaller queries which are less likely to timeout internally without error install.packages("/home/yuri/biomaRt_2.37.0.tar.gz", repos = NULL, type="source") ## devel level version
 
 require(biomaRt)
-useMart()
+useMart("ENSEMBL_MART_ENSEMBL") ### used to be useMart()
 ## load the 'mart' and tell the program we want to use Ensembl and specifically the human annotations 
 
-# listMarts ### sometimes temperamental and have to run the useMart or listMarts more than once, then rerun ensembl.mart line
+listMarts ### sometimes temperamental and have to run the useMart or listMarts more than once, then rerun ensembl.mart line. It worked after I ran the listMarts command then listMarts() then reran ensembl.mart (18/9/18)
+listMarts() ### added 18/9/18
 
+# listMarts(mart = NULL, host="www.ensembl.org", path="/biomart/martservice",
+         # port=80, includeHosts = FALSE, archive = FALSE, ssl.verifypeer = TRUE, 
+         # ensemblRedirect = TRUE, verbose = FALSE)
 
+# ?listMarts
 ensembl.mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+
+# ensembl.mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset = "hsapiens_gene_ensembl")
+
 
 ## set up the query: attributes are all the things we want to pull and filters are the IDs we want to filter by, takes 5-10 minutes without doParallel
 hugene.anno <- getBM(attributes = c("ensembl_gene_id",
@@ -115,6 +123,28 @@ eset$OS <- eset$OS_.years.
 # goi.cat <- ifelse(goi >median(goi, na.rm = T), "high","low")
 
 
+
+
+### can add in MYC and MYCN data here
+
+eset_match <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset_master.csv", header = TRUE, sep = ",", quote = "\"")
+head(eset_match)
+
+rownames(eset_match)<- eset_match[,1]
+
+names(eset_match)
+eset_match$Sample_Name
+head(eset_match)
+View(pData(eset))
+
+# colnames(eset_match)
+### eset_match$Sample_Name this is the MB_SubtypeStudy_number
+
+### next step is to move MYC and MYCN columns from eset_match into the eset that uses pData
+### then can create this as main dataframe from which to subset expression datasets/ match in expression data. 
+
+index_match <- match(names)
+
 ### match in data with MELK
 ### this worked below 17/7/18 - 8/8/18 for MELK
 
@@ -127,7 +157,6 @@ MELK.cat <- ifelse(MELK>median(MELK, na.rm = T), "high", "low")
 index <- match(names(MELK.cat), rownames(eset))
 matched.eset <- eset[index[!is.na(index)],]
 
-### can add in MYC and MYCN data here
 
 ### add in MELK categorical variable into the matched dataset directly to compare with OS outcomes
 
@@ -248,6 +277,31 @@ summary.cox.G3G4.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = co
 
 
 ### need to get high risk low risk G3G4 status and also to pull in MYC data
+
+eset_df <- as.data.frame(pData(matched.eset))
+Eset_Cavalli <- write.table(eset_df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset.txt")
+
+# str(eset_df)
+MYC <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/Copy_myc_Cav_taylor.csv", header = TRUE)
+
+MYCN <- read.csv (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/Copy_MYCN_Cav_taylor.csv", header = TRUE)
+
+### add in column for amplified to each dataframe
+MYC$Ampl = "1"
+MYCN$Ampl = "1"
+
+
+# head(MYC)
+# head(MYCN)
+# dim(MYCN)
+# dim(MYC)
+
+### match in these Geo accession numbers in to eset_df. 
+### class(MYCN) ### it is a dataframe
+??match
+# eset_ampl_df<- match(eset_df$Sample_geo_accession, MYCN$Accession)
+# match(eset_df$Sample_geo_accession,MYCN$Accession)
+
 ----------------------------------------------------------------------------------------------
 
 ### example of code that was trialled
