@@ -143,15 +143,26 @@ View(pData(eset))
 ### next step is to move MYC and MYCN columns from eset_match into the eset that uses pData
 ### then can create this as main dataframe from which to subset expression datasets/ match in expression data. 
 
-index_match <- match(names)
+eset$MYC <- eset_match$MYC  ### this is probably OK as the sample numbers are in same order
+eset$MYCN <- eset_match$MYCN
+eset$meth7 <- eset_match$meth7
+
+View(pData(eset)) 
+
+# index_match <- match(names(eset_match), rownames(eset))
+# head(index_match)
+# matched.eset.master <- eset[index_match[!is.na(index_match)],]
+# head(matched.eset.master)
+
+##############################################################################################################
 
 ### match in data with MELK
 ### this worked below 17/7/18 - 8/8/18 for MELK
 
 MELK <- eset.exprs["ENSG00000165304", ]
-# plot(MELK)
-# qqnorm(MELK) ### demonstrates that it is normally distributed
-
+plot(MELK)
+qqnorm(MELK) ### demonstrates that it is normally distributed
+summary(MELK)
 MELK.cat <- ifelse(MELK>median(MELK, na.rm = T), "high", "low")
 
 index <- match(names(MELK.cat), rownames(eset))
@@ -175,9 +186,9 @@ matched.eset$LCA  <- ifelse((matched.eset$histology=="LCA"), "LCA", "non-LCA")
 matched.eset$mets <- ifelse(matched.eset$Met.status_.1.Met._0.M0.=="1","metastatic","non-metastatic")
 
 
-### include in multivariable cox regression analysis
+### include in multivariable cox regression analysis adding in MYC or MYCN
 
-cox.OS.MELK <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$LCA + matched.eset$Gender + matched.eset$Subgroup + matched.eset$mets, data = matched.eset)
+cox.OS.MELK <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$LCA + matched.eset$Gender + matched.eset$Subgroup + matched.eset$mets + matched.eset$MYC + matched.eset$MYCN, data = matched.eset)
 
 #str(summary(cox.OS.MELK))
 
@@ -191,6 +202,12 @@ cox.lower.95CI.MELK <- summary(cox.OS.MELK)[[8]][1,3]
 cox.upper.95CI.MELK <- summary (cox.OS.MELK)[[8]][1,4]
 summary.cox.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
   
+### putting in the Lancet Oncology factors
+cox.OS.MELK.Lancet <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$meth7 + matched.eset$MYC + matched.eset$Gender)
+
+summary(cox.OS.MELK.Lancet)
+### create function to output these p value and HR characteristics
+
 ### Plot transcript expression in Cavalli dataset, unfiltered, with median expression as cutoff
 
 plot(MELK, xlab = "individual samples", ylab = "MELK expression", main = "Expression of MELK in validation cohort")
