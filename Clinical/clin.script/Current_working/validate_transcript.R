@@ -3,7 +3,7 @@
 ### Yura Grabovska and Marion Mateos July 17 2018
 
 # source("https://bioconductor.org/biocLite.R") ### use http if https does not work
-# biocLite()
+# biocLite() ### to install program
 
 
 library(car)
@@ -11,9 +11,9 @@ library(stats)
 library(survival)
 library(BiocInstaller)
 
-biocLite(pkgs = "affy")
-biocLite("survival")
-biocLite(pkgs = "dplyr")
+#biocLite(pkgs = "affy")
+#biocLite("survival")
+#biocLite(pkgs = "dplyr")
 
 library(affy)
 library(biomaRt)
@@ -35,9 +35,10 @@ library(doParallel)
 registerDoParallel(16)
 
 ##expression array data
-eset <- readRDS("/home/yuri/eSet_for_Dan_GSE85218.rds")
+# eset <- readRDS("/home/yuri/eSet_for_Dan_GSE85218.rds")
+eset <- readRDS ("/home/yuri/eSet_GSE85218_26Sep2018.rds") 
 
-##obtain a dataframe of the phenotype factors from the paper # (I omitted the copy number data because it wasn’t straightforward to tabulate from the paper supplements) 
+##obtain a dataframe of the phenotype factors from the paper # (Yura omitted the copy number data because it wasn’t straightforward to tabulate from the paper supplements) 
 
 pd <- pData(eset)
 
@@ -127,10 +128,10 @@ eset$OS <- eset$OS_.years.
 
 ### can add in MYC and MYCN data here
 
-eset_match <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset_master.csv", header = TRUE, sep = ",", quote = "\"")
+eset_match <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset_master.csv", header = TRUE, sep = ",", quote = "\"", row.names = 1)
 head(eset_match)
 
-rownames(eset_match)<- eset_match[,1]
+#rownames(eset_match)<- eset_match[,1]
 
 names(eset_match)
 eset_match$Sample_Name
@@ -143,9 +144,13 @@ View(pData(eset))
 ### next step is to move MYC and MYCN columns from eset_match into the eset that uses pData
 ### then can create this as main dataframe from which to subset expression datasets/ match in expression data. 
 
+
+
 eset$MYC <- eset_match$MYC  ### this is probably OK as the sample numbers are in same order
 eset$MYCN <- eset_match$MYCN
 eset$meth7 <- eset_match$meth7
+
+# identical(rownames(pData(eset)),rownames(eset_match))
 
 View(pData(eset)) 
 
@@ -202,10 +207,12 @@ cox.lower.95CI.MELK <- summary(cox.OS.MELK)[[8]][1,3]
 cox.upper.95CI.MELK <- summary (cox.OS.MELK)[[8]][1,4]
 summary.cox.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
   
-### putting in the Lancet Oncology factors
+### putting in the Lancet Oncology factors ### need to add in q13 loss as of 12/10/18
+
 cox.OS.MELK.Lancet <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$meth7 + matched.eset$MYC + matched.eset$Gender)
 
 summary(cox.OS.MELK.Lancet)
+
 ### create function to output these p value and HR characteristics
 
 ### Plot transcript expression in Cavalli dataset, unfiltered, with median expression as cutoff
