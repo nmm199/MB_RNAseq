@@ -128,7 +128,7 @@ eset$OS <- eset$OS_.years.
 
 ### can add in MYC and MYCN data here
 
-eset_match <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset_master.csv", header = TRUE, sep = ",", quote = "\"", row.names = 1)
+eset_match <- read.csv(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/eset_master_20181015.csv", header = TRUE, sep = ",", quote = "\"", row.names = 1)
 head(eset_match)
 
 #rownames(eset_match)<- eset_match[,1]
@@ -146,11 +146,11 @@ View(pData(eset))
 
 
 
-eset$MYC <- eset_match$MYC  ### this is probably OK as the sample numbers are in same order
+eset$MYC <- eset_match$MYC  ### this is OK as the sample numbers are in same order
 eset$MYCN <- eset_match$MYCN
 eset$meth7 <- eset_match$meth7
-
-# identical(rownames(pData(eset)),rownames(eset_match))
+eset$q13loss <- eset_match$q13loss_YN
+identical(rownames(pData(eset)),rownames(eset_match)) ### TRUE indicates that rownames are identical therefore valid to use above column additions
 
 View(pData(eset)) 
 
@@ -207,9 +207,9 @@ cox.lower.95CI.MELK <- summary(cox.OS.MELK)[[8]][1,3]
 cox.upper.95CI.MELK <- summary (cox.OS.MELK)[[8]][1,4]
 summary.cox.MELK <- list(pval = cox.pval.MELK, HR = cox.HR.MELK, L95CI = cox.lower.95CI.MELK, U95CI =cox.upper.95CI.MELK, n = cox.n, nevent = cox.nevent, table = summary(cox.OS.MELK)[[7]])  
   
-### putting in the Lancet Oncology factors ### need to add in q13 loss as of 12/10/18
+### putting in the Lancet Oncology factors including q13 loss (added 15/10/18)
 
-cox.OS.MELK.Lancet <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$meth7 + matched.eset$MYC + matched.eset$Gender)
+cox.OS.MELK.Lancet <- coxph(Surv(matched.eset$OS, matched.eset$Dead)~matched.eset$MELK + matched.eset$meth7 + matched.eset$MYC + matched.eset$q13loss + matched.eset$Gender)
 
 summary(cox.OS.MELK.Lancet)
 
