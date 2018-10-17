@@ -153,14 +153,13 @@ eset$q13loss <- eset_match$q13loss_YN
 identical(rownames(pData(eset)),rownames(eset_match)) ### TRUE indicates that rownames are identical therefore valid to use above column additions
 
 View(pData(eset)) 
-summary_cavalli <- summary(pData(matched.eset))
-# write.csv (summary_cavalli, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/summary.cavalli.csv")
 
 # index_match <- match(names(eset_match), rownames(eset))
 # head(index_match)
 # matched.eset.master <- eset[index_match[!is.na(index_match)],]
 # head(matched.eset.master)
 
+##############################################################################################################
 ##############################################################################################################
 
 ### match in data with MELK
@@ -174,6 +173,10 @@ MELK.cat <- ifelse(MELK>median(MELK, na.rm = T), "high", "low")
 
 index <- match(names(MELK.cat), rownames(eset))
 matched.eset <- eset[index[!is.na(index)],]
+
+summary_cavalli <- summary(pData(matched.eset))
+# write.csv (summary_cavalli, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/summary.cavalli.csv")
+
 
 
 ### add in MELK categorical variable into the matched dataset directly to compare with OS outcomes
@@ -227,6 +230,7 @@ length(MELK.high)
 MELK.low <- which (MELK < median (MELK))
 length (MELK.low)
  
+#########################################################################################################
 ### look at expression in Group 3/Group 4. Generate dataframe for all expression data (rather than just matched.eset for MELK)
 ### rename the matched.eset here
 matched.eset.all <- matched.eset 
@@ -266,10 +270,10 @@ matched.eset.G3G4 <- pData(G3G4.exp)
 # str(pData(G3G4.exp))
 # class(pData(G3G4.exp))
 # rownames(pData(G3G4.exp))
+# plot(G3G4.exp$MELKexp)
+# G3G4.exp$MELK
 
-#plot(G3G4.exp$MELKexp)
-#G3G4.exp$MELK
-
+### MELK-specific script #################################################################
 
 plot(matched.eset.G3G4$MELKexp, xlab = "individual samples", ylab = "MELK expression", main = "Expression of MELK in G3G4 validation cohort")
 abline(h=median(matched.eset.G3G4$MELKexp), lty = 1, col = "red") ### v for vertical ie x axis ### h, for horizontal
@@ -297,9 +301,16 @@ plot(km.OS.G3G4.MELK)
 ### i) Lancet
 ### ii) PNET 5
 
-cox.OS.G3G4.MELK.Lancet <- coxph(Surv(matched.eset.G3G4.incl$OS, matched.eset.G3G4.incl$Dead)~matched.eset.G3G4.incl$MELK + matched.eset.G3G4.incl$q13loss + matched.eset.G3G4.incl$meth7_HR +  matched.eset.G3G4.incl$Gender + matched.eset.G3G4.incl$MYC, data = matched.eset.G3G4.incl)
+cox.OS.G3G4.MELK.Lancet <- coxph(Surv(matched.eset.G3G4.incl$OS, matched.eset.G3G4.incl$Dead)~matched.eset.G3G4.incl$MELK + matched.eset.G3G4.incl$q13loss + matched.eset.G3G4.incl$meth7_HR  + matched.eset.G3G4.incl$MYC + matched.eset.G3G4.incl$Gender, data = matched.eset.G3G4.incl)
+cox.OS.G3G4.Lancet <- coxph(Surv(matched.eset.G3G4.incl$OS, matched.eset.G3G4.incl$Dead)~ matched.eset.G3G4.incl$q13loss + matched.eset.G3G4.incl$meth7_HR  + matched.eset.G3G4.incl$MYC, data = matched.eset.G3G4.incl )
+
+cox.OS.G3G4.Lancet.output <- summary(cox.OS.G3G4.Lancet)$conf.int
+
+# write.csv(cox.OS.G3G4.Lancet.output, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/Lancet.G3G4.csv")
 
 #str(summary(cox.OS.MELK))
+
+#####################################################################################################################################
 
 cox.n.G3G4.Lancet <- summary(cox.OS.G3G4.MELK.Lancet)[[4]] ### n             ###cox.OS.MELK$n          ### cox.OS.MELK[[11]] 
 cox.nevent.G3G4.Lancet <- summary(cox.OS.G3G4.MELK.Lancet)[[6]] ### nevent   ###cox.OS.MELK$nevent     ### cox.OS.MELK[[12]] 
@@ -313,25 +324,16 @@ summary.cox.G3G4.MELK.Lancet <- list(pval = cox.pval.G3G4.MELK.Lancet, HR = cox.
 
 write.csv (summary.cox.G3G4.MELK.Lancet, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/MELK.multivar.G3G4.csv")
 
-# cox.list.95CI <- summary(cox.OS.G3G4.MELK.Lancet)$conf.int
-                                         
+# cox.list.95CI <- summary(cox.OS.G3G4.MELK.Lancet)$conf.int  ### this brings up all the hazard ratios and 95CI range
+
+##########################################################################################################   
+
 ----------------------------------------------------------------------------------------------
 
 ### example of code that was trialled
-# rownames(eset) ### ensemblID
-# names(MELK.cat)### sample names
-# colnames(eset.exprs) ### sample names ### also colnames(eset)
-#colnames(eset) ### sample names
 
 # eset.expr.high<- which(eset.exprs["ENSG00000165304", ] < median(eset.exprs["ENSG00000165304", ]))
-#index <- match(colnames(eset), names(MELK.cat)) ### did not work
 
-# matched.eset <- eset[index[!is.na(index)], ] ### did not work 
 
-### delete below if do not use
 
-### example code - work on this if need to alter to bring in additional goi 
-### matched.eset <- eset[index[!is.na(index)],]  ### redefine for which eset group and then may need to alter index 
-# matched.eset.G3G4 <- matched.eset.all [index[!is.na(index)],] ### n=763 (i.e whole cohort) therefore does not work
-# View(pData(matched.eset.G3G4))
-# matched.eset.G3G4$MELK   <- eset.exprs["ENSG00000165304", ]
+
