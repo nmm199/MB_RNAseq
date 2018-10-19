@@ -701,26 +701,25 @@ clinPathAssess <- function(test.pData,
      # pdf.file = NULL
      # log.file = NULL
   
-  ### MM stipulating inputs 140917, best to refresh environment and restart R
-  ### will need to run clinical_data_master lines 39-104 to generate mb.vsd which is required for goi.vsd below, then will need to unhash the following then line 147-171 (for filtered matrix):
+  ### will need to run clinical_data_master generate gp.filt.mb.vsd which is required for goi.vsd below. Can generate in clinical_data_master.R first, or below
+  ### input required
       ### 1. a goi line
-      ### 2. goi.vsd line 717 that links to mb.vsd
-      ### 3. names(goi.vsd) line 720
+      ### 2. goi.vsd line 717 that links to gp.filt.mb.vsd
+      ### 3. names(goi.vsd) line 723 
   ### if then interrogate functions, will need to generate matched.test.pData
   ### unhash ** when running individual goi
   
   # goi <- "ENSG00000124588"   ### NQO2 ** or equivalent goi of interest
-  # goi <- "ENSG00000008196.12_1" ### TFAP2B
-  # goi <- "ENSG00000008196"
-  ### PVT1  "ENSG00000249859"  MYC "ENSG00000136997" ### unhash ** when running individual goi
-  # goi <- "ENSG00000136997"
+  # goi <- "ENSG00000136997" ### MYC
   # goi <- "ENSG00000168772"  ### CXXC4
-  # goi <- "ENSG00000136997" ### try with MYC 30/1/18, and ran lines 717, 720, 723-725.
-  # goi <- "ENSG00000173818.16"  ### sig in G3G4 lancet model above current factors, in PFS and OS
+  
   ### unhash here for goi.vsd
-  # goi.vsd <- as.numeric(gp.filt.mb.vsd[goi,]) ### ** 9/1/18 hashed when running the clinical_data_master.R; unhashed when interrogating clinPathAssess function ie. ### unhash ** when running individual goi
-                                          ###  12/6/18 use filtered file, have established that gp.filt.mb.vsd gives same results as filt.mb.vsd
+  # goi.vsd <- as.numeric(gp.filt.mb.vsd[goi,]) ### ** 9/1/18 hashed when running the clinical_data_master.R; unhashed if running individual goi
+                                          
+  ###  12/6/18 use filtered file( gp.filt.mb.vsd gives same results as filt.mb.vsd)
+  
   ### the output would be a vector with a continuous variable, names equal NMB numbers
+  
   # names(goi.vsd) <- names(gp.filt.mb.vsd) ### ** added 16/1/18, unhash ** when running individual goi
 
   # test.pData = test.pData ###**

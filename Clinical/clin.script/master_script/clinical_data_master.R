@@ -109,7 +109,6 @@ log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 ### look at marker.results.pdf graphs generated when do run of 1 in clinPathAssess OR see clinical_data_functions_master.R line 703 onwards for instructions on generating single KM curves within ClinPathAssess function
 
 # goi <- "ENSG00000124588"   ### NQO2
-# goi <- "ENSG00000008196"     
 # goi <- "ENSG00000173818.16"
 
 ### goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, OR can specify a goi within inverted commas 
