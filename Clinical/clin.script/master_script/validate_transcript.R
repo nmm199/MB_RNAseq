@@ -167,6 +167,11 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/Valid
   
 list.goi.MELK <- goi.validate(goi = "ENSG00000165304", data = eset )
 list.goi.NQO2 <- goi.validate(goi =  "ENSG00000124588", data = eset )
+list.goi.LOC256880 <- goi.validate (goi = "ENSG00000245322", data = eset) ### error subscript out of bounds
+
+
+write.csv(list.goi.NQO2$cox_summary$summary_nogender, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQO2_cox_nogender.csv")
+write.csv(list.goi.NQO2$cox_summary$summary_gender, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQO2_cox_gender.csv")
 
 ### saveRDS 
 
@@ -175,9 +180,9 @@ saveRDS(list.goi.MELK, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Ap
 
 ### write out specific .csv based on the files in the rds object
 
-# NQO2 <- readRDS(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQ02.rds")
+NQO2 <- readRDS(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQ02.rds")
 MELK <- readRDS(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/MELK.rds")
-NQO2$pval
+# NQO2$pval
 
 
 

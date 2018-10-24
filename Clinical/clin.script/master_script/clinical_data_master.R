@@ -180,8 +180,8 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 # goi <- "ENSG00000124588"   ### NQO2
 # goi <- "ENSG00000168772" ### CXXC4
 # goi <- "ENSG00000173818" ### ENDOV
-# goi <- "ENSG00000165304" ### MELK
- goi <-  "ENSG00000178980" ### SELENOW
+ goi <- "ENSG00000165304" ### MELK
+# goi <-  "ENSG00000178980" ### SELENOW
 # goi <- "ENSG00000245322"  ### LOC256880
 # goi <- "ENSG00000266872"
 
@@ -432,5 +432,22 @@ library(powerSurvEpi)
 ### where E=experimental group, C=control group, pE= probability of event in the experimental group, RR is relative risk
 ### if calculating ratios between E:C group, where k=ratio E:C, m= total number of expected events over both groups
 # powerCT.default0(k=, m=, RR=, alpha=)
+
+######################################################################
+### additional graphics for distribution plots in primary dataset
+
+# fig1 = ggplot(matched.test.incl.pData, aes(x=matched.test.incl.pData$Followup, y=matched.goi.vsd.incl)) ### need to update with additional graphics as per below
+### define goi then run through clinPathAssess function  manually 
+fig2 = ggplot(matched.test.incl.pData, aes(x=matched.test.incl.pData$OS.cat, y=matched.goi.vsd.incl)) +
+                 geom_boxplot() +
+                 geom_point(colour = "red") +
+                 xlab ("Survival") +
+                 ylab ("Gene expression") +
+                 ggtitle ("Gene expression and survivorship")
+
+                 
+               
+
+
 
 
