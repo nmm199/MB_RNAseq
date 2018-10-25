@@ -103,31 +103,8 @@ log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.txt"
 
 ### run up to here if wish to interrogate clinPathAssess function, by directly nominating input variables within clinical_data_functions_master.R
 ################################################################################
-### If running on complete transcripts use section 111-131 below
-### If running on gene filtered file, use gp.filt.mb.vsd section below, line 147 onwards
-### Unhash this section as required (between lines 111-131) when running one goi within clinPathAssess function on complete transcripts, however has been replaced by using filt.mb.vsd files below. 
-### look at marker.results.pdf graphs generated when do run of 1 in clinPathAssess OR see clinical_data_functions_master.R line 703 onwards for instructions on generating single KM curves within ClinPathAssess function
 
-# goi <- "ENSG00000124588"   ### NQO2
-# goi <- "ENSG00000173818.16"
-
-### goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, OR can specify a goi within inverted commas 
-# goi.vsd <- as.numeric(mb.vsd[goi, ])   
- 
-# names(mb.vsd) -> names(goi.vsd)        
-
-## results for run of one
-# results.master <- clinPathAssess(test.pData,
-                      #  goi.vsd,
-                      #  pdf.file = pdf.file,
-                       #  log.file = log.file)
-
-
-# names(results.master)<- row.names(goi.vsd)
-
-# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
-
-# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
+### If running on gene filtered file, use gp.filt.mb.vsd section 
 
 ###############################################################################
 
@@ -173,54 +150,45 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 ######################################################################################################################################################################
 ### can run specific input transcript files, then choose the relevant input and output below, with results.master name and destination, annotated file for known genes
 ######################################################################################################################################################################
-
 ### for run of n=1
 ### define goi
 
 # goi <- "ENSG00000124588"   ### NQO2
 # goi <- "ENSG00000168772" ### CXXC4
 # goi <- "ENSG00000173818" ### ENDOV
- goi <- "ENSG00000165304" ### MELK
+# goi <- "ENSG00000165304" ### MELK
 # goi <-  "ENSG00000178980" ### SELENOW
 # goi <- "ENSG00000245322"  ### LOC256880
 # goi <- "ENSG00000266872"
 
-###
-# goi.vsd <- as.numeric(filt.mb.vsd[goi, ])   
-goi.vsd <- as.numeric (gp.filt.mb.vsd[goi,])
-
-# names(goi.vsd) <- names(filt.mb.vsd)
-names(goi.vsd) <- names(gp.filt.mb.vsd)
+### create dataframe
+# goi.vsd <- as.numeric (gp.filt.mb.vsd[goi,])
+# names(goi.vsd) <- names(gp.filt.mb.vsd)
 
 ### to determine distribution of the biomarker using qqnorm (qqplot) to assess value as a biomarker
-qqnorm(goi.vsd)
+# qqnorm(goi.vsd)
 
+### unhash when running results for run of one
+# results.master <- clinPathAssess(test.pData,
+#  goi.vsd,
+#  pdf.file = pdf.file,
+#  log.file = log.file)
 
-## results for run of one
-results.master <- clinPathAssess(test.pData,
-  goi.vsd,
-  pdf.file = pdf.file,
-  log.file = log.file)
+# names(results.master)<- row.names(goi.vsd)
 
- names(results.master)<- row.names(goi.vsd)
-
- # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
-
- saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000178980.gp.filt.mb.vsd.rds")
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
+### change name of transcript output
+### saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000178980.gp.filt.mb.vsd.rds")
  
 ### read results back in
  
- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
+# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.transcript.filt.mb.vsd.rds")
 
-# rm(goi)
-# rm(goi.vsd)
-# rm(gp.filt.mb.vsd)
-# rm(results.master)
- 
+### Graphical output: marker.results.pdf graphs generated when do run of 1 in clinPathAssess
+### OR see clinical_data_functions_master.R line 703 onwards for instructions on generating single KM curves within ClinPathAssess function
 ######################################################################################################################################################################
 
-### unhash when running the filtered transcript set (filt.mb.vsd) (removed duplicates with "NMBXXXT")
-### unfiltered transcript is mb.vsd, however no current use due to duplicate samples
+### unhash when running the filtered transcript set (filt.mb.vsd) (removed duplicates from mb.vsd with "NMBXXXT")
 
 # results.master <- foreach(i = 1:nrow(filt.mb.vsd))%dopar%{
   ### results.master <- foreach(i = 1:100)%dopar%{
@@ -231,12 +199,21 @@ results.master <- clinPathAssess(test.pData,
 
 ################################################################################
 ### unhash when running the filtered transcript set that removes sample duplicates AND pre-filters based on expression features of the transcripts
+### USE THIS SCRIPT FOR MAIN ANALYSIS 25/10/18
 
-# results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
+ results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
  ### results.master <- foreach(i = 1:100)%dopar%{
-# as.numeric(gp.filt.mb.vsd[i,]) -> x
-# names(x) <- colnames(gp.filt.mb.vsd)
-# return(clinPathAssess(test.pData,x)) 
+ as.numeric(gp.filt.mb.vsd[i,]) -> x
+ names(x) <- colnames(gp.filt.mb.vsd)
+ return(clinPathAssess(test.pData,x)) 
+ }
+
+
+# results.master <- foreach(i = 1:10)%dopar%{
+  ### results.master <- foreach(i = 1:100)%dopar%{
+ # as.numeric(gp.filt.mb.vsd[i,]) -> x
+ # names(x) <- colnames(gp.filt.mb.vsd)
+ # return(clinPathAssess(test.pData,x)) 
 # }
 
 ################################################################################
@@ -253,16 +230,10 @@ results.master <- clinPathAssess(test.pData,
 ################################################################################
 ### unhash when running the randomised dataset  ### can interchange with gp.filt.mb.vsd.random 
 
- results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd.random))%dopar%{
-  as.numeric(gp.filt.mb.vsd.random [i,]) -> x
-  names(x) <- colnames(gp.filt.mb.vsd.random)
-  return(clinPathAssess(test.pData,x)) 
- }
-
-# results.master.try <- foreach(i= 1:100)%dopar%{
- #  as.numeric(gp.filt.mb.vsd.random [i,]) -> x
- #  names(x) <- colnames(gp.filt.mb.vsd.random)
- #  return(clinPathAssess(test.pData,x)) 
+# results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd.random))%dopar%{
+#  as.numeric(gp.filt.mb.vsd.random [i,]) -> x
+#  names(x) <- colnames(gp.filt.mb.vsd.random)
+#  return(clinPathAssess(test.pData,x)) 
 # }
 
 ################################################################################
@@ -276,41 +247,33 @@ results.master <- clinPathAssess(test.pData,
 # }
 
 ################################################################################
-### troubleshooting
-################################################################################
+### Unhash this section below when running one goi within clinPathAssess function on complete transcripts, however has been replaced by using filt.mb.vsd files above. 
 
-### script for  isolated set of transcripts to see that function is working. Changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+# goi <- "ENSG00000124588"   ### NQO2
+# goi <- "ENSG00000173818.16"
 
-### this is for the main expression dataset
-# i = 1
-# results.master <- foreach(i = 1:25)%dopar%{
-# as.numeric(filt.mb.vsd[i,]) -> x
-# names(x) <- colnames(filt.mb.vsd)
-# names(x) <- gsub("T","",names(filt.mb.vsd)) 
-# return(clinPathAssess(test.pData,x))
-# }
+### goi.vsd <- as.numeric(mb.vsd[1,]) ### can choose a specific row, OR can specify a goi within inverted commas 
+# goi.vsd <- as.numeric(mb.vsd[goi, ])   
 
-# results.master <- foreach(i = 12200:12250)%dopar%{      ### investigating range to determine location of error
- # as.numeric(mb.vsd.novel[i,]) -> x
- #  names(x) <- colnames(mb.vsd.novel)
- # names(x) <- gsub("T","",names(mb.vsd.novel)) 
- #  return(clinPathAssess(test.pData,x))
- # }
+# names(mb.vsd) -> names(goi.vsd)        
 
-### other troubleshooting
+## results for run of one
+# results.master <- clinPathAssess(test.pData,
+#  goi.vsd,
+#  pdf.file = pdf.file,
+#  log.file = log.file)
 
-# i=25 
-# as.numeric(mb.vsd.novel[i,]) -> x
-# names(x) <- colnames(mb.vsd.novel)
-#  names(x) <- gsub("T","",names(mb.vsd.novel))
-#  clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
+# names(results.master)<- row.names(goi.vsd)
+
+# saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
+
+# readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/results.master.ENSG00000124588.rds")
+
 
 ######################################################################################################################################################################
 ### unhash the relevant name for the output 
 ######################################################################################################################################################################
-
-
-### relevant files are the unfiltered complete transcripts (mb.vsd), randomised complete (mb.vsd.random), complete novel (mb.vsd.novel)
+### note files: unfiltered complete transcripts (mb.vsd), randomised complete (mb.vsd.random), complete novel (mb.vsd.novel)
 ### sample filtered: will need to use these now with sample filtration (filt.mb.vsd)  
 ### gene and sample filtered (gp.filt.mb.vsd)
 
@@ -319,12 +282,11 @@ results.master <- clinPathAssess(test.pData,
 # names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:10]
 # names (results.master) <- row.names (filt.mb.vsd)
-# names (results.master)<- row.names(gp.filt.mb.vsd) 
+ names (results.master)<- row.names(gp.filt.mb.vsd) 
 # names (results.master)<- row.names(filt.mb.vsd.novel) ### interchange (gp.)filt.mb.vsd.novel
-names (results.master) <- row.names(gp.filt.mb.vsd.random) ### interchange (gp.)filt.mb.vsd.random
+# names (results.master) <- row.names(gp.filt.mb.vsd.random) ### interchange (gp.)filt.mb.vsd.random
 
 toc()
-
 
 ######################################################################################################################################################################
 ### run up to here for the clinPathAssess function 
@@ -339,9 +301,9 @@ toc()
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
 
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this is the filtered file for samples, contains > 60000 transcripts (filt.mb.vsd)
-# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
+ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181025.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.novel.20180220.rds") ### interchange with complete.novel and genefilter.novel
- saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds") ### randomised file, interchange with genefilter.random
+# saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds") ### randomised file, interchange with genefilter.random
 
 ### to examine results, reload relevant results master file and see clinical_data_extract_DW.R script file
 
@@ -349,20 +311,19 @@ toc()
 ### run up to here for the clinPathAssess function 
 ######################################################################################################################################################################
 
-
 ### Annotate with known gene sets
 
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) 
 
-# annot.filt.results <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd)) ### interchange filt.mb.vsd and  gp.filt.mb.vsd
+annot.filt.results <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd)) ### interchange filt.mb.vsd and  gp.filt.mb.vsd
 # annot.filt.novel <- annotate.HTseq.IDs(row.names(filt.mb.vsd.novel)) ### interchange filt.mb.vsd.novel and gp.filt.mb.vsd.novel
- annot.filt.random <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd.random))
+# annot.filt.random <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd.random))
 
 # write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.filt.complete.20180220.csv") ### filt.mb.vsd this is the filtered file for samples only, > 60000 transcripts
-# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts 
+ write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181025.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts 
 # write.csv(annot.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.novel.20180104.csv") ### this is the novel transcripts
- write.csv(annot.filt.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.csv") ### interchange genefilter.random and complete.random
+# write.csv(annot.filt.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.csv") ### interchange genefilter.random and complete.random
 # write.csv(annot.filt.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.novel.20180220.csv") ### interchange genefilter.novel and complete.novel
 
 ###############################################################################
@@ -414,9 +375,6 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 ### earlier commands for clinical data
 # library(readxl)
 # database <- read_excel("~/R/Data/database.xlsx")
-# View(database)
-# head(database)
-
 
 ### installing packages for survival analysis
 ### choose mirror e.g Cambridge
@@ -433,7 +391,36 @@ library(powerSurvEpi)
 ### if calculating ratios between E:C group, where k=ratio E:C, m= total number of expected events over both groups
 # powerCT.default0(k=, m=, RR=, alpha=)
 
-######################################################################
+################################################################################
+################################################################################
+### troubleshooting
+################################################################################
+
+### script for  isolated set of transcripts to see that function is working. Changed names(goi.vsd) to names(x), goi.vsd is specified as "x" in script below:
+
+### this is for the main expression dataset
+# i = 1
+# results.master <- foreach(i = 1:25)%dopar%{
+# as.numeric(filt.mb.vsd[i,]) -> x
+# names(x) <- colnames(filt.mb.vsd)
+# names(x) <- gsub("T","",names(filt.mb.vsd)) 
+# return(clinPathAssess(test.pData,x))
+# }
+
+# results.master <- foreach(i = 12200:12250)%dopar%{      ### investigating range to determine location of error
+# as.numeric(mb.vsd.novel[i,]) -> x
+#  names(x) <- colnames(mb.vsd.novel)
+# names(x) <- gsub("T","",names(mb.vsd.novel)) 
+#  return(clinPathAssess(test.pData,x))
+# }
+
+### other troubleshooting
+
+# i=25 
+# as.numeric(mb.vsd.novel[i,]) -> x
+# names(x) <- colnames(mb.vsd.novel)
+#  names(x) <- gsub("T","",names(mb.vsd.novel))
+#  clinPathAssess(test.pData,x)      ### unhash here when trouble shooting
 ### additional graphics for distribution plots in primary dataset
 
 # fig1 = ggplot(matched.test.incl.pData, aes(x=matched.test.incl.pData$Followup, y=matched.goi.vsd.incl)) ### need to update with additional graphics as per below
