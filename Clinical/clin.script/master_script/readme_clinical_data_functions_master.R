@@ -64,6 +64,7 @@ extract.chi.all
 ### List of outputs
 km.OS.all.results 
 km.OS.G3G4.results 
+km.OS.G4.results ### added 25/10/18 with other G4-specific output
 km.OS.SHH.results 
 km.OS.SHH.old.results 
 
@@ -74,6 +75,7 @@ km.EFS.G3G4.results
 ### PFS p values
 km.PFS.all.results 
 km.PFS.G3G4.results
+km.PFS.G4.results
 km.PFS.SHH.results
 km.PFS.SHH.old.results
 
@@ -84,11 +86,13 @@ significant.km.EFS.G3G4
 
 significant.km.OS.all 
 significant.km.OS.G3G4 
+significant.km.OS.G4 ### (added 25/10/18)
 significant.km.OS.SHH 
 significant.km.OS.SHH.old 
 
 significant.km.PFS.all              
-significant.km.PFS.G3G4         
+significant.km.PFS.G3G4 
+significant.km.PFS.G4
 significant.km.PFS.SHH 
 significant.km.PFS.SHH.old 
 
@@ -96,7 +100,9 @@ significant.km.PFS.SHH.old
 cox.PFS.cat.all.df 
 cox.PFS.cont.all.df 
 cox.PFS.cat.G3G4.df
-cox.PFS.cont.G3G4.df 
+cox.PFS.cont.G3G4.df
+cox.PFS.cat.G4.df
+cox.PFS.cont.G4.df
 cox.PFS.cat.SHH.df
 cox.PFS.cont.SHH.df 
 cox.PFS.cat.SHH.old.df                                     
@@ -108,6 +114,8 @@ sig.cox.PFS.cat.all
 sig.cox.PFS.cont.all 
 sig.cox.PFS.cat.G3G4 
 sig.cox.PFS.cont.G3G4
+sig.cox.PFS.cat.G4
+sig.cox.PFS.cont.G4
 sig.cox.PFS.cat.SHH 
 sig.cox.PFS.cont.SHH 
 sig.cox.PFS.cat.SHH.old 
@@ -121,7 +129,10 @@ annot.cox.PFS.cat.all
 annot.sig.cox.PFS.cat.all
 annot.cox.PFS.cat.G3G4
 annot.sig.cox.PFS.cat.G3G4
-
+annot.cox.PFS.cat.G4.df
+annot.cox.PFS.cont.G4.df 
+# annot.sig.cox.PFS.cat.G4.df ### does not exist
+# annot.sig.cox.PFS.cont.G4.df ### not exist
 # annot.cox.PFS.cont.SHH ### these objects may not exist
 # annot.sig.cox.PFS.cont.SHH  ### these objects may not exist
 # annot.cox.PFS.cat.SHH   ### these objects may not exist
@@ -141,6 +152,8 @@ cox.OS.cat.all.df
 cox.OS.cont.all.df 
 cox.OS.cat.G3G4.df 
 cox.OS.cont.G3G4.df 
+cox.OS.cat.G4.df
+cox.OS.cont.G4.df
 cox.OS.cat.SHH.df 
 cox.OS.cont.SHH.df
 cox.OS.cat.SHH.old.df 
@@ -157,6 +170,7 @@ annot.sig.cox.OS.cat.G3G4
 annot.sig.cox.OS.cat.G3G4
 sig.cox.OS.cont.G3G4 
 annot.sig.cox.OS.cat.G3G4
+
 sig.cox.OS.cont.G3G4
 sig.cox.OS.cat.SHH 
 sig.cox.OS.cont.SHH.df 
@@ -229,6 +243,8 @@ significant.chi.MYCMYCN ### n=214 4/12/17 for mb.vsd
 
 multivar.cox.OS.combined.cat.df  ### updated so that p value is for biomarker not overall model p val 21/11/17
 multivar.cox.OS.combined.cont.df 
+multivar.cox.OS.PNET.G3G4.cat.df
+multivar.cox.OS.PNET.G3G4.cont.df
 multivar.cox.OS.lancetG3G4.cat.df 
 multivar.cox.OS.lancetG3G4.cont.df 
 multivar.cox.OS.PNET5.cat.df 
@@ -247,10 +263,12 @@ multivar.cox.PFS.SHHold.cont.df
 ### generating significant dataframes for the multivariate cox modelling, ie transcripts that perform about and beyond current clinical risk models
 
 significant.multivar.cox.OS.combined.cat 
-significant.multivar.cox.OS.combined.cont  ###n=13 21/12/17 for all transcripts mb.vsd
+significant.multivar.cox.OS.combined.cont  
+significant.multivar.cox.OS.PNET5.G3G4.cat ### may  not exist
+significant.multivar.cox.OS.PNET5.G3G4.cont ### may not exist
 significant.multivar.cox.OS.lancetG3G4.cat 
 significant.multivar.cox.OS.lancetG3G4.cont
-significant.multivar.cox.OS.PNET5.cat       ### n=43 for mb.vsd
-significant.multivar.cox.OS.PNET5.cont      ### n=30 for mb.vsd
+significant.multivar.cox.OS.PNET5.cat       
+significant.multivar.cox.OS.PNET5.cont      
 significant.multivar.cox.OS.SHHold.cat 
 significant.multivar.cox.OS.SHHold.cont 

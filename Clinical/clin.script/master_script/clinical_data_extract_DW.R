@@ -7,10 +7,10 @@
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.20180104.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds")   ### samples filtered only
-results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181025.rds") ### samples and genes filtered
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20181026.rds") ### samples and genes filtered
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20181026.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180314.rds")
 # results.master <- readRDS (file  =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 
@@ -103,7 +103,10 @@ cox.PFS.cat.SHH.old.df <- extract.cox (results.master, "surv.cox.relapse.incl.SH
                                        
 cox.PFS.cont.SHH.old.df <- extract.cox (results.master, "surv.cox.relapse.incl.SHH.old.contin") 
 
-### generate dataset for GSEA/IPA analysis with cox univariate regression using ranked.file function ### note sometimes need to rerun ranked.file function or annotated dataframes as unreliable function
+### generate dataset for GSEA/IPA analysis with cox univariate regression using ranked.file function 
+### note sometimes need to rerun ranked.file function (in extract functions) or annotate.HTseq.IDs function(in master function) or rerun part of command 
+### only useful if gene is a known transcript
+
 annot.cox.PFS.cat.all.df <- ranked.file (cox.PFS.cat.all.df)
 annot.cox.PFS.cont.all.df <- ranked.file (cox.PFS.cont.all.df)
 annot.cox.PFS.cat.G3G4.df <- ranked.file (cox.PFS.cat.G3G4.df)
@@ -150,6 +153,7 @@ sig.cox.PFS.cont.SHH.old <- cox.PFS.cont.SHH.old.df[which(cox.PFS.cont.SHH.old.d
 ###########################################################################################
 
 ### annotate those with ensembl gene IDs, removing those with NA ### need to run annotate.HTseq.IDs function again prior to this working
+### remember useful for known transcripts only
 
 # try(annot.cox.PFS.cont.all <- annotate.HTseq.IDs(rownames(cox.PFS.cont.all.df)), silent = T)
 try(annot.sig.cox.PFS.cont.all <- annotate.HTseq.IDs(rownames(sig.cox.PFS.cont.all)),silent = T) ### worked after reload load a few times of function 24/4/18
@@ -198,13 +202,15 @@ write.csv(annot.sig.cox.PFS.cat.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/
 try(write.csv (annot.sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.SHH.old.csv"), silent = T)
 try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.SHH.old.csv"), silent = T)
 
-### for files where annotate did not work
+### for files where annotate did not work or not feasible
+
 write.csv(sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHHold.csv")
 write.csv(sig.cox.PFS.cont.SHH, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHH.csv") 
+
 ########################################################################################
 ########################################################################################
 
-### Cox OS overall for categorical variable ### updated 27/2/18 
+### Cox OS overall for categorical variable 
 
 cox.OS.cat.all.df <- extract.cox.OS (results.master, "surv.cox.result.OS.all.cat") ### was 11; and so forth below, note different function for extract.cox.OS
 
@@ -228,7 +234,7 @@ cox.OS.cont.SHH.old.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.o
 
 ##################
 ### generate complete datasets for ranking in GSEA or IPA
-### easiest if generated annotated dataframes for export with gene names
+### easiest if generated annotated dataframes for export with gene names if known transcripts
 
 annot.cox.OS.cat.all.df <- ranked.file (cox.OS.cat.all.df)
 annot.cox.OS.cont.all.df <- ranked.file (cox.OS.cont.all.df)
@@ -283,15 +289,16 @@ write.csv(annot.sig.cox.OS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinic
 
 ###
 
-sig.cox.OS.cat.SHH <- cox.OS.cat.SHH.df[which(cox.OS.cat.SHH.df[, 2]<0.05),] ### no results
+sig.cox.OS.cat.SHH <- cox.OS.cat.SHH.df[which(cox.OS.cat.SHH.df[, 2]<0.05),] 
 
 sig.cox.OS.cont.SHH.df <- cox.OS.cont.SHH.df[which(cox.OS.cont.SHH.df[, 2]<0.05), ]
-write.csv(sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHH.csv")
+
+write.csv(sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/sig.cox.OS.cont.SHH.csv")
 try(annot.sig.cox.OS.cont.SHH.df <- annotate.HTseq.IDs(rownames(sig.cox.OS.cont.SHH.df)),silent = T) ### this worked after reran annotate.HTseq.IDs function within clinical_data_functions_master.R
 try(write.csv(annot.sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.SHH.csv"), silent = TRUE)
 
 sig.cox.OS.cat.SHH.old <- cox.OS.cat.SHH.old.df[which(cox.OS.cat.SHH.old.df[, 2]<0.05),]
-try(write.csv(sig.cox.OS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.SHHold.csv"), silent = T)
+try(write.csv(sig.cox.OS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/sig.cox.OS.cat.SHHold.csv"), silent = T)
 
 sig.cox.OS.cont.SHH.old.df <- cox.OS.cont.SHH.old.df [which(cox.OS.cont.SHH.old.df[,2]<0.05),]
 try(write.csv(sig.cox.OS.cont.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHHold.csv"), silent = T)
@@ -432,7 +439,7 @@ logistic.reg.results <- as.list(mget(ls(pattern="extract.logreg")))
 
 ### creating log reg list for all significant variables
 # significant.logreg.df.all <- logistic.reg.results[which(logistic.reg.results[, 2]<0.05),] ### this does not work because logistic.reg.results object is a list
-
+# logistic.reg.df <- as.data.frame(logistic.reg.results)
 
 #######################################################################
 
@@ -566,9 +573,14 @@ significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[whic
 write.csv(significant.multivar.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.OS.combined.cat.csv")
 try(write.csv(significant.multivar.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multi.cox.OS.lancetG3G4.cont.csv"), silent = T)
 write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv")
-try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cat.csv"  ), silent = T)
+
+try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cat.csv"  ), silent = T)
 try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv"  ), silent = T)
-write.csv (significant.multivar.cox.OS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.OS.lancetG3G4.cont.csv"  )  
+
+write.csv(significant.multivar.cox.PFS.combined.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/results.sig.multivar.cox.PFS.combined.cont.csv")
+write.csv(significant.multivar.cox.PFS.PNET.G3G4.cont,file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/results.sig.multivar.cox.PFS.PNET.G3G4.cont.csv")
+
+write.csv (significant.multivar.cox.OS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/novel_transcripts_filtered/results.sig.multivar.cox.OS.lancetG3G4.cont.csv"  )  
 write.csv(significant.multivar.cox.PFS.PNET5.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.PNET5.cat.csv")
 
 ### annotated dataframes for significant multivar cox  ### note that the rownames (ENSG id) have been truncated so may need to be optimised 4/1/18
@@ -600,7 +612,7 @@ try(annot.sig.multivar.cox.PFS.combined.cat <- annotate.HTseq.IDs(rownames(signi
 
 ### now have replaced subset x[[5]]<15 for all, used to have following tips:
 ### there are fewer candidates found when have more liberal NA rule e.g for x[[4]]<17 (liberal, fewer candidates, less NAs) compared to x[[4]]<6 (strict)
-########################################
+
 
 #########################################################
 #########################################################

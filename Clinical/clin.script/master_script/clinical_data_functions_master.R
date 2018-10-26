@@ -1336,15 +1336,15 @@ clinPathAssess <- function(test.pData,
   ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe)
   ### Mstatus, TP53 for SHH-child, MYCN, matched.SHH.old.incl.pData
   
-  try(multivar.cox.OS.SHH.old.cat <- cox.multivar.surv.Schwalbe_4(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, FacD = matched.SHH.old.incl.pData$sex, data = matched.SHH.old.incl.pData ), silent =T)
-  try(multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_4(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, FacD = matched.SHH.old.incl.pData$sex, data = matched.SHH.old.incl.pData ), silent =T)
+  try(multivar.cox.OS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  try(multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
   
 
-  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss, adjust for sex
+  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss
   ### high risk methylation group (ie HR Group 3 and HR Group 4 combined) in matched.G3G4.incl.pData$G3G4.high.incl for categorical and continuous variable
   
-  try(multivar.cox.OS.Lancet.G3G4.cat <- cox.multivar.surv.Schwalbe_4 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss, FacD = matched.G3G4.incl.pData$sex,  data = matched.G3G4.incl.pData), silent =T)
-  try(multivar.cox.OS.Lancet.G3G4.contin <- cox.multivar.surv.Schwalbe_4 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss, FacD = matched.G3G4.incl.pData$sex,  data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.OS.Lancet.G3G4.cat <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.OS.Lancet.G3G4.contin <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
   
   
   
