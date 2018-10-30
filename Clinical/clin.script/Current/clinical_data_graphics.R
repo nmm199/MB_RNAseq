@@ -13,15 +13,15 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20180220.rds")
+ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20181026.rds")
 # results.master >- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this will be for running Z score ranking for GSEA (17/4/18)
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20180220.rds")
+# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20181025.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 ### results.filt.genefilter.20180220.rds: this is a gene filtered file for transcripts and relationship to survival and clinical characteristics within childhood medulloblastoma cohort)
 
 ### need to extract clinical data results
 
-### run clinical_data_extract_DW.R on results.master (such as results.filt.genefilter.20180220.rds)
+### run clinical_data_extract_DW.R on results.master (such as results.filt.genefilter.20181026.rds)
 
 ### may wish to alter graphics later
 

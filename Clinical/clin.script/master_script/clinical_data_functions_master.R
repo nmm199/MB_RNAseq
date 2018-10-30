@@ -709,7 +709,7 @@ clinPathAssess <- function(test.pData,
   ### unhash ** when running individual goi
   
   # goi <- "ENSG00000124588"   ### NQO2 ** or equivalent goi of interest
-  # goi <- "ENSG00000136997" ### MYC
+  goi <- "ENSG00000136997" ### MYC
   # goi <- "ENSG00000168772"  ### CXXC4
   
   ### unhash here for goi.vsd
