@@ -10,7 +10,10 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/clini
 ### loading in clinical data object = test.pData
 load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
-### run the goi (MYC) and clinPath Assess function to generate matched.test.pData or can use the script below:
+### inputs
+### run the goi (MYC) 
+### need to generate the gp.filt.mb.vsd object from the clinical_data_master.R file
+### run the clinPath Assess function within clinical_data_functions_master.R to generate matched.test.pData or use the script below
 
 goi <- "ENSG00000136997" ### MYC
 
@@ -100,10 +103,6 @@ try(logreg.pData.TERT.PFS <- logisticRegression (x= matched.test.pData$relapse, 
 
 logistic.reg.results <- as.list(mget(ls(pattern="logreg.pData"))) 
 
-logistic.reg.results
-
-
-
 
 #################################################################################################
 
@@ -111,57 +110,83 @@ logistic.reg.results
 ### make dataframe
 
 summary(matched.test.pData$meth)
-G3G4.matched.pData <- matched.test.pData[(matched.test.pData$meth=="G3"| matched.test.pData$meth =="G4"), ]
+
+G3G4.matched.pData <- matched.test.pData[(matched.test.pData$meth=="G3"| matched.test.pData$meth =="G4"),  ] 
+
+G3G4.matched.pData <- G3G4.matched.pData[!is.na(G3G4.matched.pData$meth), ] ### this is how to remove NA, n=136 G3G4 patients
+
+### generate G3G4_HR variable
+
+G3G4.matched.pData$G3G4_HR <- ifelse (G3G4.matched.pData$meth7.cat=="Grp4_HighRisk"|G3G4.matched.pData$meth7.cat=="Grp3_HighRisk", "G3G4_HR", "G3G4_LR")
+
+G3G4.matched.pData$G3G4_HR
+
+# summary(G3G4.matched.pData$meth)
+# summary(G3G4.matched.pData$meth7.cat)
+
+### univariate logistic regression associations
+
+try(logreg.G3G4.mstatus <- logisticRegression(x= G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$mstatus, data=G3G4.matched.pData), silent= T)
+
+try(logreg.G3G4.mstatus.PFS <- logisticRegression(x= G3G4.matched.pData$relapse, y= G3G4.matched.pData$mstatus, data=G3G4.matched.pData), silent= T)
 
 
-try(logreg.G3G4.mstatus <- logisticRegression(x= matched.test.pData$OS.cat, y= matched.test.pData$mstatus, data=matched.test.pData), silent= T)
+try(logreg.G3G4.resection <- logisticRegression(x =G3G4.matched.pData$OS.cat, y = G3G4.matched.pData$resection, data=G3G4.matched.pData), silent= T)
 
-try(logreg.G3G4.mstatus.PFS <- logisticRegression(x= matched.test.pData$relapse, y= matched.test.pData$mstatus, data=matched.test.pData), silent= T)
-
-
-try(logreg.G3G4.resection <- logisticRegression(x =matched.test.pData$OS.cat, y = matched.test.pData$resection, data=matched.test.pData), silent= T)
-
-try(logreg.pData.resection.PFS <- logisticRegression(x =matched.test.pData$relapse, y = matched.test.pData$resection, data=matched.test.pData), silent= T)
+try(logreg.G3G4.resection.PFS <- logisticRegression(x =G3G4.matched.pData$relapse, y = G3G4.matched.pData$resection, data=G3G4.matched.pData), silent= T)
 
 
-try(logreg.pData.LCA <- logisticRegression(x= matched.test.pData$OS.cat, y = matched.test.pData$LCA, data=matched.test.pData), silent= T)
+try(logreg.G3G4.LCA <- logisticRegression(x= G3G4.matched.pData$OS.cat, y = G3G4.matched.pData$LCA, data=G3G4.matched.pData), silent= T)
 
-try(logreg.pData.LCA.PFS <- logisticRegression(x= matched.test.pData$relapse, y = matched.test.pData$LCA, data=matched.test.pData), silent= T)
+try(logreg.G3G4.LCA.PFS <- logisticRegression(x= G3G4.matched.pData$relapse, y = G3G4.matched.pData$LCA, data=G3G4.matched.pData), silent= T)
 
 
-try(logreg.pData.MYC <- logisticRegression (x= matched.test.pData$OS.cat, y= matched.test.pData$MYC.cat,  data=matched.test.pData), silent= T)
+try(logreg.G3G4.MYC <- logisticRegression (x= G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$MYC.cat,  data=G3G4.matched.pData), silent= T)
 
-try(logreg.pData.MYC.PFS <- logisticRegression (x= matched.test.pData$relapse, y= matched.test.pData$MYC.cat,  data=matched.test.pData), silent= T)
+try(logreg.G3G4.MYC.PFS <- logisticRegression (x= G3G4.matched.pData$relapse, y= G3G4.matched.pData$MYC.cat,  data=G3G4.matched.pData), silent= T)
 
 
 
-try(logreg.pData.MYCN <- logisticRegression (x=matched.test.pData$OS.cat , y=matched.test.pData$MYCN.cat, data=matched.test.pData), silent= T)
+try(logreg.G3G4.MYCN <- logisticRegression (x=G3G4.matched.pData$OS.cat , y=G3G4.matched.pData$MYCN.cat, data=G3G4.matched.pData), silent= T)
 
-try(logreg.pData.MYCN.PFS <- logisticRegression (x=matched.test.pData$relapse , y=matched.test.pData$MYCN.cat, data=matched.test.pData), silent= T)
-
-
-try(logreg.pData.MYCMYCN <- logisticRegression (x=matched.test.pData$OS.cat, y= matched.test.pData$MYCMYCN.cat, data=matched.test.pData), silent= T)
-
-try(logreg.pData.MYCMYCN.PFS <- logisticRegression (x=matched.test.pData$relapse, y= matched.test.pData$MYCMYCN.cat, data=matched.test.pData), silent= T)
+try(logreg.G3G4.MYCN.PFS <- logisticRegression (x=G3G4.matched.pData$relapse , y=G3G4.matched.pData$MYCN.cat, data=G3G4.matched.pData), silent= T)
 
 
-try(logreg.pData.meth <- logisticRegression (x= matched.test.pData$OS.cat, y= matched.test.pData$meth, data = matched.test.pData), silent= T)
+try(logreg.G3G4.MYCMYCN <- logisticRegression (x=G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$MYCMYCN.cat, data=G3G4.matched.pData), silent= T)
 
-try(logreg.pData.meth.PFS <- logisticRegression (x= matched.test.pData$relapse, y= matched.test.pData$meth, data = matched.test.pData), silent= T)
-
-
-try(logreg.pData.meth7 <- logisticRegression (x = matched.test.pData$OS.cat, y= matched.test.pData$meth7,  data = matched.test.pData), silent= T)
-
-try(logreg.pData.meth7.PFS <- logisticRegression (x = matched.test.pData$relapse, y= matched.test.pData$meth7,  data = matched.test.pData), silent= T)
+try(logreg.G3G4.MYCMYCN.PFS <- logisticRegression (x=G3G4.matched.pData$relapse, y= G3G4.matched.pData$MYCMYCN.cat, data=G3G4.matched.pData), silent= T)
 
 
-try(logreg.pData.TP53 <- logisticRegression (x = matched.test.pData$OS.cat , y= matched.test.pData$TP53.cat, data=matched.test.pData), silent= T)
+try(logreg.G3G4.meth <- logisticRegression (x= G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$meth, data = G3G4.matched.pData), silent= T)
 
-try(logreg.pData.TP53.PFS <- logisticRegression (x = matched.test.pData$relapse , y= matched.test.pData$TP53.cat, data=matched.test.pData), silent= T)
-
-
-try(logreg.pData.TERT <- logisticRegression (x= matched.test.pData$OS.cat, y= matched.test.pData$TERT.cat, data = matched.test.pData), silent= T)
-
-try(logreg.pData.TERT.PFS <- logisticRegression (x= matched.test.pData$relapse, y= matched.test.pData$TERT.cat, data = matched.test.pData), silent= T)
+try(logreg.G3G4.meth.PFS <- logisticRegression (x= G3G4.matched.pData$relapse, y= G3G4.matched.pData$meth, data = G3G4.matched.pData), silent= T)
 
 
+try(logreg.G3G4.meth7 <- logisticRegression (x = G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$meth7,  data = G3G4.matched.pData), silent= T)
+
+try(logreg.G3G4.meth7.PFS <- logisticRegression (x = G3G4.matched.pData$relapse, y= G3G4.matched.pData$meth7,  data = G3G4.matched.pData), silent= T)
+
+
+try(logreg.G3G4.TP53 <- logisticRegression (x = G3G4.matched.pData$OS.cat , y= G3G4.matched.pData$TP53.cat, data=G3G4.matched.pData), silent= T)
+
+try(logreg.G3G4.TP53.PFS <- logisticRegression (x = G3G4.matched.pData$relapse , y=G3G4.matched.pData$TP53.cat, data=G3G4.matched.pData), silent= T)
+
+
+try(logreg.G3G4.TERT <- logisticRegression (x= G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$TERT.cat, data = G3G4.matched.pData), silent= T)
+
+try(logreg.G3G4.TERT.PFS <- logisticRegression (x= G3G4.matched.pData$relapse, y= G3G4.matched.pData$TERT.cat, data = G3G4.matched.pData), silent= T)
+
+
+logreg.G3G4.q13loss <- logisticRegression(x = G3G4.matched.pData$OS.cat, y = G3G4.matched.pData$q13loss, data = G3G4.matched.pData)
+
+
+logreg.G3G4.q13loss.PFS <- logisticRegression(x = G3G4.matched.pData$relapse, y = G3G4.matched.pData$q13loss, data = G3G4.matched.pData)
+
+logreg.G3G4.G3G4HR <- logisticRegression(x = G3G4.matched.pData$OS.cat, y = G3G4.matched.pData$G3G4_HR, data = G3G4.matched.pData)
+
+logreg.G3G4.G3G4HR.PFS <- logisticRegression(x = G3G4.matched.pData$relapse, y = G3G4.matched.pData$G3G4_HR, data = G3G4.matched.pData)
+
+
+### then list of results logreg.G3G4
+
+logistic.reg.G3G4 <- as.list(mget(ls(pattern="logreg.G3G4"))) 
