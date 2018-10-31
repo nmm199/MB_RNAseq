@@ -43,6 +43,12 @@ write.csv (summary.217, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/O
 
 # load (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/summary.217.csv")
 
+### generate WNT vs non WNT
+
+matched.test.pData$WNT_PNET5<- ifelse(matched.test.pData$meth == "WNT", "WNT", "non-WNT")
+
+#### run logistic regression
+
 logreg.pData.sex <- logisticRegression(x=matched.test.pData$OS.cat, y = matched.test.pData$sex, data = matched.test.pData)
 
 logreg.pData.sex.PFS <- logisticRegression(x =matched.test.pData$relapse, y= matched.test.pData$sex, data = matched.test.pData)
@@ -99,6 +105,10 @@ try(logreg.pData.TERT <- logisticRegression (x= matched.test.pData$OS.cat, y= ma
 try(logreg.pData.TERT.PFS <- logisticRegression (x= matched.test.pData$relapse, y= matched.test.pData$TERT.cat, data = matched.test.pData), silent= T)
 
 
+logreg.pData.WNT <- logisticRegression(x = matched.test.pData$OS.cat, y = matched.test.pData$WNT_PNET5, data = matched.test.pData)
+
+logreg.pData.WNT.PFS <- logisticRegression(x = matched.test.pData$relapse, y = matched.test.pData$WNT_PNET5, data = matched.test.pData)
+
 ### generate list of results
 
 logistic.reg.results <- as.list(mget(ls(pattern="logreg.pData"))) 
@@ -125,6 +135,10 @@ G3G4.matched.pData$G3G4_HR
 # summary(G3G4.matched.pData$meth7.cat)
 
 ### univariate logistic regression associations
+
+logreg.G3G4.sex <- logisticRegression(x=G3G4.matched.pData$OS.cat, y = G3G4.matched.pData$sex, data = G3G4.matched.pData)
+
+logreg.G3G4.sex.PFS <- logisticRegression(x = G3G4.matched.pData$relapse, y= G3G4.matched.pData$sex, data = G3G4.matched.pData)
 
 try(logreg.G3G4.mstatus <- logisticRegression(x= G3G4.matched.pData$OS.cat, y= G3G4.matched.pData$mstatus, data=G3G4.matched.pData), silent= T)
 
@@ -190,3 +204,51 @@ logreg.G3G4.G3G4HR.PFS <- logisticRegression(x = G3G4.matched.pData$relapse, y =
 ### then list of results logreg.G3G4
 
 logistic.reg.G3G4 <- as.list(mget(ls(pattern="logreg.G3G4"))) 
+
+#################################################################################################
+#################################################################################################
+### analyse SHH factors
+
+SHH.matched.pData <- matched.test.pData[(matched.test.pData$meth=="SHH"), ]
+
+SHH.matched.pData <- SHH.matched.pData[!is.na(SHH.matched.pData$meth), ]
+
+SHH.old.matched.pData <- SHH.matched.pData[SHH.matched.pData$meth7.cat=="SHH_Old", ]
+
+### checking mstatus, resection, LCA, MYCN, TP53
+# x <- SHH.matched.pData$OS.cat ### OS variable
+# y <- SHH.matched.pData$sex ###"variable of interest" 
+# z  <- SHH.matched.pData$relapse ### PFS variable
+# data <- SHH.matched.pData
+
+logreg.assoc <- function (x,y,z,data){
+  log.reg.temp <- logisticRegression (x = x, y = y, data= data)
+  log.reg.temp.PFS <- logisticRegression (x = z, y = y, data = data)
+  log.reg.list <- list(OS = log.reg.temp, PFS = log.reg.temp.PFS)
+  return(log.reg.list)
+}
+
+log.reg.SHH.sex <- logreg.assoc(x =  SHH.matched.pData$OS.cat, y = SHH.matched.pData$sex, z = SHH.matched.pData$relapse, data = SHH.matched.pData)
+
+log.reg.SHH.mstatus <- logreg.assoc (x = SHH.matched.pData$OS.cat, y = SHH.matched.pData$mstatus, z = SHH.matched.pData$relapse, data = SHH.matched.pData)
+
+log.reg.SHH.resection <- logreg.assoc (x = SHH.matched.pData$OS.cat, y = SHH.matched.pData$resection, z = SHH.matched.pData$relapse, data = SHH.matched.pData)
+
+log.reg.SHH.LCA <- logreg.assoc (x = SHH.matched.pData$OS.cat, y = SHH.matched.pData$LCA, z = SHH.matched.pData$relapse, data = SHH.matched.pData)
+
+### in SHH_old (SHH_child) group
+
+log.reg.SHHold.mstatus <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.matched.pData$mstatus, z = SHH.old.matched.pData$relapse, data = SHH.old.matched.pData)
+
+log.reg.SHHold.resection <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.matched.pData$resection, z = SHH.old.matched.pData$relapse, data = SHH.old.matched.pData)
+
+log.reg.SHHold.LCA <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.matched.pData$LCA, z = SHH.old.matched.pData$relapse, data = SHH.old.matched.pData)
+
+log.reg.SHHold.MYCN <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.matched.pData$MYCN.cat, z = SHH.old.matched.pData$relapse, data = SHH.old.matched.pData)
+
+log.reg.SHH.TP53 <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.matched.pData$TP53.cat, z = SHH.old.matched.pData$relapse, data = SHH.old.matched.pData)
+
+
+
+
+
