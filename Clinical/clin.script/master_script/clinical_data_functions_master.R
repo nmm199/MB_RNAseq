@@ -751,7 +751,7 @@ clinPathAssess <- function(test.pData,
   ### unhash ** when running individual goi
   
   # goi <- "ENSG00000124588"   ### NQO2 ** or equivalent goi of interest
-  goi <- "ENSG00000136997" ### MYC
+  # goi <- "ENSG00000136997" ### MYC
   # goi <- "ENSG00000168772"  ### CXXC4
   
   ### unhash here for goi.vsd
@@ -822,6 +822,7 @@ clinPathAssess <- function(test.pData,
   
   ### create WNT vs non WNT variable
   matched.test.pData$WNT_PNET5<- ifelse(matched.test.pData$meth == "WNT", "WNT", "non-WNT") ### added 31/10/18
+  matched.test.pData$WNT1_0 <- ifelse(matched.test.pData$WNT_PNET5 =="WNT", 1, 0)
   
   ### run chi-squared analysis
   
@@ -839,7 +840,7 @@ clinPathAssess <- function(test.pData,
   
   list.meth.7 <- chi.sq (x = matched.test.pData$meth7, y = matched.goi.vsd.cat)
   
-  list.WNT.non <- chi.sq (x = matched.test.pData$WNT_PNET5, y = matched.goi.vsd.cat) ### added 31/10/18
+  list.WNTnon <- chi.sq (x = matched.test.pData$WNT_PNET5, y = matched.goi.vsd.cat) ### added 31/10/18
   
   list.path <- chi.sq (x = matched.test.pData$histopath, y = matched.goi.vsd.cat)
   
@@ -931,7 +932,7 @@ clinPathAssess <- function(test.pData,
   try(log.reg.MYCMYCN <- logisticRegression (x=matched.test.pData$MYCMYCN.cat, y= matched.goi.vsd, data=matched.test.pData), silent= T)
   try(log.reg.meth <- logisticRegression (x=matched.test.pData$meth, y= matched.goi.vsd, data = matched.test.pData), silent= T)
   try(log.reg.meth7 <- logisticRegression (x = matched.test.pData$meth7, y= matched.goi.vsd, data = matched.test.pData), silent= T)
-  try(log.reg.WNTnon <-  logisticRegression (x = matched.test.pData$WNT_PNET5, y =  matched.goi.vsd, data = matched.test.pData), silent = T) ### added 31/10/18
+  try(log.reg.WNT1_0 <-  logisticRegression (x = matched.test.pData$WNT1_0, y =  matched.goi.vsd, data = matched.test.pData), silent = T) ### added 31/10/18 ### WNT = 1, nonWNT =0
   try(log.reg.TP53 <- logisticRegression (x= matched.test.pData$TP53.cat, y= matched.goi.vsd, data=matched.test.pData), silent= T)
   try(log.reg.TERT <- logisticRegression (x= matched.test.pData$TERT.cat, y= matched.goi.vsd, data = matched.test.pData), silent= T)
  
@@ -1300,9 +1301,13 @@ clinPathAssess <- function(test.pData,
   # summary.cox
   
   ############################
+  ### re-analysis 31/10/18 using factors that are significant in the RNA cohort in univariate regression for combined PNET5 and Lancet: mstatus, LCA, MYCMYCN, meth7, q13loss
   
-  try(multivar.cox.PFS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
-  try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat,  FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.PFS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat,  FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  
+  try(multivar.cox.PFS.combined.cat <- cox.multivar.surv_5(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, FacE= matched.test.incl.pData$q13loss,  data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, FacE= matched.test.incl.pData$q13loss,  data = matched.test.incl.pData), silent =T)
   
   ### reanalysis 31/10/18 after determined that in overall group, mstatus, LCA, MYCMYCN (vs non MYC/non MYC amplified), WNT vs non WNT in PNET5 schema is significant in univariate log regression
   
@@ -1310,31 +1315,33 @@ clinPathAssess <- function(test.pData,
   try(multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$WNT_PNET5, data = matched.test.incl.pData), silent =T)
   
   
-  ### cox multivariate with established risk factors per PNET5 only
+  ### cox multivariate with established risk factors per PNET5 only ### analysis prior to 31/10/18
   ### LCA, mstatus,  MYCMYCN.cat, resection, meth (after D/W Dan, reinterpretation of the paper), TP53.cat (added 5/10/17)
   
   # try(multivar.cox.PFS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection,  FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
   # try(multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
   
-  ### PNET5 RF in G3G4 subgroup (25/10/18)
+  ### PNET5 RF in G3G4 subgroup (updated 31/10/18 to include factors significant in univariate regression : mstatus, LCA, MYC)
   
-  try(multivar.cox.PFS.PNET5.G3G4.cat <- cox.multivar.surv.PNET5_4 (time =matched.G3G4.incl.pData$PFS,event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$LCA, FacB = matched.G3G4.incl.pData$MYCMYCN.cat, FacC = matched.G3G4.incl.pData$mstatus, FacD = matched.G3G4.incl.pData$resection, FacE =  matched.G3G4.incl.pData$meth, FacF=matched.G3G4.incl.pData$TP53, data =  matched.G3G4.incl.pData), silent =T )
-  try(multivar.cox.PFS.PNET5.G3G4.contin <- cox.multivar.surv.PNET5_4 (time =matched.G3G4.incl.pData$PFS,event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$LCA, FacB = matched.G3G4.incl.pData$MYCMYCN.cat, FacC = matched.G3G4.incl.pData$mstatus, FacD = matched.G3G4.incl.pData$resection, FacE =  matched.G3G4.incl.pData$meth, FacF=matched.G3G4.incl.pData$TP53, data =  matched.G3G4.incl.pData), silent =T )
+  try(multivar.cox.PFS.PNET5.G3G4.cat <- cox.multivar.surv_3 (time =matched.G3G4.incl.pData$PFS,event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$LCA, FacB = matched.G3G4.incl.pData$MYC.cat, FacC = matched.G3G4.incl.pData$mstatus, data =  matched.G3G4.incl.pData), silent =T )
+  try(multivar.cox.PFS.PNET5.G3G4.contin <- cox.multivar.surv_3 (time =matched.G3G4.incl.pData$PFS,event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$LCA, FacB = matched.G3G4.incl.pData$MYC.cat, FacC = matched.G3G4.incl.pData$mstatus,  data =  matched.G3G4.incl.pData), silent =T )
   
   ### cox multivariate with established risk factors per Schwalbe only
+  ### analysis 31/10/18 decision to include 3 significant factors from PNET5/Lancet paper for SHH_old (SHH_child) cohort: LCA, MYCN and TP53. Resection and metastatic status were not signicant in univariate logistic regression analysis
   
-  ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe)
-  ### Mstatus, TP53 for SHH-child, MYCN, adjust for sex in matched.SHH.old.incl.pData
+  try(multivar.cox.PFS.SHH.old.cat <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat,  data = matched.SHH.old.incl.pData ), silent =T)
+  try(multivar.cox.PFS.SHH.old.contin <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
   
-  try(multivar.cox.PFS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat,  data = matched.SHH.old.incl.pData ), silent =T)
-  try(multivar.cox.PFS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe), analysis prior to 31/10/18
+  # try(multivar.cox.PFS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat,  data = matched.SHH.old.incl.pData ), silent =T)
+  # try(multivar.cox.PFS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
   
   
-  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss
+  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss - analysis unchanged 31/10/18
   ### high risk methylation group (ie HR Group 3 and HR Group 4 combined) in matched.G3G4.incl.pData$G3G4.high.incl for categorical and continuous variable
   
-  try(multivar.cox.PFS.Lancet.G3G4.cat <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,  data = matched.G3G4.incl.pData), silent =T)
-  try(multivar.cox.PFS.Lancet.G3G4.contin <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,  data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.PFS.Lancet.G3G4.cat <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,  data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.PFS.Lancet.G3G4.contin <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,  data = matched.G3G4.incl.pData), silent =T)
   
   
   #####################################################################
@@ -1373,34 +1380,52 @@ clinPathAssess <- function(test.pData,
   
   ### multivariate cox regression for OS, based on categories combined (PNET + Schwalbe all risk factors, PNET5 alone, Schwalbe (lancet) subgroups)
   
-  try(multivar.cox.OS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
-  try(multivar.cox.OS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.OS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.OS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
   
-  ### cox multivariate with established risk factors per PNET5 only
-  ### LCA, mstatus,  MYCMYCN.cat, resection, methylation status (4 subgroup), TP53.cat added 5/10/17
+  ### overall cohort: 31/10/18 - mstatus, LCA, MYCMYCN, meth7, q13loss
+  try(multivar.cox.OS.combined.cat <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD =  matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.OS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
   
-  try(multivar.cox.OS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
-  try(multivar.cox.OS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
   
+  ### cox multivariate with established risk factors per PNET5 that are significant in univariate analysis in the RNA cohort (n=217): LCA, MYCMYCN, mstatus, WNT vs non WNT
+  ### 31/10/18: 
+  
+  try(multivar.cox.OS.PNET5.cat <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$WNT1_0, data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.OS.PNET5.contin <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$WNT1_0, data = matched.test.incl.pData), silent =T)
+  
+  ### pre-31/10/18: LCA, mstatus,  MYCMYCN.cat, resection, methylation status (4 subgroup), TP53.cat added 5/10/17
+  
+  # try(multivar.cox.OS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.OS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat,  FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
   
   ### cox multivariable in PNET 5, G3G4 group
-  try(multivar.cox.OS.PNET5.G3G4.cat <- cox.multivar.surv.PNET5_6 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYCMYCN.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus, FacD = matched.G3G4.incl.pData$resection, FacE = matched.G3G4.incl.pData$meth, FacF = matched.G3G4.incl.pData$TP53.cat, data = matched.G3G4.incl.pData), silent =T)
-  try(multivar.cox.OS.PNET5.G3G4.contin <- cox.multivar.surv.PNET5_6 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYCMYCN.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus,  FacD = matched.G3G4.incl.pData$resection, FacE = matched.G3G4.incl.pData$meth, FacF = matched.G3G4.incl.pData$TP53.cat, data = matched.G3G4.incl.pData), silent =T)
+  ### 31/10/18: using mstatus, LCA, MYC (significant in univariate logistic regression)
+  
+  try(multivar.cox.OS.PNET5.G3G4.cat <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus, data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.OS.PNET5.G3G4.contin <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus, data = matched.G3G4.incl.pData), silent =T)
+  
+  # try(multivar.cox.OS.PNET5.G3G4.cat <- cox.multivar.surv.PNET5_6 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYCMYCN.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus, FacD = matched.G3G4.incl.pData$resection, FacE = matched.G3G4.incl.pData$meth, FacF = matched.G3G4.incl.pData$TP53.cat, data = matched.G3G4.incl.pData), silent =T)
+  # try(multivar.cox.OS.PNET5.G3G4.contin <- cox.multivar.surv.PNET5_6 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYCMYCN.cat, FacB = matched.G3G4.incl.pData$LCA, FacC = matched.G3G4.incl.pData$mstatus,  FacD = matched.G3G4.incl.pData$resection, FacE = matched.G3G4.incl.pData$meth, FacF = matched.G3G4.incl.pData$TP53.cat, data = matched.G3G4.incl.pData), silent =T)
   
   ### cox multivariate with established risk factors per Schwalbe only
   
   ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe)
-  ### Mstatus, TP53 for SHH-child, MYCN, matched.SHH.old.incl.pData
+  ### 31/10/18: SHH_Old significant factors in univariate logistic regression were LCA, MYCN, TP53 mutational status
   
-  try(multivar.cox.OS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
-  try(multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  try(multivar.cox.OS.SHH.old.cat <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  try(multivar.cox.OS.SHH.old.contin <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  
+  ### Mstatus, TP53 for SHH-child, MYCN, matched.SHH.old.incl.pData ### analysis pre 31/10/18
+  # try(multivar.cox.OS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
+  # try(multivar.cox.OS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
   
 
-  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss
+  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss ### analysis unchanged 31/10/18
   ### high risk methylation group (ie HR Group 3 and HR Group 4 combined) in matched.G3G4.incl.pData$G3G4.high.incl for categorical and continuous variable
   
-  try(multivar.cox.OS.Lancet.G3G4.cat <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
-  try(multivar.cox.OS.Lancet.G3G4.contin <- cox.multivar.surv.Schwalbe_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.OS.Lancet.G3G4.cat <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
+  try(multivar.cox.OS.Lancet.G3G4.contin <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,   data = matched.G3G4.incl.pData), silent =T)
   
   
   
@@ -1487,13 +1512,15 @@ cox.dataframe <- function(pval, Zscore, HR, L95CI, U95CI){
 
 ### Function called annotate.HTseq.IDs
 ### input is a datafile (results.master) generated from clinical_data_master.R 
-
+# listDatasets()
+# listMarts()
 library(biomaRt)
 
 annotate.HTseq.IDs<-function(HTseq.IDs){
   ensemblID <- gsub("\\..*", '', HTseq.IDs)
   #fetch the annotation information from the Ensembl database
-  ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')
+  #ensembl <- useMart('ensembl', dataset='hsapiens_gene_ensembl')### changed 6/11/18
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL",dataset='hsapiens_gene_ensembl') ### added 6/11/18
   symbols <- getBM(attributes=c('ensembl_gene_id', 'hgnc_symbol'), filters='ensembl_gene_id', ensemblID, mart=ensembl)
   #combine the annotation with the RNA-Seq data
   annotatedix <- match(ensemblID,symbols$ensembl_gene_id)
@@ -1501,6 +1528,7 @@ annotate.HTseq.IDs<-function(HTseq.IDs){
   return(cbind(HTseq.IDs,annotatedGenes))
 }
 
+### mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl", host = "jul2016.archive.ensembl.org");
 ###  If you are a user of biomaRt (a part of the Bioconductor library) change the host from 'www.biomart.org' to 'www.ensembl.org'. 24/4/18)
 
 #listMarts(mart = NULL, host = "www.ensembl.org", path = "/biomart/martservice", port = 80, includeHosts= FALSE, archive = FALSE, ssl.verifypeer = TRUE, ensemblRedirect = TRUE, verbose = FALSE)

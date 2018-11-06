@@ -209,12 +209,12 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
  }
 
 
-# results.master <- foreach(i = 1:10)%dopar%{
+ results.master <- foreach(i = 1:10)%dopar%{
   ### results.master <- foreach(i = 1:100)%dopar%{
- # as.numeric(gp.filt.mb.vsd[i,]) -> x
- # names(x) <- colnames(gp.filt.mb.vsd)
- # return(clinPathAssess(test.pData,x)) 
-# }
+  as.numeric(gp.filt.mb.vsd[i,]) -> x
+  names(x) <- colnames(gp.filt.mb.vsd)
+  return(clinPathAssess(test.pData,x)) 
+ }
 
 ################################################################################
 ### unhash when running the novel transcript analysis
