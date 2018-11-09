@@ -525,7 +525,83 @@ multivar.cox.PFS.SHHold.cat.df <- extract.multivar.cox (results.master, "multiva
 multivar.cox.PFS.SHHold.cont.df <- extract.multivar.cox (results.master, "multivar.cox.PFS.SHH.old.contin") 
 
 
+### need to generate annotated files with trimmed ENSG ID names and z scores 
+
+### OS files
+
+annot.multivar.cox.OS.combined.cat <- annotate.HTseq.IDs(rownames(multivar.cox.OS.combined.cat.df))
+annot.multivar.cox.OS.combined.cat.bind <- cbind (annot.multivar.cox.OS.combined.cat, multivar.cox.OS.combined.cat.df)
+
+
+
+annot.multivar.cox.OS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(multivar.cox.OS.lancetG3G4.cont.df))
+annot.multivar.cox.OS.lancetG3G4.cont.bind <- cbind (annot.multivar.cox.OS.lancetG3G4.cont, multivar.cox.OS.lancetG3G4.cont.df)
+
+
+### PFS files
+
+annot.multivar.cox.PFS.combined.cat <- annotate.HTseq.IDs(rownames(multivar.cox.PFS.combined.cat.df)) 
+annot.multivar.cox.PFS.combined.cat.bind <- cbind (annot.multivar.cox.PFS.combined.cat, multivar.cox.PFS.combined.cat.df)
+
+annot.multivar.cox.PFS.combined.cont <- annotate.HTseq.IDs (rownames(multivar.cox.PFS.combined.cont.df))
+annot.multivar.cox.PFS.combined.cont.bind <- cbind (annot.multivar.cox.PFS.combined.cont, multivar.cox.PFS.combined.cont.df)
+
+annot.multivar.cox.PFS.lancetG3G4.cont <- annotate.HTseq.IDs(rownames(multivar.cox.PFS.lancetG3G4.cont.df))
+annot.multivar.cox.PFS.lancetG3G4.cont.bind <- cbind (annot.multivar.cox.PFS.lancetG3G4.cont, multivar.cox.PFS.lancetG3G4.cont.df)
+
+annot.multivar.cox.PFS.PNET5.cont <- annotate.HTseq.IDs(rownames(multivar.cox.PFS.PNET5.cont.df))
+annot.multivar.cox.PFS.PNET5.cont.bind <- cbind (annot.multivar.cox.PFS.PNET5.cont, multivar.cox.PFS.PNET5.cont.df)
+  
+annot.multivar.cox.PFS.SHHold.cont <- annotate.HTseq.IDs(rownames(multivar.cox.PFS.SHHold.cont.df))
+annot.multivar.cox.PFS.SHHold.cont.bind <- cbind(annot.multivar.cox.PFS.SHHold.cont, multivar.cox.PFS.SHHold.cont.df)
+
 ### write out csv to interrogate Z scores for specific targets
+### OS files
+
+write.csv (annot.multivar.cox.OS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.cat.bind.csv")
+
+write.csv(annot.multivar.cox.OS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.lancetG3G4.ocnt.bind.csv")
+
+### PFS files
+
+write.csv(annot.multivar.cox.PFS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cat.bind.csv")
+
+write.csv (annot.multivar.cox.PFS.combined.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cont.bind.csv")
+
+write.csv(annot.multivar.cox.PFS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.lancetG3G4.cont.bind.csv")
+
+write.csv (annot.multivar.cox.PFS.PNET5.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.PNET5.cont.bind.csv")
+
+write.csv (annot.multivar.cox.PFS.SHHold.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.SHHold.cont.bind.csv")
+
+
+# write.table(annot.multivar.cox.PFS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multi.cox.PFS.combined.cat.bind.txt", sep = "\t",
+#      row.names = TRUE, col.names = TRUE)
+
+
+
+### files to annotate, prioritise G3G4
+
+multivar.cox.PFS.PNET5.G3G4.cat.df 
+
+multivar.cox.PFS.PNET5.G3G4.cont.df 
+
+multivar.cox.PFS.lancetG3G4.cat.df 
+
+
+multivar.cox.PFS.PNET5.cat.df <- 
+
+ 
+
+multivar.cox.PFS.SHHold.cat.df 
+
+multivar.cox.PFS.SHHold.cont.df 
+
+### write csv
+
+
+
+
 
 
 write.csv (multivar.cox.PFS.combined.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.combined.cont.csv")
@@ -630,7 +706,11 @@ try(annot.sig.multivar.cox.PFS.combined.cat <- annotate.HTseq.IDs(rownames(signi
 
 annot.sig.multivar.cox.PFS.SHHold.cat <- annotate.HTseq.IDs(rownames(significant.multivar.cox.PFS.SHHold.cat))
 
+
+
+
 ### write csv
+
 
 write.csv (annot.sig.multi.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multi.cox.OS.combined.cat.csv") 
 
