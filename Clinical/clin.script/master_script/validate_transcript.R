@@ -167,11 +167,28 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/Valid
   
 list.goi.MELK <- goi.validate(goi = "ENSG00000165304", data = eset )
 list.goi.NQO2 <- goi.validate(goi =  "ENSG00000124588", data = eset )
-list.goi.LOC256880 <- goi.validate (goi = "ENSG00000245322", data = eset) ### error subscript out of bounds
-
+# list.goi.LOC256880 <- goi.validate (goi = "ENSG00000245322", data = eset) ### error subscript out of bounds
+list.goi.MRPS12 <- goi.validate (goi = "ENSG00000128626", data = eset)
+list.goi.MLYCD <- goi.validate (goi = "ENSG00000103150", data = eset)
+list.goi.AKTIP <- goi.validate(goi = "ENSG00000166971", data = eset)
+list.goi.SLC25A34 <- goi.validate (goi ="ENSG00000162461", data = eset )
+list.goi.POU6F1 <- goi.validate (goi = "ENSG00000184271", data = eset)
+list.goi.CXXC4 <- goi.validate (goi ="ENSG00000168772", data = eset )
+list.goi.CHEK1 <- goi.validate (goi = "ENSG00000149554", data = eset)
+list.goi.CDK4 <- goi.validate (goi = "ENSG00000135446", data = eset)
+list.goi.ROGDI <- goi.validate (goi ="ENSG00000067836", data = eset )
 
 write.csv(list.goi.NQO2$cox_summary$summary_nogender, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQO2_cox_nogender.csv")
 write.csv(list.goi.NQO2$cox_summary$summary_gender, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/Validation/NQO2_cox_gender.csv")
+write.csv (list.goi.MRPS12[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/MRPS12_cox_nogender.csv")
+write.csv (list.goi.MLYCD[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/MLYCD_cox_nogender.csv")
+write.csv (list.goi.AKTIP[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/AKTIP_cox_nogender.csv")
+write.csv (list.goi.SLC25A34[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/SLC25A34_cox_nogender.csv")
+write.csv (list.goi.POU6F1[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/POU6F1_cox_nogender.csv")
+write.csv (list.goi.CXXC4[[4]], file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/CXXC4_cox_nogender.csv") 
+write.csv (list.goi.CHEK1[[4]], file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/CHEK1_cox_nogender.csv")
+write.csv (list.goi.CDK4[[4]], file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/CDK4_cox_nogender.csv")
+write.csv (list.goi.ROGDI[[4]], file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/Validation/ROGD1_cox_nogender.csv")
 
 ### saveRDS 
 

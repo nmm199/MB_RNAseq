@@ -20,10 +20,11 @@
 #######################################################################################################################################
 ### deriving values from categorical expression data (>median, < median)
 
- goi <- "ENSG00000124588" ### NQO2
+# goi <- "ENSG00000124588" ### NQO2
 # goi <- "ENSG00000245322" ### Error in data.exprs[goi, ] : subscript out of bounds # LOC256880 ### does not exist in Cavalli dataset
 # goi <- "ENSG00000165304"
 # goi <- "ENSG00000173818" ### ENDOV
+# goi <- "ENSG00000128626" ### MRPS12
 
 data <- eset 
 
@@ -56,15 +57,30 @@ surv.pval.OS.all <- 1 - pchisq(OS.all.logrank$chisq, length(OS.all.logrank$obs)-
 ### up to here 24/10/18
 
 ### add in the multivariable for the overall cohort prior to dividing into G3G4
+### add here Dec 2018...
+
 ### the following is dividing into G3G4
 
 sub <- matched.goi@phenoData@data$meth7 ### an alternate way to access the expression data subcolumns
 matched.G3G4 <- matched.goi[,which(sub=="Grp3_LowRisk"|sub=="Grp3_HighRisk"|sub=="Grp4_LowRisk"|sub=="Grp4_HighRisk")] ### changed comma position ### generates G3G4 expression set
 matched.G3G4$G3G4_HR <- matched.G3G4$meth7=="Grp4_HighRisk"|matched.G3G4$meth7 =="Grp3_HighRisk"
 
-cox.G3G4.goi <- coxph(Surv(matched.G3G4$OS, matched.G3G4$Dead)~matched.G3G4$goi + matched.G3G4$q13loss + matched.G3G4$G3G4_HR +  matched.G3G4$Gender + matched.G3G4$MYC, data = data)
+# cox.G3G4.goi <- coxph(Surv(matched.G3G4$OS, matched.G3G4$Dead)~matched.G3G4$goi + matched.G3G4$q13loss + matched.G3G4$G3G4_HR +  matched.G3G4$Gender + matched.G3G4$MYC, data = data)
 cox.G3G4.goi_nogender <- coxph(Surv(matched.G3G4$OS, matched.G3G4$Dead)~matched.G3G4$goi + matched.G3G4$q13loss + matched.G3G4$G3G4_HR + matched.G3G4$MYC, data = data)
-summary_cox <- list (summary_nogender = summary(cox.G3G4.goi_nogender)$conf.int, summary_genderincl = summary(cox.G3G4.goi)$conf.int)
+# summary_cox <- list (summary_nogender = summary(cox.G3G4.goi_nogender)$conf.int, summary_genderincl = summary(cox.G3G4.goi)$conf.int)
+
+
+### this section was added in Dec 11 2018 to improve the cox output
+
+cox.n.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[4]]   ### n             ###cox.OS.MELK$n          ### cox.OS.MELK[[11]] 
+cox.nevent.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[6]] ### nevent   ###cox.OS.MELK$nevent     ### cox.OS.MELK[[12]] 
+
+# summary(cox.OS.G3G4.MELK.Lancet)[[7]] ### this is the table of relevance p value
+cox.pval.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[7]][1,5] ### this accesses the p value for MELK (row 1, position 5)
+cox.HR.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[7]][1,2]
+cox.lower.95CI.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[8]][1,3]
+cox.upper.95CI.G3G4.goi <- summary(cox.G3G4.goi_nogender)[[8]][1,4]
+summary.cox.G3G4.goi <- list(pval = cox.pval.G3G4.goi, HR = cox.HR.G3G4.goi, L95CI = cox.lower.95CI.G3G4.goi, U95CI =cox.upper.95CI.G3G4.goi, n = cox.n.G3G4.goi , nevent = cox.nevent.G3G4.goi, table = summary(cox.G3G4.goi_nogender)[[7]], HR_table = summary(cox.G3G4.goi_nogender)$conf.int)  
 
 
 ### km results in G3G4
@@ -78,8 +94,9 @@ surv.pval.OS.G3G4 <- 1 - pchisq(OS.G3G4.logrank$chisq, length(OS.G3G4.logrank$ob
 list.goi <- list(n = summary(cox.G3G4.goi_nogender)$n,  
                  nevent = summary(cox.G3G4.goi_nogender)$nevent,  
                  pval_nogender = summary(cox.G3G4.goi_nogender)$coefficients, 
-                 pval_gender = summary(cox.G3G4.goi)$coefficients, 
-                 cox_summary = summary_cox, 
+                 # pval_gender = summary(cox.G3G4.goi)$coefficients, 
+                 # cox_summary = summary_cox, 
+                 goi_G3G4_cox = summary.cox.G3G4.goi, 
                  km.OS.all = OS.all.logrank, 
                  pval.km.all = surv.pval.OS.all,
                  km.OS.G3G4 = km.OS.G3G4, 

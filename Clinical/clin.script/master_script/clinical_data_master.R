@@ -184,8 +184,15 @@ coxfilter()
 ### for run of n=1
 ### define goi
 
+# goi <- "ENSG00000105810" ### CDK6
+# goi <- "ENSG00000135446" ### CDK4
+# goi <- "ENSG00000166483" ### WEE1
+# goi <- "ENSG00000105329" ### TGFB1
+# goi <- "ENSG00000149554" ### CHEK1
+# goi <- "ENSG00000261534" ### lncRNA
+# goi <- "ENSG00000196123" ### KIAA0895L
 # goi <- "ENSG00000166971" ### AKTIP
-# goi <- "ENSG00000162461"  ### SLC25A34
+# goi <- "ENSG00000162461" ### SLC25A34
 # goi <- "ENSG00000184271" ### POU6F1
 # goi <- "ENSG00000161664" ### ASB16
 # goi <- "ENSG00000260440" ### LINC01544

@@ -148,13 +148,13 @@ km.log.test <- function(time, event, marker, out.file = "none"){
   }
   km.PFS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
   # plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "Biomarker expression and progression-free survival (PFS)",  lty = 1:2)
-   plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "ROGDI and progression-free survival (PFS)",  lty = 1:2)
+   plot(km.PFS.incl, yaxt="n", col = c("red", "blue"),xlab = "time to progression/relapse (years)", ylab = "PFS (%)", xlim = c(0,10), main = "CDK6 and PFS",  lty = 1:2) ### "Marker and progression-free survival(PFS)"
   PFS.names <- c("biomarker - high", "biomarker - low")
   legend (x="topright", PFS.names,  lty= 1:2, col = c("red","blue"))
   axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
   PFS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
   1 - pchisq(PFS.incl.logrank$chisq, length(PFS.incl.logrank$obs)-1) -> surv.p.val.PFS
-  text(4,0.1,paste("p =",round(surv.p.val.PFS, 3)), pos = 4, cex = 1) ### if the p value does not paste, may be due to rounding, e.g set at 5 dp (25/10/18)
+  text(4,0.1,paste("p =",round(surv.p.val.PFS, 3)), pos = 4, cex = 1) ### if the p value does not paste, may be due to rounding, e.g was 3, set at 5 dp (25/10/18)
   #assign(paste0("Survival_pval_", marker, surv.p.val.PFS)) ### added 140917
   PFS.surv.table <- summary(km.PFS.incl)
   return (list(PFS.p.val = surv.p.val.PFS,
@@ -192,7 +192,7 @@ km.log.test.OS <- function(time, event, marker, out.file = "none"){
   }
   km.OS.incl <- survfit(Surv(time, event)~marker, type = "kaplan-meier", conf.type = "log")
   # plot(km.OS.incl,yaxt="n", col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS (%)", xlim = c(0,10), main = "Biomarker expression and overall survival (OS)",  lty = 1:2)
-   plot(km.OS.incl,yaxt="n", col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS (%)", xlim = c(0,10), main = "ROGDI and overall survival (OS)",  lty = 1:2)
+   plot(km.OS.incl,yaxt="n", col = c("red", "blue"),xlab = "overall survival (years)", ylab = "OS (%)", xlim = c(0,10), main = "CDK6 and overall survival (OS)",  lty = 1:2)
   OS.names <- c("biomarker - high", "biomarker - low")
   legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
   axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
@@ -752,7 +752,7 @@ clinPathAssess <- function(test.pData,
   ### if then interrogate functions, will need to generate matched.test.pData
   ### unhash ** when running individual goi
   
-  # goi <- "ENSG00000124588"   ### NQO2 ** or equivalent goi of interest
+  # goi <- "ENSG00000124588" ### NQO2 ** or equivalent goi of interest
   # goi <- "ENSG00000136997" ### MYC
 
   
@@ -965,23 +965,23 @@ clinPathAssess <- function(test.pData,
   
   ### hardcoded boxplots, separated now from logistic regression coding 140917
   
-  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "ROGDI and age (infant vs non infant)")
-  sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "ROGDI expression and gender")
-  mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "Correlation between biomarker and metastatic status")
-  relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between ROGDI and relapse")
-  resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between ROGDI and resection status")
+  age.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$age.cat.infant, col = c("red", "blue"), xlab = "Infant", ylab = "Biomarker expression", main = "CDK6 and age (infant vs non infant)")
+  sex.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$sex, col = c("red", "blue"), xlab = "Gender", ylab = "Expression of biomarker", main = "CDK6 expression and gender")
+  mstatus.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$mstatus, col = c("red", "blue"), xlab = "M status", ylab = "Biomarker expression", main = "CDK6 expression and metastatic status")
+  relapse.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$relapse, col = c("red", "blue"), xlab = "Relapse status", ylab = "Biomarker expression",  main = "Correlation between CDK6 and relapse")
+  resection.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$resection, col = c("red", "blue"), xlab = "Resection status", ylab = "Biomarker expression", main = "Correlation between CDK6 and resection status")
   histopath.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$histopath, col = c("red", "blue"), xlab = "Histopathology subtype", ylab = "Biomarker expression", main = "Correlation between biomarker and histopathology")
-  LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blue"),  xlab = "LCA pathology", ylab = "Biomarker expression", main = "Correlation between ROGDI and LCA")
-  MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "ROGDI and MYC amplification")
-  MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "Correlation between biomarker and MYCN expression")
-  MYCMYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, col = c("Red", "Blue"), xlab = "MYC or MYCN amplification", ylab = "Biomarker expression", main = "ROGDI and MYC/MYCN amplification")
+  LCA.boxplot <- boxplot (matched.goi.vsd~ matched.test.pData$LCA,col=c("red","blue"),  xlab = "LCA pathology", ylab = "Biomarker expression", main = "Correlation between CDK6 and LCA")
+  MYC.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYC.cat, col = c("Red", "Blue"), xlab = "MYC amplification", ylab = "Biomarker expression", main = "CDK6 and MYC amplification")
+  MYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCN.cat, col = c("Red", "Blue"), xlab = "amplification", ylab = "Biomarker expression", main = "CDK6 and MYCN amplification")
+  MYCMYCN.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$MYCMYCN.cat, col = c("Red", "Blue"), xlab = "MYC or MYCN amplification", ylab = "Biomarker expression", main = "CDK6 and MYC/MYCN amplification")
   ### determine legend 
   
-  meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "ROGDI and 4 molecular subgroups")
-  meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("pink", "yellow","dark green","light green", "red","dark red", "blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "ROGDI and 7 molecular subgroups", names = c("G3_HR","G3_LR", "G4_HR", "G4_LR", "SHH-Inf", "SHH-Child", "WNT"))
-  TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "ROGDI and TP53 status")
-  TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT amplification (pos vs neg)", ylab = "Biomarker expression", main = "ROGDI and TERT amplifiation")
-  WNT.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$WNT1_0, col = c("Red", "Blue"), xlab = "WNT (1) vs non WNT(0)", ylab = "Biomarker expression", main = "Correlation between ROGDI and WNT status")
+  meth.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth, col=c("yellow","green","red","blue"), xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "CDK6 and 4 molecular subgroups")
+  meth7.boxplot <- boxplot(matched.goi.vsd~matched.test.pData$meth7, col=c("pink", "yellow","dark green","light green", "red","dark red", "blue"),  xlab = "Methylation subgroup", ylab = "Biomarker expression", main = "CDK6 and 7 molecular subgroups", names = c("G3_HR","G3_LR", "G4_HR", "G4_LR", "SHH-Inf", "SHH-Child", "WNT"))
+  TP53.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TP53.cat, col = c("Red", "Blue"), xlab = "TP53 mutational status", ylab = "Biomarker expression", main = "CDK6 and TP53 status")
+  TERT.boxplot <- boxplot(matched.goi.vsd ~ matched.test.pData$TERT.cat, col = c("Red", "Blue"), xlab = "TERT amplification (pos vs neg)", ylab = "Biomarker expression", main = "CDK6 and TERT amplifiation")
+  WNT.boxplot <- boxplot (matched.goi.vsd ~ matched.test.pData$WNT1_0, col = c("Red", "Blue"), xlab = "WNT (1) vs non WNT(0)", ylab = "Biomarker expression", main = "CDK6 and WNT status")
   
   #######################################################################
   
