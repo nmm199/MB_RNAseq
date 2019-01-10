@@ -740,7 +740,7 @@ clinPathAssess <- function(test.pData,
   
   ### attempt with Dan
      # test.pData = test.pData
-     # x -> goi.vsd   
+     # goi.vsd <- x   
      # pdf.file = NULL
      # log.file = NULL
   
