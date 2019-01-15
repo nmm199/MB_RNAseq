@@ -75,6 +75,18 @@ km.OS.test <- survfit(Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl)~ m
 
 summary(km.OS.test)
 
+#res <- summary( survfit( Surv(futime, fustat)~rx, data=ovarian))
+res <- summary(km.OS.test)
+
+cols <- lapply(c(2:6, 8:11) , function(x) res[x])
+
+tbl <- do.call(data.frame, cols)
+write.table(tbl, file="kaplan meier results for OS.txt", sep="\t")
+#head(tbl)
+
+
+
+
 
 n <- km.OS.test$n
 n_events <- km.OS.test$n.event
@@ -85,7 +97,7 @@ std_error <- km.OS.test$std.err
 censor <- km.OS.test$n.censor
 
 ### dataframe with errors
-### km.OS.df <- cbind( OS_time, n_risk, n_events, censor, surv_percent, std_error)
+km.OS.df <- cbind( OS_time, n_risk, n_events, censor, surv_percent, std_error)
 
 ### p value derivation
 
@@ -220,8 +232,8 @@ survplot(fit = km.OS.test.2, col = c("red", "blue"),
          legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue")),
          axis(2, at=pretty(OS.cat.bin.incl), lab=pretty(OS.cat.bin.incl) * 100, las=TRUE),
          OS.incl.logrank <- survdiff(Surv(matched.test.incl.pData$Followup, OS.cat.bin.incl) ~ matched.goi.vsd.cat.incl),
-         surv.p.val <- 1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1),
-         text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1),
+         #surv.p.val <- 1 - pchisq(OS.incl.logrank$chisq, length(OS.incl.logrank$obs)-1),
+         #text(4,0.1,paste("p =",round(surv.p.val, 3)), pos = 4, cex = 1),
          #label.curves = list(keys = "lines",  col = c("red", "blue")),
          levels.only  = FALSE,                                          # show only levels, no label
          abbrev.label = FALSE,                                        # if label used, abbreviate
@@ -236,13 +248,11 @@ survplot(fit = km.OS.test.2, col = c("red", "blue"),
 )
 
 
-OS.names <- c("biomarker - high", "biomarker - low")
-legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
-axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
-OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
+#OS.names <- c("biomarker - high", "biomarker - low")
+#legend (x="topright", OS.names,  lty= 1:2, col = c("red","blue"))
+#axis(2, at=pretty(event), lab=pretty(event) * 100, las=TRUE)
+#OS.incl.logrank <- survdiff(Surv(time, event) ~ marker)
 
-
-### legend.pos = "topright"
 
         
 ### comparison script taken from "Drawing survival curves in R.pdf" and from Alice's script
@@ -267,6 +277,7 @@ survplot(fit  = tmp.survfitSHH,
          ## srt.n.risk = 0, sep.n.risk = 0.056, adj.n.risk = 1,
          ## y.n.risk = 0, cex.n.risk = 0.6
 )
+
 ### km survival function for comparison
 
 km.log.test.OS <- function(time, event, marker, out.file = "none"){
