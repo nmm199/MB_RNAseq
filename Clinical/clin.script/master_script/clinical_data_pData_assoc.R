@@ -47,7 +47,22 @@ write.csv (summary.217, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/O
 
 matched.test.pData$WNT_PNET5<- ifelse(matched.test.pData$meth == "WNT", "WNT", "non-WNT")
 
-#### run logistic regression
+### in order to create levels in logistic regression, to set 'reference level' for risk (odds ratio), variables must be factors ### Jan 18 2019
+as.factor(names(matched.test.pData))
+matched.test.pData$WNT <- as.factor(matched.test.pData$WNT_PNET5)
+
+# head(matched.test.pData$CSI) ### check relevant levels
+
+### define reference level for each
+matched.test.pData$mstatus <- relevel (matched.test.pData$mstatus, ref = "M0/M1" )
+matched.test.pData$LCA <- relevel (matched.test.pData$LCA, ref = "non LCA")
+matched.test.pData$MYC.cat <- relevel (matched.test.pData$MYC.cat, ref = "MYC non ampl")
+matched.test.pData$MYCN.cat<- relevel (matched.test.pData$MYCN.cat, ref = "MYCN non ampl" )
+matched.test.pData$MYCMYCN.cat <- relevel (matched.test.pData$MYCMYCN.cat, ref = "MYC MYCN non ampl" )
+matched.test.pData$WNT <- relevel (matched.test.pData$WNT, ref = "WNT")
+matched.test.pData$TP53.cat <- relevel (matched.test.pData$TP53.cat, ref = "TP53 WT")
+
+#### run logistic regression for OS and PFS
 
 logreg.pData.sex <- logisticRegression(x=matched.test.pData$OS.cat, y = matched.test.pData$sex, data = matched.test.pData)
 
@@ -105,9 +120,9 @@ try(logreg.pData.TERT <- logisticRegression (x= matched.test.pData$OS.cat, y= ma
 try(logreg.pData.TERT.PFS <- logisticRegression (x= matched.test.pData$relapse, y= matched.test.pData$TERT.cat, data = matched.test.pData), silent= T)
 
 
-logreg.pData.WNT <- logisticRegression(x = matched.test.pData$OS.cat, y = matched.test.pData$WNT_PNET5, data = matched.test.pData)
+logreg.pData.WNT <- logisticRegression(x = matched.test.pData$OS.cat, y = matched.test.pData$WNT, data = matched.test.pData)
 
-logreg.pData.WNT.PFS <- logisticRegression(x = matched.test.pData$relapse, y = matched.test.pData$WNT_PNET5, data = matched.test.pData)
+logreg.pData.WNT.PFS <- logisticRegression(x = matched.test.pData$relapse, y = matched.test.pData$WNT, data = matched.test.pData)
 
 ### generate list of results
 
@@ -129,10 +144,17 @@ G3G4.matched.pData <- G3G4.matched.pData[!is.na(G3G4.matched.pData$meth), ] ### 
 
 G3G4.matched.pData$G3G4_HR <- ifelse (G3G4.matched.pData$meth7.cat=="Grp4_HighRisk"|G3G4.matched.pData$meth7.cat=="Grp3_HighRisk", "G3G4_HR", "G3G4_LR")
 
-G3G4.matched.pData$G3G4_HR
-
+# G3G4.matched.pData$G3G4_HR
 # summary(G3G4.matched.pData$meth)
 # summary(G3G4.matched.pData$meth7.cat)
+
+### transform variables into factors to allow levels to be stipulated
+## need to run above relevel commands on matched.test.pData to allow follow through of reference variables 
+
+as.factor(names(G3G4.matched.pData))
+G3G4.matched.pData$G3G4_HR <- relevel(as.factor(G3G4.matched.pData$G3G4_HR), ref = "G3G4_LR")
+# G3G4.matched.pData$q13loss ### default is "no q13 loss" as reference
+
 
 ### univariate logistic regression associations
 

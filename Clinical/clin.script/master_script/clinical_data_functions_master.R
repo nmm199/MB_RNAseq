@@ -745,11 +745,12 @@ clinPathAssess <- function(test.pData,
      # log.file = NULL
   
   ### will need to run clinical_data_master generate gp.filt.mb.vsd which is required for goi.vsd below. Can generate in clinical_data_master.R first, or below
+  
   ### input required
       ### 1. a goi line
-      ### 2. goi.vsd line 717 in this file that links to gp.filt.mb.vsd
-      ### 3. names(goi.vsd) line 723 
-  ### if then interrogate functions, will need to generate matched.test.pData
+      ### 2. goi.vsd line 763 in this file that links to gp.filt.mb.vsd (filtered file, give same results as filt.mb.vsd)
+      ### 3. names(goi.vsd) line 764
+  ### if then interrogate functions and generate individual high quality graphics, will need to generate matched.test.pData
   ### unhash ** when running individual goi
   
   # goi <- "ENSG00000124588" ### NQO2 ** or equivalent goi of interest
@@ -757,13 +758,11 @@ clinPathAssess <- function(test.pData,
 
   
   ### unhash here for goi.vsd
-  # goi.vsd <- as.numeric(gp.filt.mb.vsd[goi,]) ### ** 9/1/18 hashed when running the clinical_data_master.R; unhashed if running individual goi
-                                          
-  ###  12/6/18 use filtered file( gp.filt.mb.vsd gives same results as filt.mb.vsd)
   ### the output would be a vector with a continuous variable, names equal NMB numbers
   
+  # goi.vsd <- as.numeric(gp.filt.mb.vsd[goi,]) ### ** 9/1/18 hashed when running the clinical_data_master.R; unhashed if running individual goi
   # names(goi.vsd) <- names(gp.filt.mb.vsd) ### ** added 16/1/18, unhash ** when running individual goi
-
+  
   # test.pData = test.pData ###**
   # pdf.file = NULL  ###**
   # log.file = NULL  ###**
@@ -783,7 +782,7 @@ clinPathAssess <- function(test.pData,
   #############################################
   
   ### matching the expression data (goi data) with the initially compiled clinical data with important variables
-  ### will need to exclude duplicates (two RNA samples separately listed, defined as "NMBnumberT") 16/1/18
+  ### Note this excludes duplicates (two RNA samples separately listed, defined as "NMBnumberT") 16/1/18
   
   ##### looking to combine dataset to plot expression data for alive vs dead patients
   # matchdata <- test.pData[names(goi.vsd),]

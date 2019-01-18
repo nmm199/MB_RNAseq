@@ -44,10 +44,14 @@ source(file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.script/master_script/KM_nu
 ### using function
 OS.km.overall.risk <- KM_risk_OS(matched.test.incl.pData$Followup, OS.cat.bin.incl, matched.goi.vsd.cat.incl )
 OS.km.G3G4.risk <- KM_risk_OS(time = matched.G3G4.incl.pData$Followup, event = OS.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl )
+OS.km.G4.risk <- KM_risk_OS(time = matched.G4.incl.pData$Followup, event = OS.G4.bin.incl, marker = matched.goi.vsd.cat.G4.incl)
+OS.km.SHH.risk <- KM_risk_OS(time = matched.SHH.incl.pData$Followup, event = OS.SHH.bin.incl, marker = matched.goi.vsd.cat.SHH.incl)
+OS.km.SHHold.risk <- KM_risk_OS(time = matched.SHH.old.incl.pData$Followup, event = OS.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl)
+
 PFS.km.overall.risk <- KM_risk_PFS(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl)
 PFS.km.G3G4.risk <- KM_risk_PFS(time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl) ### need to adjust d.p in function
 PFS.km.G4.risk <- KM_risk_PFS (time = matched.G4.incl.pData$PFS, event = relapse.G4.bin.incl, marker = matched.goi.vsd.cat.G4.incl)
-
+PFS.km.SHH.risk <- KM_risk_PFS(time = matched.SHH.incl.pData$PFS, event = relapse.SHH.bin.incl, marker = matched.goi.vsd.cat.SHH.incl)
 
 
 ###############################################################################################################################

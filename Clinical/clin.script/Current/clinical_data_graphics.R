@@ -13,7 +13,7 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 
 ### need results.master file to generate input file
 
- results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20181026.rds")
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20181219.rds")
 # results.master >- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this will be for running Z score ranking for GSEA (17/4/18)
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20181025.rds")
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
@@ -29,12 +29,12 @@ load("/home/nmm199/R/MB_RNAseq/Clinical/test.pData")
 #########################################################################################################################################
 ### set output files
 
-pdf ("/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/ENSG00000124588.stats.report.pdf") ### adjust to which data are being used
+pdf ("/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/filtered.transcripts.stats.report.pdf") ### adjust to which data are being used
 # par(mfrow = c(2,2)) ### will output all graphs in 2 x 2 format
 par (mfrow = c(1,1))
 
 ### set file for log output
-log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/pDatalog.report.data.txt"
+log.file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/pDatalog.report.data.txt"
 
 ### write out tables as required. 
 ### log.report.transpose
@@ -330,11 +330,11 @@ plotHist(multivar.cox.OS.lancetG3G4.cat.df[,2],  "Cox OS lancet G3G4 multivar ca
 plotHist(multivar.cox.OS.lancetG3G4.cont.df[,1],  "Cox OS lancet G3G4 multivar continuous", breaks = 100, xlab = "p-value", cutoff = 0.05)
 plotHist(multivar.cox.OS.lancetG3G4.cont.df[,2],  "Cox OS lancet G3G4 multivar continuous", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
-plotHist(multivar.cox.PFS.lancetG3G4.cat.df[,1],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(multivar.cox.PFS.lancetG3G4.cat.df[,2],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+plotHist(multivar.cox.PFS.lancetG3G4.cat.df[,1],  "Cox PFS lancet G3G4 multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
+plotHist(multivar.cox.PFS.lancetG3G4.cat.df[,2],  "Cox PFS lancet G3G4 multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
-plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,1],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
-plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,2],  "Cox OS lancet G3G4 multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
+plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,1],  "Cox PFS lancet G3G4 multivar categorical", breaks = 100, xlab = "p-value", cutoff = 0.05)
+plotHist(multivar.cox.PFS.lancetG3G4.cont.df[,2],  "Cox PFS lancet G3G4 multivar categorical", breaks = 100, xlab = "adjusted p-value", cutoff = 0.05)
 
 #########################################################################################################################################
 
@@ -421,8 +421,7 @@ chi.report.table <- as.data.frame(cbind(chi.report.mstatus, chi.report.MYC, chi.
 
 print(chi.report.table)
 
-write.csv(chi.report.table, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/chireport.gp.filt.mb.vsd.20180417.csv") 
-
+write.csv(chi.report.table, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/chi.report.gp.filt.mb.vsd.20181107.csv") ### error 7/11/18
 ### aim to run a function ( run lapply within the function and return (list)), and return object is then written out as a dataframe
 
 
@@ -436,7 +435,7 @@ log.report.transpose <- t(log.report.table) ### transpose #
 print(log.report.transpose)
 
 
-write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/April_13_2018/Complete_transcripts_filtered/logreport.gp.filt.mb.vsd.20180413.csv")
+write.csv(log.report.transpose, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/logreport.gp.filt.mb.vsd.20181107.csv")
 
 #########################################################################################################################################
 
