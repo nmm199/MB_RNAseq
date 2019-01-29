@@ -379,23 +379,6 @@ cox.result.surv <- function (time, event, marker, strata = NULL, data)
 ### not including isochromosome 17q and how can this data be derived from matched.test.incl.pData$q17   (levels Gain, Neutral, Loss)
 
 
-# cox.multivar.surv.PNET5_6 <- function (time, event, marker, FacA, FacB, FacC, FacD, FacE, FacF, strata = NULL, data) {
-# if(is.null(strata)){
-#  cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE +FacF, data=data)
-# }else {
-#   cox.temp <- coxph(Surv(time, event)~marker + FacA +FacB +FacC +FacD +FacE + FacF, data=data)
-#  }
-# cox.p.val <- summary(cox.temp)$coefficients[1,5] ### updated 21/11/17. 
-#  cox.HR <- summary(cox.temp)$coefficients[1,2] ### updated 21/11/17. 
-#  cox.lower.95CI <- summary(cox.temp)$conf.int[1,3] ### multivariate, access 1st row results
-#  cox.upper.95CI <- summary(cox.temp)$conf.int[1,4]
-#  cox.Zscore <- summary(cox.temp)$coefficients[1,4] ### added this in to access Z score
-#  cox.n <-summary(cox.temp)$n
-#  cox.nevent <-summary(cox.temp)$nevent
-#  summary.cox <- list(cox.pval = cox.p.val,cox.HR = cox.HR, cox.lower.95CI = cox.lower.95CI, cox.upper.95CI =cox.upper.95CI, cox.Zscore = cox.Zscore, n = cox.n, n.event = cox.nevent)
-#  return (summary.cox)
-# }
-
 
 cox.multivar.surv.PNET5_4 <- function (time, event, marker, FacA, FacB, FacC, FacD, strata = NULL, data) {
   if(is.null(strata)){
@@ -1304,25 +1287,23 @@ clinPathAssess <- function(test.pData,
   # summary.cox
   
   ############################
-  ### re-analysis 31/10/18 using factors that are significant in the RNA cohort in univariate regression for combined PNET5 and Lancet: mstatus, LCA, MYCMYCN, meth7, q13loss
+  ### re-analysis 29/1/19 using factors that are significant in the RNA cohort (Approach 2 commenced 29/10/18 and refined 29/1/19, removal of q13loss)
+  ### using factors that are significant in n=217 RNA cohort, in univariate regression for combined PNET5 and Lancet: mstatus, LCA, MYCMYCN, meth7
+  ### now 4 factors therefore going to use the cox multivariable regression for 4 factors which is termed "cox.multivar.surv.PNET5_4", however NOT specific to PNET5
+  ### made changes to lines 1295, 1296 on 29/1/19
   
-  # try(multivar.cox.PFS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
-  # try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat,  FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.PFS.combined.cat <- cox.multivar.surv.PNET5_4(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.PFS.combined.contin <- cox.multivar.surv.PNET5_4(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, data = matched.test.incl.pData), silent =T)
   
-  try(multivar.cox.PFS.combined.cat <- cox.multivar.surv_5(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, FacE= matched.test.incl.pData$q13loss,  data = matched.test.incl.pData), silent =T)
-  try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, FacE= matched.test.incl.pData$q13loss,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.PFS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat, FacE= matched.test.incl.pData$q13loss,  data = matched.test.incl.pData), silent =T)
   
   ### reanalysis 31/10/18 after determined that in overall group, mstatus, LCA, MYCMYCN (vs non MYC/non MYC amplified), WNT vs non WNT in PNET5 schema is significant in univariate log regression
   
   try(multivar.cox.PFS.PNET5.cat <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$WNT_PNET5, data = matched.test.incl.pData), silent =T) ### updated here
   try(multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$WNT_PNET5, data = matched.test.incl.pData), silent =T)
   
-  
   ### cox multivariate with established risk factors per PNET5 only ### analysis prior to 31/10/18
   ### LCA, mstatus,  MYCMYCN.cat, resection, meth (after D/W Dan, reinterpretation of the paper), TP53.cat (added 5/10/17)
-  
-  # try(multivar.cox.PFS.PNET5.cat <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.cat.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection,  FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
-  # try(multivar.cox.PFS.PNET5.contin <- cox.multivar.surv.PNET5_6 (time = matched.test.incl.pData$PFS, event = relapse.bin.incl, marker = matched.goi.vsd.incl, FacA = matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC = matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE = matched.test.incl.pData$meth, FacF = matched.test.incl.pData$TP53.cat, data = matched.test.incl.pData), silent =T)
   
   ### PNET5 RF in G3G4 subgroup (updated 31/10/18 to include factors significant in univariate regression : mstatus, LCA, MYC)
   
@@ -1335,12 +1316,9 @@ clinPathAssess <- function(test.pData,
   try(multivar.cox.PFS.SHH.old.cat <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat,  data = matched.SHH.old.incl.pData ), silent =T)
   try(multivar.cox.PFS.SHH.old.contin <- cox.multivar.surv_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$LCA, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
   
-  ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe), analysis prior to 31/10/18
-  # try(multivar.cox.PFS.SHH.old.cat <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.cat.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat,  data = matched.SHH.old.incl.pData ), silent =T)
-  # try(multivar.cox.PFS.SHH.old.contin <- cox.multivar.surv.Schwalbe_3(time = matched.SHH.old.incl.pData$PFS, event = relapse.SHH.old.bin.incl, marker = matched.goi.vsd.SHH.old.incl, FacA = matched.SHH.old.incl.pData$MYCN.cat, FacB = matched.SHH.old.incl.pData$mstatus, FacC = matched.SHH.old.incl.pData$TP53.cat, data = matched.SHH.old.incl.pData ), silent =T)
-  
-  
-  ### Group 3 and 4 combined: Group 3/4 HR, MYC amplification, q13 loss - analysis unchanged 31/10/18
+  ### subgroup specific for SHH_Child (which is SHH_Old in our dataframe), analysis prior to 31/10/18 used MYCN.cat, mstatus, TP53.cat
+ 
+  ### Group 3 and 4 combined (Schwalbe): Group 3/4 HR, MYC amplification, q13 loss - analysis unchanged 31/10/18
   ### high risk methylation group (ie HR Group 3 and HR Group 4 combined) in matched.G3G4.incl.pData$G3G4.high.incl for categorical and continuous variable
   
   try(multivar.cox.PFS.Lancet.G3G4.cat <- cox.multivar.surv_3 (time = matched.G3G4.incl.pData$PFS, event = relapse.G3G4.bin.incl, marker = matched.goi.vsd.cat.G3G4.incl, FacA = matched.G3G4.incl.pData$MYC.cat, FacB = matched.G3G4.incl.pData$G3G4.high.incl, FacC = matched.G3G4.incl.pData$q13loss,  data = matched.G3G4.incl.pData), silent =T)
@@ -1383,12 +1361,14 @@ clinPathAssess <- function(test.pData,
   
   ### multivariate cox regression for OS, based on categories combined (PNET + Schwalbe all risk factors, PNET5 alone, Schwalbe (lancet) subgroups)
   
-  # try(multivar.cox.OS.combined.cat <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
-  # try(multivar.cox.OS.combined.contin <- cox.multivar.surv_7(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$resection, FacE= matched.test.incl.pData$q13loss, FacF= matched.test.incl.pData$TP53.cat, FacG= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  ### overall cohort: 31/10/18 - mstatus, LCA, MYCMYCN, meth7, q13loss now replaced by 29/1/19 analysis
+  ### 29/1/19: mstatus, LCA< MYCMYCN, meth7 only
   
-  ### overall cohort: 31/10/18 - mstatus, LCA, MYCMYCN, meth7, q13loss
-  try(multivar.cox.OS.combined.cat <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD =  matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
-  try(multivar.cox.OS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.OS.combined.cat <- cox.multivar.surv.PNET5_4 (time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  try(multivar.cox.OS.combined.contin <- cox.multivar.surv.PNET5_4(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  
+  # try(multivar.cox.OS.combined.cat <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.cat.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD =  matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
+  # try(multivar.cox.OS.combined.contin <- cox.multivar.surv_5(time = matched.test.incl.pData$Followup, event = OS.cat.bin.incl, marker = matched.goi.vsd.incl, FacA= matched.test.incl.pData$LCA, FacB = matched.test.incl.pData$MYCMYCN.cat, FacC= matched.test.incl.pData$mstatus, FacD = matched.test.incl.pData$q13loss, FacE= matched.test.incl.pData$meth7.cat,  data = matched.test.incl.pData), silent =T)
   
   
   ### cox multivariate with established risk factors per PNET5 that are significant in univariate analysis in the RNA cohort (n=217): LCA, MYCMYCN, mstatus, WNT vs non WNT

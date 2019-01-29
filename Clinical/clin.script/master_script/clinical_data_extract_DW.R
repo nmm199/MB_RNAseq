@@ -7,9 +7,9 @@
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds")   ### samples filtered only
 
- results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20181219.rds") ### samples and genes filtered
+#  results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20190129.rds") ### samples and genes filtered
 
-# results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20181031.rds")
+ results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20190129.rds")
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 
@@ -118,16 +118,16 @@ annot.cox.PFS.cont.SHH.df <- ranked.file (cox.PFS.cont.SHH.df)
 annot.cox.PFS.cat.SHH.old.df <- ranked.file (cox.PFS.cat.SHH.old.df)
 annot.cox.PFS.cont.SHH.old.df <- ranked.file (cox.PFS.cont.SHH.old.df)
 
-write.csv(annot.cox.PFS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.all.csv")
-write.csv (annot.cox.PFS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.all.csv") 
-write.csv (annot.cox.PFS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.G3G4.csv" )
-write.csv (annot.cox.PFS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.G3G4.csv" )
-write.csv (annot.cox.PFS.cat.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.G4.csv" )
-write.csv (annot.cox.PFS.cont.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.G4.csv" )
-write.csv (annot.cox.PFS.cat.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.SHH.csv" )
-write.csv (annot.cox.PFS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.SHH.csv" )
-write.csv (annot.cox.PFS.cat.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.SHH.old.csv" )
-write.csv (annot.cox.PFS.cont.SHH.old.df , file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.SHH.old.csv" )
+#write.csv(annot.cox.PFS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.all.csv")
+#write.csv (annot.cox.PFS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.all.csv") 
+#write.csv (annot.cox.PFS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.G3G4.csv" )
+#write.csv (annot.cox.PFS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.G3G4.csv" )
+#write.csv (annot.cox.PFS.cat.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.G4.csv" )
+#write.csv (annot.cox.PFS.cont.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.G4.csv" )
+#write.csv (annot.cox.PFS.cat.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.SHH.csv" )
+#write.csv (annot.cox.PFS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.SHH.csv" )
+#write.csv (annot.cox.PFS.cat.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cat.SHH.old.csv" )
+#write.csv (annot.cox.PFS.cont.SHH.old.df , file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.PFS.cont.SHH.old.csv" )
 
 ##########################################################################################################################
 sig.cox.PFS.cat.all <- cox.PFS.cat.all.df [which(cox.PFS.cat.all.df[, 2]<0.05),]  ### nrow = 81 for complete transcripts
@@ -188,30 +188,30 @@ annot.sig.cox.PFS.cont.SHH.old <- cbind (annot.cox.PFS.cont.SHH.old, sig.cox.PFS
 try(annot.cox.PFS.cat.SHH.old <- annotate.HTseq.IDs(rownames(sig.cox.PFS.cat.SHH.old)), silent = T)
 annot.sig.cox.PFS.cat.SHH.old <- cbind(annot.cox.PFS.cat.SHH.old, sig.cox.PFS.cat.SHH.old)
 
-### save annotated files
+### save annotated files ### have hashed this all 29/1/19
  
 ### unhash SHH cat and SHH contin if useful
 # clean.annot.sig.cox.PFS.cont.all <- annot.sig.cox.PFS.cont.all[complete.cases(annot.sig.cox.PFS.cont.all),] ### complete.cases removes NAs
 
-try(write.csv(annot.sig.cox.PFS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.all.csv"), silent = T)
+#try(write.csv(annot.sig.cox.PFS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.all.csv"), silent = T)
 ### note that this file above contains both the significant results and the annotated gene name
 
-write.csv(annot.sig.cox.PFS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.all.csv")
+# try(write.csv(annot.sig.cox.PFS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.all.csv"))
 
-write.csv(annot.sig.cox.PFS.cont.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.G3G4.csv")
-write.csv(annot.sig.cox.PFS.cat.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.G3G4.csv")
+#try(write.csv(annot.sig.cox.PFS.cont.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.G3G4.csv"))
+#try(write.csv(annot.sig.cox.PFS.cat.G3G4, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.G3G4.csv"))
 
 
 # write.csv(annot.sig.cox.PFS.cont.SHH, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/significant.cox.PFS.cont.SHH.csv")
 # write.csv (annot.sig.cox.PFS.cat.SHH, file = ""/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/significant.cox.PFS.cat.SHH.csv")
 
-try(write.csv (annot.sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.SHH.old.csv"), silent = T)
-try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.SHH.old.csv"), silent = T)
+#try(write.csv (annot.sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cont.SHH.old.csv"), silent = T)
+#try(write.csv(annot.sig.cox.PFS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.PFS.cat.SHH.old.csv"), silent = T)
 
 ### for files where annotate did not work or not feasible
 
-write.csv(sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHHold.csv")
-write.csv(sig.cox.PFS.cont.SHH, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHH.csv") 
+# write.csv(sig.cox.PFS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHHold.csv")
+# write.csv(sig.cox.PFS.cont.SHH, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.PFS.cont.SHH.csv") 
 
 ########################################################################################
 ########################################################################################
@@ -239,59 +239,60 @@ cox.OS.cat.SHH.old.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.ol
 cox.OS.cont.SHH.old.df <- extract.cox (results.master, "surv.cox.result.OS.SHH.old.contin")
 
 ##################
-### generate complete datasets for ranking in GSEA or IPA
+### generate complete datasets for ranking in GSEA or IPA ### hashed out 29/1/19 as takes time
 ### easiest if generated annotated dataframes for export with gene names if known transcripts
 
-annot.cox.OS.cat.all.df <- ranked.file (cox.OS.cat.all.df)
-annot.cox.OS.cont.all.df <- ranked.file (cox.OS.cont.all.df)
-annot.cox.OS.cat.G3G4.df <- ranked.file (cox.OS.cat.G3G4.df)
-annot.cox.OS.cont.G3G4.df <- ranked.file (cox.OS.cont.G3G4.df)
-annot.cox.OS.cat.G4.df <- ranked.file (cox.OS.cat.G4.df) ### 25/10/18
-annot.cox.OS.cont.G4.df <- ranked.file (cox.OS.cont.G4.df) ### 25/10/18
-annot.cox.OS.cat.SHH.df <- ranked.file (cox.OS.cat.SHH.df)
-annot.cox.OS.cont.SHH.df <- ranked.file (cox.OS.cont.SHH.df)
-annot.cox.OS.cat.SHH.old.df <- ranked.file (cox.OS.cat.SHH.old.df)
-annot.cox.OS.cont.SHH.old.df <- ranked.file (cox.OS.cont.SHH.old.df)
+# annot.cox.OS.cat.all.df <- ranked.file (cox.OS.cat.all.df)
+# annot.cox.OS.cont.all.df <- ranked.file (cox.OS.cont.all.df)
+# annot.cox.OS.cat.G3G4.df <- ranked.file (cox.OS.cat.G3G4.df)
+# annot.cox.OS.cont.G3G4.df <- ranked.file (cox.OS.cont.G3G4.df)
+# annot.cox.OS.cat.G4.df <- ranked.file (cox.OS.cat.G4.df) ### 25/10/18
+# annot.cox.OS.cont.G4.df <- ranked.file (cox.OS.cont.G4.df) ### 25/10/18
+# annot.cox.OS.cat.SHH.df <- ranked.file (cox.OS.cat.SHH.df)
+# annot.cox.OS.cont.SHH.df <- ranked.file (cox.OS.cont.SHH.df)
+# annot.cox.OS.cat.SHH.old.df <- ranked.file (cox.OS.cat.SHH.old.df)
+# annot.cox.OS.cont.SHH.old.df <- ranked.file (cox.OS.cont.SHH.old.df)
 
-write.csv(annot.cox.OS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.all.csv")
-write.csv (annot.cox.OS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.all.csv") 
-write.csv (annot.cox.OS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.G3G4.csv" )
-write.csv (annot.cox.OS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.G3G4.csv" )
-write.csv (annot.cox.OS.cat.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.G4.csv" )
-write.csv (annot.cox.OS.cont.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.G4.csv" )
-write.csv (annot.cox.OS.cat.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.SHH.csv" )
-write.csv (annot.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.SHH.csv" )
-write.csv (annot.cox.OS.cat.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.SHH.old.csv" )
-write.csv (annot.cox.OS.cont.SHH.old.df , file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.SHH.old.csv" )
+
+#write.csv(annot.cox.OS.cat.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.all.csv")
+#write.csv (annot.cox.OS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.all.csv") 
+#write.csv (annot.cox.OS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.G3G4.csv" )
+#write.csv (annot.cox.OS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.G3G4.csv" )
+#write.csv (annot.cox.OS.cat.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.G4.csv" )
+#write.csv (annot.cox.OS.cont.G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.G4.csv" )
+#write.csv (annot.cox.OS.cat.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.SHH.csv" )
+#write.csv (annot.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.SHH.csv" )
+#write.csv (annot.cox.OS.cat.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cat.SHH.old.csv" )
+#write.csv (annot.cox.OS.cont.SHH.old.df , file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.cox.OS.cont.SHH.old.csv" )
 
 ### significant dataframes & annotation
 
 sig.cox.OS.cat.all <- cox.OS.cat.all.df[which(cox.OS.cat.all.df[, 2]<0.05),]
 try(annot.sig.cox.OS.cat.all <- annotate.HTseq.IDs(rownames(sig.cox.OS.cat.all)), silent = T)
-write.csv(sig.cox.OS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.all.csv")
+#write.csv(sig.cox.OS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.all.csv")
 
 ###
 
 sig.cox.OS.cont.all <- cox.OS.cont.all.df[which(cox.OS.cont.all.df[, 2]<0.05),]
 try(annot.sig.cox.OS.cont.all <- annotate.HTseq.IDs(rownames(sig.cox.OS.cont.all)), silent = T)
-write.csv(sig.cox.OS.cont.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.all.csv")
-write.csv(annot.sig.cox.OS.cont.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.all.csv" )
+#write.csv(sig.cox.OS.cont.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.all.csv")
+#write.csv(annot.sig.cox.OS.cont.all, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.all.csv" )
 annot.sig.cox.OS.cont.all.df <- cbind(sig.cox.OS.cont.all, annot.sig.cox.OS.cont.all)
-write.csv (annot.sig.cox.OS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.all.complete.csv" )
+#write.csv (annot.sig.cox.OS.cont.all.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.all.complete.csv" )
 ###
 
 sig.cox.OS.cat.G3G4 <- cox.OS.cat.G3G4.df[which(cox.OS.cat.G3G4.df[, 2]<0.05),]  ### no results
 try(annot.sig.cox.OS.cat.G3G4 <- annotate.HTseq.IDs(rownames(sig.cox.OS.cat.G3G4)), silent = T)
-write.csv(sig.cox.OS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.G3G4.csv")
+#write.csv(sig.cox.OS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.G3G4.csv")
 annot.sig.cox.OS.cat.G3G4.df <- cbind (sig.cox.OS.cat.G3G4, annot.sig.cox.OS.cat.G3G4)
-write.csv(annot.sig.cox.OS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cat.G3G4.complete.csv")
+#write.csv(annot.sig.cox.OS.cat.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cat.G3G4.complete.csv")
 ###
 
 sig.cox.OS.cont.G3G4 <- cox.OS.cont.G3G4.df[which(cox.OS.cont.G3G4.df[, 2]<0.05),]
 try(annot.sig.cox.OS.cont.G3G4 <- annotate.HTseq.IDs(rownames(sig.cox.OS.cont.G3G4)), silent = T)
 annot.sig.cox.OS.cont.G3G4.df <- cbind (sig.cox.OS.cont.G3G4, annot.sig.cox.OS.cont.G3G4)
-write.csv(sig.cox.OS.cont.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.G3G4.csv")
-write.csv(annot.sig.cox.OS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.G3G4.csv")
+#write.csv(sig.cox.OS.cont.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.G3G4.csv")
+#write.csv(annot.sig.cox.OS.cont.G3G4.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.G3G4.csv")
 
 ###
 
@@ -299,17 +300,17 @@ sig.cox.OS.cat.SHH <- cox.OS.cat.SHH.df[which(cox.OS.cat.SHH.df[, 2]<0.05),]
 
 sig.cox.OS.cont.SHH.df <- cox.OS.cont.SHH.df[which(cox.OS.cont.SHH.df[, 2]<0.05), ]
 
-write.csv(sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHH.csv")
+#write.csv(sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHH.csv")
 try(annot.sig.cox.OS.cont.SHH.df <- annotate.HTseq.IDs(rownames(sig.cox.OS.cont.SHH.df)),silent = T) ### this worked after reran annotate.HTseq.IDs function within clinical_data_functions_master.R
-try(write.csv(annot.sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.SHH.csv"), silent = TRUE)
+#try(write.csv(annot.sig.cox.OS.cont.SHH.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.SHH.csv"), silent = TRUE)
 
 sig.cox.OS.cat.SHH.old <- cox.OS.cat.SHH.old.df[which(cox.OS.cat.SHH.old.df[, 2]<0.05),]
-try(write.csv(sig.cox.OS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.SHHold.csv"), silent = T)
+#try(write.csv(sig.cox.OS.cat.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cat.SHHold.csv"), silent = T)
 
 sig.cox.OS.cont.SHH.old.df <- cox.OS.cont.SHH.old.df [which(cox.OS.cont.SHH.old.df[,2]<0.05),]
-try(write.csv(sig.cox.OS.cont.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHHold.csv"), silent = T)
+#try(write.csv(sig.cox.OS.cont.SHH.old.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.OS.cont.SHHold.csv"), silent = T)
 try(annot.sig.cox.OS.cont.SHH.old <- annotate.HTseq.IDs(rownames(sig.cox.OS.cont.SHH.old.df)), silent = T)
-try(write.csv(annot.sig.cox.OS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.SHHold.csv"), silent = T)
+#try(write.csv(annot.sig.cox.OS.cont.SHH.old, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.cox.OS.cont.SHHold.csv"), silent = T)
 ########################################################################
 
 ### Cox EFS for all - these are all categorical expression data
@@ -325,9 +326,9 @@ sig.cox.EFS.cat.all <- cox.EFS.cat.all.df[which(cox.EFS.cat.all.df[, 2]<0.05),]
 sig.cox.EFS.cat.G3G4 <- cox.EFS.cat.G3G4.df[which(cox.EFS.cat.G3G4.df[,2]<0.05), ]
 
 
-try(write.csv(sig.cox.EFS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.EFS.all.csv"), silent =T)
+#try(write.csv(sig.cox.EFS.cat.all,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.EFS.all.csv"), silent =T)
 
-try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.EFS.G3G4.csv"), silent = T)
+#try(write.csv(sig.cox.EFS.cat.G3G4,  file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/sig.cox.EFS.G3G4.csv"), silent = T)
 
 #################################################################################################
 #################################################################################################
@@ -558,21 +559,21 @@ annot.multivar.cox.PFS.SHHold.cont.bind <- cbind(annot.multivar.cox.PFS.SHHold.c
 ### write out csv to interrogate Z scores for specific targets
 ### OS files
 
-write.csv (annot.multivar.cox.OS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.cat.bind.csv")
+#write.csv (annot.multivar.cox.OS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.cat.bind.csv")
 
-write.csv(annot.multivar.cox.OS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.lancetG3G4.ocnt.bind.csv")
+#write.csv(annot.multivar.cox.OS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.OS.lancetG3G4.ocnt.bind.csv")
 
 ### PFS files
 
-write.csv(annot.multivar.cox.PFS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cat.bind.csv")
+#write.csv(annot.multivar.cox.PFS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cat.bind.csv")
 
-write.csv (annot.multivar.cox.PFS.combined.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cont.bind.csv")
+#write.csv (annot.multivar.cox.PFS.combined.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.combined.cont.bind.csv")
 
-write.csv(annot.multivar.cox.PFS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.lancetG3G4.cont.bind.csv")
+#write.csv(annot.multivar.cox.PFS.lancetG3G4.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.lancetG3G4.cont.bind.csv")
 
-write.csv (annot.multivar.cox.PFS.PNET5.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.PNET5.cont.bind.csv")
+#write.csv (annot.multivar.cox.PFS.PNET5.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.PNET5.cont.bind.csv")
 
-write.csv (annot.multivar.cox.PFS.SHHold.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.SHHold.cont.bind.csv")
+#write.csv (annot.multivar.cox.PFS.SHHold.cont.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multivar.cox.PFS.SHHold.cont.bind.csv")
 
 
 # write.table(annot.multivar.cox.PFS.combined.cat.bind, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.multi.cox.PFS.combined.cat.bind.txt", sep = "\t",
@@ -580,37 +581,28 @@ write.csv (annot.multivar.cox.PFS.SHHold.cont.bind, file = "/home/nmm199/R/MB_RN
 
 
 
-### files to annotate, prioritise G3G4
-
-multivar.cox.PFS.PNET5.G3G4.cat.df 
-
-multivar.cox.PFS.PNET5.G3G4.cont.df 
-
-multivar.cox.PFS.lancetG3G4.cat.df 
-
-
-multivar.cox.PFS.PNET5.cat.df 
-
- 
-
-multivar.cox.PFS.SHHold.cat.df 
-
-multivar.cox.PFS.SHHold.cont.df 
-
 ### write csv
 
 
+#write.csv (multivar.cox.PFS.combined.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.combined.cont.csv")
 
+#write.csv (multivar.cox.PFS.combined.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.combined.cat.csv")
 
+#write.csv (multivar.cox.PFS.lancetG3G4.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.lancetG3G4.cat.csv")
 
+#write.csv (multivar.cox.PFS.lancetG3G4.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.lancetG3G4.cont.csv")
 
-write.csv (multivar.cox.PFS.combined.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.combined.cont.csv")
+#write.csv (multivar.cox.PFS.PNET5.G3G4.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts/filtered/multivar.cox.PFS.PNET5.G3G4.cat.csv")
 
-write.csv (multivar.cox.PFS.combined.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.combined.cat.csv")
+#write.csv (multivar.cox.PFS.PNET5.G3G4.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts/filtered/multivar.cox.PFS.PNET5.G3G4.cont.csv")
 
-write.csv (multivar.cox.PFS.lancetG3G4.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.lancetG3G4.cat.csv")
+#write.csv(multivar.cox.PFS.PNET5.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.PNET5.cat.csv")
 
-write.csv (multivar.cox.PFS.lancetG3G4.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.lancetG3G4.cont.csv")
+#write.csv(multivar.cox.PFS.PNET5.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.PNET5.cont.csv")
+
+#write.csv (multivar.cox.PFS.SHHold.cat.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.SHHold.cat.csv")
+
+#write.csv (multivar.cox.PFS.SHHold.cont.df, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/multivar.cox.PFS.SHHold.cont.csv")
 
 
 ### generating significant dataframes for the multivariate cox modelling, ie transcripts that perform about and beyond current clinical risk models
@@ -667,24 +659,26 @@ significant.multivar.cox.PFS.SHHold.cont <- multivar.cox.PFS.SHHold.cont.df[whic
 
 # write.csv(significant.multivar.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.OS.combined.cat.csv")
 
-try(write.csv(significant.multivar.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multi.cox.OS.lancetG3G4.cont.csv"), silent = T)
+try(write.csv(significant.multivar.cox.OS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.sig.multi.cox.OS.lancetG3G4.cont.csv"), silent = T)
 
-write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv")
+#write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv")
 
-try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cat.csv"  ), silent = T)
+#try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cat.csv"  ), silent = T)
 
-try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv"  ), silent = T)
+#try(write.csv(significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.lancetG3G4.cont.csv"  ), silent = T)
 
 
-write.csv(significant.multivar.cox.PFS.combined.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.combined.cont.csv")
+write.csv(significant.multivar.cox.PFS.combined.cont, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.sig.multivar.cox.PFS.combined.cont.csv")
 
-write.csv(significant.multivar.cox.PFS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.combined.cat.csv")
+#write.csv(significant.multivar.cox.PFS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.combined.cat.csv")
 
-write.csv(significant.multivar.cox.PFS.PNET.G3G4.cont,file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.PNET.G3G4.cont.csv")
+#write.csv(significant.multivar.cox.PFS.PNET.G3G4.cont,file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.PNET.G3G4.cont.csv")
 
-write.csv (significant.multivar.cox.OS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.OS.lancetG3G4.cont.csv"  )  
+# write.csv (significant.multivar.cox.PFS.lancetG3G4.cont, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.OS.lancetG3G4.cont.csv"  )  
 
-write.csv(significant.multivar.cox.PFS.PNET5.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.PNET5.cat.csv")
+write.csv (significant.multivar.cox.PFS.lancetG3G4.cat, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.sig.multivar.cox.PFS.lancetG3G4.cat.csv")  
+
+#write.csv(significant.multivar.cox.PFS.PNET5.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/results.sig.multivar.cox.PFS.PNET5.cat.csv")
 
 
 
@@ -712,9 +706,9 @@ annot.sig.multivar.cox.PFS.SHHold.cat <- annotate.HTseq.IDs(rownames(significant
 ### write csv
 
 
-write.csv (annot.sig.multi.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multi.cox.OS.combined.cat.csv") 
+#write.csv (annot.sig.multi.cox.OS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multi.cox.OS.combined.cat.csv") 
 
-write.csv (annot.sig.multivar.cox.PFS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multi.cox.PFS.combined.cat.csv") 
+#write.csv (annot.sig.multivar.cox.PFS.combined.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multi.cox.PFS.combined.cat.csv") 
 
 # write.csv(annot.sig.multivar.cox.PFS.SHHold.cat, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/Oct_25_2018/Complete_transcripts_filtered/annot.sig.multivar.cox.PFS.SHHold.cat.csv")
 

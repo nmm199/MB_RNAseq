@@ -283,7 +283,8 @@ log.reg.SHH.TP53 <- logreg.assoc (x = SHH.old.matched.pData$OS.cat, y = SHH.old.
 ##########################################################################################################################
 ##########################################################################################################################
 
-### New dataframes for survival analyses to see effect of clinical variables in survival cohort 22/1/19
+### New dataframes for survival analyses to see effect of clinical variables in survival cohort 22/1/19 n=145. 
+### THIS WAS NOT USED FOR THE FINAL ANALYSIS
 
 ### restrict analysis to age 3-16 yo, treated with curative intent including CSI
 
