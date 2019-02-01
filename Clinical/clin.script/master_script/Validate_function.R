@@ -74,7 +74,11 @@ matched.goi$LCA <- ifelse (matched.goi$histology == "LCA", 1, 0)
 # table (matched.goi$MYCMYCN) ### confirms that the new variable is correct as MYC or MYCN amplified ### n=69 either MYC or MYCN amplified
 matched.goi$mstatus <- matched.goi$Met.status_.1.Met._0.M0.
 
-cox.overall.goi <- coxph(Surv(matched.goi$OS, matched.goi$Dead)~matched.goi$goi + matched.goi$LCA + matched.goi$mstatus + matched.goi$q13loss + matched.goi$meth7 + matched.goi$MYCMYCN, data = data)
+# cox.overall.goi <- coxph(Surv(matched.goi$OS, matched.goi$Dead)~matched.goi$goi + matched.goi$LCA + matched.goi$mstatus + matched.goi$q13loss + matched.goi$meth7 + matched.goi$MYCMYCN, data = data)
+
+### updated 31/1/19 to remove q13loss in the overall cohort validation (as no longer part of algorithm for combined PNET5/lancet)
+
+cox.overall.goi <- coxph(Surv(matched.goi$OS, matched.goi$Dead)~matched.goi$goi + matched.goi$LCA + matched.goi$mstatus + matched.goi$meth7 + matched.goi$MYCMYCN, data = data)
 
 ###### updated 13/12/18:
 cox.pval.goi <- summary(cox.overall.goi)[[7]][1,5] ### this accesses the p value

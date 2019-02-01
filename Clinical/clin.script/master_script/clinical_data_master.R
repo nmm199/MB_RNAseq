@@ -240,12 +240,12 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 ### unhash when running the filtered transcript set that removes sample duplicates AND pre-filters based on expression features of the transcripts
 ### USE THIS SCRIPT FOR MAIN ANALYSIS 25/10/18
 
- results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
+# results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd))%dopar%{
  ### results.master <- foreach(i = 1:100)%dopar%{
- as.numeric(gp.filt.mb.vsd[i,]) -> x
- names(x) <- colnames(gp.filt.mb.vsd)
- return(clinPathAssess(test.pData,x)) 
- }
+# as.numeric(gp.filt.mb.vsd[i,]) -> x
+# names(x) <- colnames(gp.filt.mb.vsd)
+# return(clinPathAssess(test.pData,x)) 
+# }
 
 
 # results.master <- foreach(i = 1:10)%dopar%{
@@ -259,12 +259,12 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 ### unhash when running the novel transcript analysis
 ### interchange gp.filt.mb.vsd.novel with filt.mb.vsd.novel
 
-#  results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd.novel))%dopar%{
+ results.master <- foreach(i = 1:nrow(gp.filt.mb.vsd.novel))%dopar%{
   ### results.master <- foreach(i = 1:5)%dopar%{
-#  as.numeric(gp.filt.mb.vsd.novel[i,]) -> x
-#  names(x) <- colnames(gp.filt.mb.vsd.novel)
-#   return(clinPathAssess(test.pData,x)) 
-#  }
+ as.numeric(gp.filt.mb.vsd.novel[i,]) -> x
+  names(x) <- colnames(gp.filt.mb.vsd.novel)
+   return(clinPathAssess(test.pData,x)) 
+  }
 
 ### unhash when running the novel transcript set
 
@@ -320,14 +320,11 @@ rownames(gp.filt.mb.vsd.random) <- rownames(gp.filt.mb.vsd)
 ### gene and sample filtered (gp.filt.mb.vsd)
 
 # names (results.master) <- row.names (filt.mb.vsd)
-names (results.master)<- row.names(gp.filt.mb.vsd) 
-# names (results.master)<- row.names(gp.filt.mb.vsd.novel) ### interchange (gp.)filt.mb.vsd.novel
+# names (results.master)<- row.names(gp.filt.mb.vsd) 
+ names (results.master)<- row.names(gp.filt.mb.vsd.novel) ### interchange (gp.)filt.mb.vsd.novel
 # names (results.master) <- row.names(gp.filt.mb.vsd.random) ### interchange (gp.)filt.mb.vsd.random
 
 ### superceded
-# names(results.master) <- row.names(mb.vsd)
-# names (results.master) <- row.names(mb.vsd.random)
-# names(results.master) <- row.names(mb.vsd.novel)
 # names(results.master) <- row.names(mb.vsd)[1:10]
 
 toc()
@@ -344,8 +341,8 @@ toc()
 # saveRDS (results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.master.allgenes.novel.20180104.rds")
 
 # saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds") ### this is the filtered file for samples, contains > 60000 transcripts (filt.mb.vsd)
- saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181219.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
-# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20181031.rds") ### interchange with complete.novel and genefilter.novel
+# saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20190129.rds") ### this is the filtered file for both samples and genes, ~9000 transcripts (gp.filt.mb.vsd)
+ saveRDS(results.master, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20190129.rds") ### interchange with complete.novel and genefilter.novel
 # saveRDS (results.master, file =  "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds") ### randomised file, interchange with genefilter.random
 
 ### to examine results, reload relevant results master file and see clinical_data_extract_DW.R script file
@@ -359,19 +356,20 @@ toc()
 # annot.results <- annotate.HTseq.IDs(row.names(mb.vsd))
 # annot.novel <- annotate.HTseq.IDs(row.names(mb.vsd.novel)) ### not useful unless known transcript
 
- annot.filt.results <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd)) ### interchange filt.mb.vsd and  gp.filt.mb.vsd
+# annot.filt.results <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd)) ### interchange filt.mb.vsd and  gp.filt.mb.vsd
 # annot.filt.novel <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd.novel)) ### interchange filt.mb.vsd.novel and gp.filt.mb.vsd.novel
 # annot.filt.random <- annotate.HTseq.IDs(row.names(gp.filt.mb.vsd.random))
 
 # write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.annot.filt.complete.20180220.csv") ### filt.mb.vsd this is the filtered file for samples only, > 60000 transcripts
- write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181031.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts 
+# write.csv(annot.filt.results, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.20181031.csv" ) ### this is the filtered file for both samples and genes, ~9000 transcripts 
 
 # write.csv(annot.filt.random, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180227.csv") ### interchange genefilter.random and complete.random
 # write.csv(annot.filt.novel, file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.novel.20181026.csv") ### interchange genefilter.novel and complete.novel
 
 ###############################################################################
 ###############################################################################
-
+###############################################################################
+ 
 ### script for mb.vsd dataset for Janet
  
 guiltByAssociation <-function(data, associated.gene, cores = 10){
@@ -413,45 +411,6 @@ tail(guilt.res.MYC[order(guilt.res.MYC[,1]),],20) ### get the last 20 associated
 
 
 ######################################################################################################################################################################
-### there are some additional options for filtering, added 19/12/18
-### rowvsd function
-n <- 6000
-sd.genes <- apply(filt.mb.vsd, 1, sd)
-most.variable <- names(head(sd.genes[order(sd.genes, decreasing = T)], n)) 
-filt.vsd.matrix <- filt.mb.vsd[most.variable, ]
-
-### define goi
-
-# goi <- "ENSG00000165304" ### MELK
-# goi <- "ENSG00000124588"   ### NQO2
-# goi <- "ENSG00000128626" ### MRPS12
-# goi <- "ENSG00000103150" ### MLYCD  
-# goi <- "ENSG00000067836" ### ROGDI
-# goi <- "ENSG00000149554" ### CHEK1
-# goi <- "ENSG00000135446" ### CDK4
-# goi <- "ENSG00000168772" ### CXXC4
-
-# goi.vsd <- as.numeric(filt.vsd.matrix[goi,])  ### unhash to interrogate goi.vsd 19/12/18 line 169-170
-# names(goi.vsd) <- names(filt.vsd.matrix)
-# goi.vsd
-
-library(genefilter)
-
-cvfun <- cv(a=2, b=Inf, na.rm=TRUE)
-cvfun(vsd.matrix) -> index.cv
-vsd.matrix[index.cv,] -> filt.vsd.matrix
-
-pOverAfun <- pOverA(p=0.05, A=100, na.rm=TRUE)
-pOverAfun(vsd.matrix) -> index.pOverA
-vsd.matrix[index.pOverA&index.cv,] -> filt.vsd.matrix
-
-### or 
-
-vsd.matrix[index.pOverA & index.cv,] -> filt.vsd.matrix
-
-#### remove genes not independently prognostic???
-coxfilter()
-
 ######################################################################################################################################################################
 
 

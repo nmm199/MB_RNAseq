@@ -16,7 +16,7 @@ registerDoParallel(cores = 10)
 ### gtf files used for the data
 novel.gtf <- import("/home/dan/novel.mb.merged.gtf", form = "gtf")
 
-### find required novel transcripts to confirm chromosomal locatoin
+### find required novel transcripts to confirm chromosomal location
 ### XLOC_050167 for PFS (categorical and continuous expression)in G3G4 and OS (continuous) in G3G4
 ### XLOC_003973 for PFS (categorical) in G3G4
 ### XLOC_056325 for PFS (continuous) in G3G4

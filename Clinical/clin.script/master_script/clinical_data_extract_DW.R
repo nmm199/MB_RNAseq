@@ -7,9 +7,9 @@
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.complete.20180220.rds")   ### samples filtered only
 
-#  results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20190129.rds") ### samples and genes filtered
+results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Complete_transcripts/results.filt.genefilter.20190129.rds") ### samples and genes filtered
 
- results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20190129.rds")
+#  results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/Novel_transcripts/results.filt.genefilter.novel.20190129.rds")
 
 # results.master <- readRDS (file = "/home/nmm199/R/MB_RNAseq/Clinical/clin.results/master/results.filt.genefilter.random.20180327.rds")
 
